@@ -32,9 +32,14 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/dist-server ./dist-server
 
-# Create non-root user
+# Copy entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+
+# Create non-root user and set permissions
 RUN addgroup -g 1001 -S funkpilot && \
-    adduser -S funkpilot -u 1001 -G funkpilot
+    adduser -S funkpilot -u 1001 -G funkpilot && \
+    chmod +x /app/docker-entrypoint.sh && \
+    chown -R funkpilot:funkpilot /app
 USER funkpilot
 
 # Environment variables
@@ -47,4 +52,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
 
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["node", "dist-server/index.js"]

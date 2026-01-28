@@ -6,6 +6,8 @@ import LogAnalysis from './components/LogAnalysis';
 import Propagation from './components/Propagation';
 import SettingsPanel from './components/Settings';
 import { LegalModal } from './components/LegalModal';
+import { ParentSiteLogo } from './components/ParentSiteLogo';
+import { useConfig } from './hooks/useConfig';
 import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
 import type { TabId, UserSettings, SolarData } from './types';
@@ -24,6 +26,7 @@ function App() {
   const [solarData, setSolarData] = useState<SolarData | null>(null);
   const [isLoadingSolar, setIsLoadingSolar] = useState(true);
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
+  const { config } = useConfig();
 
   // Load settings on mount
   useEffect(() => {
@@ -85,17 +88,23 @@ function App() {
       <header className="bg-slate-800 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 18.5V22M8 22h8M6 10c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round"/>
-                  <path d="M4 10c0-4.4 3.6-8 8-8s8 3.6 8 8" strokeLinecap="round" opacity="0.6"/>
-                  <rect x="9" y="10" width="6" height="8" rx="1"/>
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">FunkPilot</h1>
-                <p className="text-xs text-slate-400">KI-Assistent für Funkamateure</p>
+            <div className="flex items-center gap-4">
+              {/* Parent Site Logo */}
+              <ParentSiteLogo />
+
+              {/* App Branding */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 18.5V22M8 22h8M6 10c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round"/>
+                    <path d="M4 10c0-4.4 3.6-8 8-8s8 3.6 8 8" strokeLinecap="round" opacity="0.6"/>
+                    <rect x="9" y="10" width="6" height="8" rx="1"/>
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">FunkPilot</h1>
+                  <p className="text-xs text-slate-400">KI-Assistent für Funkamateure</p>
+                </div>
               </div>
             </div>
 
@@ -165,6 +174,19 @@ function App() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-500">
             <span>FunkPilot v1.0 - 73 de OE8YML</span>
+            {config.parentSiteUrl && config.parentSiteName && (
+              <>
+                <span className="hidden sm:inline">|</span>
+                <a
+                  href={config.parentSiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:underline"
+                >
+                  Teil von {config.parentSiteName} Tools
+                </a>
+              </>
+            )}
             <span className="hidden sm:inline">|</span>
             <button
               onClick={() => setLegalModal('imprint')}

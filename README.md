@@ -191,6 +191,39 @@ funkpilot/
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Parent-Site Branding
+
+FunkPilot kann als Teil einer größeren Website mit eigenem Branding eingebettet werden.
+
+### Über Docker Umgebungsvariablen
+
+```bash
+docker run -d \
+  -p 3001:3001 \
+  -e PARENT_SITE_URL=https://example.com \
+  -e PARENT_SITE_LOGO=https://example.com/logo.png \
+  -e PARENT_SITE_NAME="Example Site" \
+  funkpilot
+```
+
+### Über config.json
+
+Alternativ kann `public/config.json` direkt editiert werden:
+
+```json
+{
+  "parentSiteUrl": "https://example.com",
+  "parentSiteLogo": "https://example.com/logo.png",
+  "parentSiteName": "Example Site"
+}
+```
+
+| Variable | Beschreibung |
+|----------|-------------|
+| `PARENT_SITE_URL` | URL der übergeordneten Website |
+| `PARENT_SITE_LOGO` | Logo-URL der übergeordneten Website |
+| `PARENT_SITE_NAME` | Name der übergeordneten Website |
+
 ## Sicherheit
 
 - API-Keys werden nur serverseitig gespeichert
