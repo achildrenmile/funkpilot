@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;

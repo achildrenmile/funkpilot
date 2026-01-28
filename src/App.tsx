@@ -5,6 +5,7 @@ import QSOChat from './components/QSOChat';
 import LogAnalysis from './components/LogAnalysis';
 import Propagation from './components/Propagation';
 import SettingsPanel from './components/Settings';
+import { LegalModal } from './components/LegalModal';
 import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
 import type { TabId, UserSettings, SolarData } from './types';
@@ -22,6 +23,7 @@ function App() {
   const [settings, setSettings] = useState<UserSettings>(getUserSettings());
   const [solarData, setSolarData] = useState<SolarData | null>(null);
   const [isLoadingSolar, setIsLoadingSolar] = useState(true);
+  const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
 
   // Load settings on mount
   useEffect(() => {
@@ -78,7 +80,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
       {/* Header */}
       <header className="bg-slate-800 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -154,19 +156,46 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
         {renderContent()}
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-800/30 border-t border-slate-700 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>FunkPilot v1.0 - Open Source</span>
-            <span>73 de OE8YML</span>
+      <footer className="py-4 border-t border-slate-700 bg-slate-800/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-500">
+            <span>FunkPilot v1.0 - 73 de OE8YML</span>
+            <span className="hidden sm:inline">|</span>
+            <button
+              onClick={() => setLegalModal('imprint')}
+              className="text-sky-400 hover:underline"
+            >
+              Impressum
+            </button>
+            <span className="hidden sm:inline">|</span>
+            <button
+              onClick={() => setLegalModal('privacy')}
+              className="text-sky-400 hover:underline"
+            >
+              Datenschutz
+            </button>
+            <span className="hidden sm:inline">|</span>
+            <a
+              href="https://github.com/achildrenmile/funkpilot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-400 hover:underline"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </footer>
+
+      {/* Legal Modals */}
+      {legalModal && (
+        <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />
+      )}
     </div>
   );
 }
