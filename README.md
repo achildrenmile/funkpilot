@@ -21,6 +21,12 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
 - Technik, Betriebsverfahren, Vorschriften
 - Propagation-Beratung mit aktuellen Solar-Daten
+- **Chat-Verlauf** mit mehreren Konversationen:
+  - Sidebar mit allen Chats (Desktop: permanent, Mobile: Drawer)
+  - Automatische Titel-Generierung aus erster Nachricht
+  - Zwischen Konversationen wechseln
+  - Chats löschen
+  - Lokale Speicherung (max. 50 Chats, 50 Nachrichten/Chat)
 - **Ham Radio Tools** (mit Groq MCP):
   - Bandplan-Abfragen
   - Wellenlängen-Berechnung
