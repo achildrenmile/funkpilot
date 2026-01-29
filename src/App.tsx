@@ -111,32 +111,32 @@ function App() {
     <div className="h-screen bg-slate-900 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="flex-shrink-0 bg-slate-800 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
               {/* Parent Site Logo */}
               <ParentSiteLogo />
 
               {/* App Branding */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 18.5V22M8 22h8M6 10c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round"/>
                     <path d="M4 10c0-4.4 3.6-8 8-8s8 3.6 8 8" strokeLinecap="round" opacity="0.6"/>
                     <rect x="9" y="10" width="6" height="8" rx="1"/>
                   </svg>
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold text-white">FunkPilot</h1>
-                  <p className="text-xs text-slate-400">KI-Assistent für Funkamateure</p>
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold text-white truncate">FunkPilot</h1>
+                  <p className="text-xs text-slate-400 hidden sm:block">KI-Assistent für Funkamateure</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
               {/* AI Badge - EU AI Act Art. 50 compliance */}
               <div
-                className="hidden sm:flex items-center gap-1.5 bg-amber-600/20 text-amber-400 px-2.5 py-1 rounded-md text-xs cursor-pointer hover:bg-amber-600/30 transition-colors"
+                className="hidden md:flex items-center gap-1.5 bg-amber-600/20 text-amber-400 px-2.5 py-1 rounded-md text-xs cursor-pointer hover:bg-amber-600/30 transition-colors"
                 onClick={() => setLegalModal('privacy')}
                 title="Dieses System verwendet Künstliche Intelligenz"
               >
@@ -146,15 +146,15 @@ function App() {
                 <span>KI-System</span>
               </div>
 
-              {/* Solar Conditions Badge */}
+              {/* Solar Conditions Badge - Compact on mobile */}
               {solarData && (
-                <div className="hidden sm:flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg text-sm">
-                  <span className="text-slate-400">SFI:</span>
+                <div className="flex items-center gap-1 sm:gap-2 bg-slate-700/50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm">
+                  <span className="text-slate-400 hidden sm:inline">SFI:</span>
                   <span className={solarData.sfi > 120 ? 'text-green-400' : solarData.sfi > 80 ? 'text-yellow-400' : 'text-red-400'}>
                     {solarData.sfi}
                   </span>
                   <span className="text-slate-600">|</span>
-                  <span className="text-slate-400">K:</span>
+                  <span className="text-slate-400 hidden sm:inline">K:</span>
                   <span className={solarData.kIndex <= 2 ? 'text-green-400' : solarData.kIndex <= 4 ? 'text-yellow-400' : 'text-red-400'}>
                     {solarData.kIndex}
                   </span>
@@ -163,7 +163,7 @@ function App() {
 
               {/* User Callsign */}
               {settings.callsign && (
-                <div className="bg-sky-600/20 text-sky-400 px-3 py-1.5 rounded-lg font-mono text-sm">
+                <div className="bg-sky-600/20 text-sky-400 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-mono text-xs sm:text-sm">
                   {settings.callsign}
                 </div>
               )}
@@ -174,8 +174,8 @@ function App() {
 
       {/* Tab Navigation */}
       <nav className="flex-shrink-0 bg-slate-800/50 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4">
+          <div className="flex justify-between sm:justify-start sm:gap-1 overflow-x-auto scrollbar-hide">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -184,15 +184,16 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                    flex items-center gap-2 px-4 py-3 text-sm font-medium
-                    transition-colors whitespace-nowrap
+                    flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium
+                    transition-colors whitespace-nowrap flex-1 sm:flex-none
                     ${isActive
                       ? 'text-sky-400 border-b-2 border-sky-400 bg-slate-700/30'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/20'
                     }
                   `}
+                  title={tab.name}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">{tab.name}</span>
                 </button>
               );
@@ -203,16 +204,17 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 w-full">
           {renderContent()}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 py-4 border-t border-slate-700 bg-slate-800/50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-500">
-            <span>FunkPilot v1.0 - 73 de OE8YML</span>
+      <footer className="flex-shrink-0 py-2 sm:py-4 border-t border-slate-700 bg-slate-800/50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:text-sm text-slate-500">
+            <span className="hidden sm:inline">FunkPilot v1.0 - 73 de OE8YML</span>
+            <span className="sm:hidden">73 de OE8YML</span>
             {config.parentSiteUrl && config.parentSiteName && (
               <>
                 <span className="hidden sm:inline">|</span>
@@ -222,40 +224,32 @@ function App() {
                   rel="noopener noreferrer"
                   className="text-sky-400 hover:underline"
                 >
-                  Teil von {config.parentSiteName} Tools
+                  {config.parentSiteName}
                 </a>
               </>
             )}
-            <span className="hidden sm:inline">|</span>
+            <span>|</span>
             <button
               onClick={() => setLegalModal('imprint')}
               className="text-sky-400 hover:underline"
             >
               Impressum
             </button>
-            <span className="hidden sm:inline">|</span>
+            <span>|</span>
             <button
               onClick={() => setLegalModal('privacy')}
               className="text-sky-400 hover:underline"
             >
-              Datenschutz & KI-Hinweis
+              <span className="hidden sm:inline">Datenschutz & KI</span>
+              <span className="sm:hidden">Datenschutz</span>
             </button>
-            <span className="hidden sm:inline">|</span>
-            <a
-              href="https://github.com/oe8yml/funkpilot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sky-400 hover:underline"
-            >
-              GitHub
-            </a>
-            <span className="hidden sm:inline">|</span>
+            <span>|</span>
             <button
               onClick={() => setShowHelp(true)}
               className="text-sky-400 hover:underline flex items-center gap-1"
             >
-              <HelpCircle className="w-4 h-4" />
-              Hilfe
+              <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Hilfe</span>
             </button>
           </div>
         </div>

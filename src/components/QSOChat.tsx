@@ -126,13 +126,14 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)] min-h-[500px]">
+    <div className="flex flex-col h-[calc(100vh-200px)] sm:h-[calc(100vh-220px)] min-h-[400px] sm:min-h-[500px]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-2xl font-bold">QSO-Assistent</h2>
-          <p className="text-slate-400 text-sm">
-            Frag mich zu Amateurfunk, Propagation, Technik und mehr
+      <div className="flex items-start sm:items-center justify-between gap-2 mb-3 sm:mb-4">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold">QSO-Assistent</h2>
+          <p className="text-slate-400 text-xs sm:text-sm">
+            <span className="hidden sm:inline">Frag mich zu Amateurfunk, Propagation, Technik und mehr</span>
+            <span className="sm:hidden">Amateurfunk-Fragen</span>
           </p>
         </div>
         <div className="flex items-center gap-2">

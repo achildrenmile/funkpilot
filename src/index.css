@@ -102,6 +102,27 @@ body {
   background: #64748b;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile touch improvements */
+@media (max-width: 640px) {
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent zoom on input focus in iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% {

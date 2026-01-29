@@ -144,15 +144,15 @@ ${analysis}
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-sky-400" />
+        <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400" />
           Log-Analyse
         </h2>
-        <p className="text-slate-400 mt-1">
-          Lade ein ADIF-Log hoch und erhalte KI-generierte Analyse und Verbesserungsvorschläge
+        <p className="text-slate-400 mt-1 text-sm sm:text-base">
+          ADIF-Log hochladen für KI-Analyse
         </p>
       </div>
 
@@ -166,17 +166,18 @@ ${analysis}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           className={`
-            border-2 border-dashed rounded-xl p-12 text-center transition-colors
+            border-2 border-dashed rounded-xl p-6 sm:p-12 text-center transition-colors
             ${isDragging
               ? 'border-sky-500 bg-sky-500/10'
               : 'border-slate-600 hover:border-slate-500'
             }
           `}
         >
-          <Upload className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-sky-400' : 'text-slate-500'}`} />
-          <p className="text-lg font-medium mb-2">ADIF-Datei hochladen</p>
-          <p className="text-slate-400 text-sm mb-4">
-            Ziehe eine .adi oder .adif Datei hierher oder klicke zum Auswählen
+          <Upload className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 ${isDragging ? 'text-sky-400' : 'text-slate-500'}`} />
+          <p className="text-base sm:text-lg font-medium mb-2">ADIF-Datei hochladen</p>
+          <p className="text-slate-400 text-xs sm:text-sm mb-4">
+            <span className="hidden sm:inline">Ziehe eine .adi oder .adif Datei hierher oder klicke zum Auswählen</span>
+            <span className="sm:hidden">.adi oder .adif Datei wählen</span>
           </p>
           <label className="inline-block">
             <input
@@ -185,7 +186,7 @@ ${analysis}
               onChange={handleFileSelect}
               className="hidden"
             />
-            <span className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg cursor-pointer transition-colors">
+            <span className="bg-sky-600 hover:bg-sky-700 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer transition-colors text-sm sm:text-base">
               Datei auswählen
             </span>
           </label>
@@ -204,23 +205,23 @@ ${analysis}
 
       {/* Stats Display */}
       {stats && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* File Info */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FileText className="w-8 h-8 text-sky-400" />
-              <div>
-                <p className="font-medium">{fileName}</p>
-                <p className="text-sm text-slate-400">
-                  {stats.totalQsos} QSOs | {stats.uniqueCallsigns} unique | {stats.countries.length} Länder
+          <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-sky-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="font-medium text-sm sm:text-base truncate">{fileName}</p>
+                <p className="text-xs sm:text-sm text-slate-400">
+                  {stats.totalQsos} QSOs | {stats.uniqueCallsigns} unique | {stats.countries.length} DXCC
                 </p>
               </div>
             </div>
             <button
               onClick={resetAnalysis}
-              className="text-slate-400 hover:text-white text-sm"
+              className="text-slate-400 hover:text-white text-xs sm:text-sm self-end sm:self-auto"
             >
-              Andere Datei laden
+              Andere Datei
             </button>
           </div>
 
@@ -240,22 +241,22 @@ ${analysis}
           </div>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <p className="text-slate-400 text-sm">Gesamt QSOs</p>
-              <p className="text-2xl font-bold text-sky-400">{stats.totalQsos}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+            <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+              <p className="text-slate-400 text-xs sm:text-sm">QSOs</p>
+              <p className="text-xl sm:text-2xl font-bold text-sky-400">{stats.totalQsos}</p>
             </div>
-            <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <p className="text-slate-400 text-sm">Unique Calls</p>
-              <p className="text-2xl font-bold text-green-400">{stats.uniqueCallsigns}</p>
+            <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+              <p className="text-slate-400 text-xs sm:text-sm">Unique</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-400">{stats.uniqueCallsigns}</p>
             </div>
-            <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <p className="text-slate-400 text-sm">Operating Time</p>
-              <p className="text-2xl font-bold text-amber-400">{(stats.operatingTime / 60).toFixed(1)}h</p>
+            <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+              <p className="text-slate-400 text-xs sm:text-sm">Zeit</p>
+              <p className="text-xl sm:text-2xl font-bold text-amber-400">{(stats.operatingTime / 60).toFixed(1)}h</p>
             </div>
-            <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <p className="text-slate-400 text-sm">Ø Rate</p>
-              <p className="text-2xl font-bold text-purple-400">
+            <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+              <p className="text-slate-400 text-xs sm:text-sm">Rate</p>
+              <p className="text-xl sm:text-2xl font-bold text-purple-400">
                 {stats.operatingTime > 0 ? (stats.totalQsos / (stats.operatingTime / 60)).toFixed(1) : 0}/h
               </p>
             </div>

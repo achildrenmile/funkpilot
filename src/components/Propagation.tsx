@@ -126,33 +126,33 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Globe className="w-6 h-6 text-sky-400" />
-            Propagation-Berater
+      <div className="flex items-start sm:items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400 flex-shrink-0" />
+            <span className="truncate">Propagation</span>
           </h2>
-          <p className="text-slate-400 mt-1">
-            Echtzeit Sonnen-Daten und KI-Empfehlungen für DX-Verbindungen
+          <p className="text-slate-400 mt-1 text-sm sm:text-base">
+            Solar-Daten und KI-Empfehlungen für DX
           </p>
         </div>
         <button
           onClick={refreshSolarData}
           disabled={isRefreshing}
-          className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-50"
+          className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
         >
           <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {/* Solar Conditions */}
-      <div className={`rounded-xl p-6 border ${quality ? getQualityBg(quality.hf) : 'bg-slate-800 border-slate-700'}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Aktuelle Bedingungen</h3>
+      <div className={`rounded-xl p-4 sm:p-6 border ${quality ? getQualityBg(quality.hf) : 'bg-slate-800 border-slate-700'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
+          <h3 className="text-base sm:text-lg font-semibold">Aktuelle Bedingungen</h3>
           {solarData && (
-            <span className="text-sm text-slate-400">
+            <span className="text-xs sm:text-sm text-slate-400">
               Stand: {solarData.updatedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })} UTC
             </span>
           )}
@@ -163,42 +163,42 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             <Loader2 className="w-8 h-8 animate-spin text-sky-400" />
           </div>
         ) : solarData ? (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
             <div className="text-center">
-              <p className="text-slate-400 text-sm mb-1">Solar Flux</p>
-              <p className={`text-2xl font-bold ${solarData.sfi > 120 ? 'text-green-400' : solarData.sfi > 80 ? 'text-yellow-400' : 'text-red-400'}`}>
+              <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">SFI</p>
+              <p className={`text-xl sm:text-2xl font-bold ${solarData.sfi > 120 ? 'text-green-400' : solarData.sfi > 80 ? 'text-yellow-400' : 'text-red-400'}`}>
                 {solarData.sfi}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 hidden sm:block">
                 {solarData.sfi > 150 ? 'Sehr gut' : solarData.sfi > 120 ? 'Gut' : solarData.sfi > 80 ? 'Moderat' : 'Niedrig'}
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm mb-1">K-Index</p>
-              <p className={`text-2xl font-bold ${solarData.kIndex <= 2 ? 'text-green-400' : solarData.kIndex <= 4 ? 'text-yellow-400' : 'text-red-400'}`}>
+              <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">K</p>
+              <p className={`text-xl sm:text-2xl font-bold ${solarData.kIndex <= 2 ? 'text-green-400' : solarData.kIndex <= 4 ? 'text-yellow-400' : 'text-red-400'}`}>
                 {solarData.kIndex}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 hidden sm:block">
                 {solarData.kIndex <= 2 ? 'Ruhig' : solarData.kIndex <= 4 ? 'Unruhig' : 'Gestört'}
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm mb-1">A-Index</p>
-              <p className={`text-2xl font-bold ${solarData.aIndex <= 10 ? 'text-green-400' : solarData.aIndex <= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
+              <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">A</p>
+              <p className={`text-xl sm:text-2xl font-bold ${solarData.aIndex <= 10 ? 'text-green-400' : solarData.aIndex <= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
                 {solarData.aIndex}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 hidden sm:block">
                 {solarData.aIndex <= 10 ? 'Normal' : solarData.aIndex <= 20 ? 'Erhöht' : 'Hoch'}
               </p>
             </div>
-            <div className="text-center">
-              <p className="text-slate-400 text-sm mb-1">Sonnenflecken</p>
-              <p className="text-2xl font-bold text-slate-200">{solarData.sunspots}</p>
-              <p className="text-xs text-slate-500">SSN</p>
+            <div className="text-center hidden sm:block">
+              <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">SSN</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-200">{solarData.sunspots}</p>
+              <p className="text-xs text-slate-500">Flecken</p>
             </div>
-            <div className="text-center">
-              <p className="text-slate-400 text-sm mb-1">X-Ray</p>
-              <p className="text-2xl font-bold text-slate-200">{solarData.xrayFlux}</p>
+            <div className="text-center hidden sm:block">
+              <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">X-Ray</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-200">{solarData.xrayFlux}</p>
               <p className="text-xs text-slate-500">
                 {solarData.xrayFlux.startsWith('A') || solarData.xrayFlux.startsWith('B') ? 'Niedrig' : 'Erhöht'}
               </p>
@@ -237,17 +237,17 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       </div>
 
       {/* Target Selection */}
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-        <h3 className="text-lg font-semibold mb-4">Ziel auswählen</h3>
+      <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Ziel auswählen</h3>
 
         {/* Popular Targets */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 mb-4">
           {PROPAGATION_TARGETS.slice(0, 8).map(target => (
             <button
               key={target.id}
               onClick={() => getAdvice(target.id)}
               disabled={isLoadingAdvice || !solarData || apiAvailable === false}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 ${
                 selectedTarget === target.id
                   ? 'bg-sky-600 text-white'
                   : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
@@ -264,16 +264,17 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             type="text"
             value={customLocator}
             onChange={(e) => setCustomLocator(e.target.value.toUpperCase())}
-            placeholder="Locator eingeben (z.B. PM95)"
+            placeholder="Locator (z.B. PM95)"
             maxLength={6}
-            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 font-mono uppercase"
+            className="flex-1 min-w-0 bg-slate-700 border border-slate-600 rounded-lg px-3 sm:px-4 py-2 font-mono uppercase text-sm sm:text-base"
           />
           <button
             onClick={getCustomAdvice}
             disabled={!customLocator || customLocator.length < 4 || isLoadingAdvice || !solarData || apiAvailable === false}
-            className="bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap"
           >
-            Analysieren
+            <span className="hidden sm:inline">Analysieren</span>
+            <span className="sm:hidden">Go</span>
           </button>
         </div>
 
@@ -514,26 +515,27 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
         };
 
         return (
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">
-                  Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})
+          <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold">
+                  <span className="hidden sm:inline">Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})</span>
+                  <span className="sm:hidden">Band-Status</span>
                 </h3>
                 <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
-                  <MapPin className="w-3 h-3" />
-                  QTH: {userLocator}
-                  {coords && <span className="text-slate-500">({coords.lat.toFixed(1)}°N, {coords.lng.toFixed(1)}°E)</span>}
+                  <MapPin className="w-3 h-3 flex-shrink-0" />
+                  <span className="truncate">QTH: {userLocator}</span>
+                  {coords && <span className="text-slate-500 hidden md:inline">({coords.lat.toFixed(1)}°N, {coords.lng.toFixed(1)}°E)</span>}
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span className="px-2 py-1 bg-slate-700 rounded">
-                  {utcHour.toString().padStart(2, '0')}:{utcMin.toString().padStart(2, '0')} UTC
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-400 flex-shrink-0">
+                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-slate-700 rounded">
+                  {utcHour.toString().padStart(2, '0')}:{utcMin.toString().padStart(2, '0')} <span className="hidden sm:inline">UTC</span>
                 </span>
-                <span className="px-2 py-1 bg-slate-700 rounded">
+                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-slate-700 rounded hidden sm:inline">
                   {localTimeStr}
                 </span>
-                <span className={`px-2 py-1 rounded ${isDay ? 'bg-yellow-500/20 text-yellow-400' : isTwilight ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded ${isDay ? 'bg-yellow-500/20 text-yellow-400' : isTwilight ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
                   {solarStatus}
                 </span>
               </div>

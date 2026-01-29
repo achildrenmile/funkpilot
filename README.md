@@ -41,9 +41,10 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 - Band-Status für alle Bänder (6m - 160m)
 - KI-Empfehlungen für DX-Verbindungen
 
-### 🎨 Themes
+### 🎨 Themes & Design
 - **Dunkel-Modus** (Standard) - Augenfreundlich für lange Betriebssessions
 - **Hell-Modus** - Bessere Lesbarkeit bei Tageslicht
+- **Responsive Design** - Optimiert für Desktop, Tablet und Mobile
 - Einstellung wird lokal gespeichert
 
 ### ❓ Hilfe
