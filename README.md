@@ -27,6 +27,10 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
   - Zwischen Konversationen wechseln
   - Chats löschen
   - Lokale Speicherung (max. 50 Chats, 50 Nachrichten/Chat)
+- **QRZ.com Integration**:
+  - Automatische Rufzeichen-Abfrage bei Erwähnung im Chat
+  - Name, QTH, Grid-Locator, Lizenzklasse
+  - Benötigt QRZ XML Subscription
 - **Ham Radio Tools** (mit Groq MCP):
   - Bandplan-Abfragen
   - Wellenlängen-Berechnung
@@ -108,6 +112,15 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 ```bash
 OPENROUTER_API_KEY=sk-or-...
+```
+
+### Optional: QRZ.com (Rufzeichen-Lookup)
+- Automatische Abfrage von Rufzeichen-Informationen
+- Zeigt Name, QTH, Grid, Lizenzklasse
+- Benötigt QRZ XML Subscription (~$35/Jahr): [qrz.com/page/xml_data.html](https://www.qrz.com/page/xml_data.html)
+
+```bash
+QRZ_API_KEY=XXXX-XXXX-XXXX-XXXX
 ```
 
 ### Provider-Priorität
