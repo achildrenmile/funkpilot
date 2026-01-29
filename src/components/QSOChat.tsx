@@ -148,9 +148,9 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 md:pl-4">
         {/* Header */}
-        <div className="mb-3 sm:mb-4 px-1">
+        <div className="mb-4 sm:mb-5 px-1">
           {/* Top row: Menu, Title, Actions */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1">
