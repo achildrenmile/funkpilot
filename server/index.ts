@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { tts, getVoices } from 'edge-tts';
+import { readFile, unlink } from 'fs/promises';
+import { EdgeTTS } from 'node-edge-tts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -284,24 +285,26 @@ app.get('/api/solar', async (_req, res) => {
   }
 });
 
-// Edge TTS - Get available voices
-app.get('/api/tts/voices', async (_req, res) => {
-  try {
-    const voices = await getVoices();
-    // Filter to German and English voices only
-    const filteredVoices = voices.filter(v =>
-      v.Locale.startsWith('de') || v.Locale.startsWith('en')
-    ).map(v => ({
-      id: v.ShortName,
-      name: v.FriendlyName,
-      locale: v.Locale,
-      gender: v.Gender,
-    }));
-    res.json(filteredVoices);
-  } catch (error) {
-    console.error('TTS voices error:', error);
-    res.status(500).json({ error: 'Failed to fetch voices' });
-  }
+// Edge TTS - Available voices (hardcoded list of popular voices)
+const EDGE_VOICES = [
+  // English voices - good for contests
+  { id: 'en-US-GuyNeural', name: 'Guy (US)', locale: 'en-US', gender: 'Male' },
+  { id: 'en-US-ChristopherNeural', name: 'Christopher (US)', locale: 'en-US', gender: 'Male' },
+  { id: 'en-US-EricNeural', name: 'Eric (US)', locale: 'en-US', gender: 'Male' },
+  { id: 'en-US-JennyNeural', name: 'Jenny (US)', locale: 'en-US', gender: 'Female' },
+  { id: 'en-US-AriaNeural', name: 'Aria (US)', locale: 'en-US', gender: 'Female' },
+  { id: 'en-GB-RyanNeural', name: 'Ryan (UK)', locale: 'en-GB', gender: 'Male' },
+  { id: 'en-GB-SoniaNeural', name: 'Sonia (UK)', locale: 'en-GB', gender: 'Female' },
+  // German voices
+  { id: 'de-AT-IngridNeural', name: 'Ingrid (AT)', locale: 'de-AT', gender: 'Female' },
+  { id: 'de-AT-JonasNeural', name: 'Jonas (AT)', locale: 'de-AT', gender: 'Male' },
+  { id: 'de-DE-ConradNeural', name: 'Conrad (DE)', locale: 'de-DE', gender: 'Male' },
+  { id: 'de-DE-KatjaNeural', name: 'Katja (DE)', locale: 'de-DE', gender: 'Female' },
+  { id: 'de-DE-KillianNeural', name: 'Killian (DE)', locale: 'de-DE', gender: 'Male' },
+];
+
+app.get('/api/tts/voices', (_req, res) => {
+  res.json(EDGE_VOICES);
 });
 
 // Edge TTS - Generate speech
@@ -313,26 +316,37 @@ app.post('/api/tts/speak', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Default to German Austrian voice if not specified
+    // Default to US male voice for contests
     const selectedVoice = voice || 'en-US-GuyNeural';
 
-    // Convert rate from multiplier (1.0) to percentage string ('+0%')
-    const rateStr = rate ? `${rate >= 1 ? '+' : ''}${Math.round((rate - 1) * 100)}%` : '+0%';
+    // Convert rate from multiplier (1.0) to percentage string
+    const rateStr = rate ? `${rate >= 1 ? '+' : ''}${Math.round((rate - 1) * 100)}%` : 'default';
 
-    // Convert pitch from multiplier to Hz offset
-    const pitchStr = pitch ? `${pitch >= 1 ? '+' : ''}${Math.round((pitch - 1) * 50)}Hz` : '+0Hz';
+    // Convert pitch from multiplier to percentage
+    const pitchStr = pitch ? `${pitch >= 1 ? '+' : ''}${Math.round((pitch - 1) * 50)}%` : 'default';
 
     // Volume percentage
-    const volumeStr = volume ? `${volume >= 1 ? '+' : ''}${Math.round((volume - 1) * 100)}%` : '+0%';
+    const volumeStr = volume ? `${volume >= 1 ? '+' : ''}${Math.round((volume - 1) * 100)}%` : 'default';
 
     console.log(`TTS: "${text.substring(0, 50)}..." voice=${selectedVoice} rate=${rateStr}`);
 
-    const audioBuffer = await tts(text, {
+    // Generate unique temp filename
+    const tempFile = `/tmp/tts-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+
+    const tts = new EdgeTTS({
       voice: selectedVoice,
       rate: rateStr,
       pitch: pitchStr,
       volume: volumeStr,
     });
+
+    await tts.ttsPromise(text, tempFile);
+
+    // Read the generated file
+    const audioBuffer = await readFile(tempFile);
+
+    // Clean up temp file
+    unlink(tempFile).catch(() => {});
 
     res.set({
       'Content-Type': 'audio/mpeg',
