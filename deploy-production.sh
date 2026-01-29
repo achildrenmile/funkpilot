@@ -17,13 +17,19 @@ else
 fi
 
 # Validate required variables
-REQUIRED_VARS="SYNOLOGY_HOST REMOTE_DIR CONTAINER_NAME IMAGE_NAME CONTAINER_PORT SITE_URL OPENROUTER_API_KEY"
+REQUIRED_VARS="SYNOLOGY_HOST REMOTE_DIR CONTAINER_NAME IMAGE_NAME CONTAINER_PORT SITE_URL"
 for var in $REQUIRED_VARS; do
     if [ -z "${!var}" ]; then
         echo -e "${RED}Error: $var is not set in .env.production${NC}"
         exit 1
     fi
 done
+
+# Check that at least one API key is set
+if [ -z "$GROQ_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$OPENROUTER_API_KEY" ]; then
+    echo -e "${RED}Error: At least one API key required (GROQ_API_KEY, ANTHROPIC_API_KEY, or OPENROUTER_API_KEY)${NC}"
+    exit 1
+fi
 
 # Docker command (Synology uses a specific path)
 DOCKER_CMD="${DOCKER_CMD:-/var/packages/Docker/target/usr/bin/docker}"
@@ -73,7 +79,9 @@ ssh "$SYNOLOGY_HOST" "
         -p '$CONTAINER_PORT' \
         -e NODE_ENV=production \
         -e PORT=3001 \
-        -e OPENROUTER_API_KEY='$OPENROUTER_API_KEY' \
+        -e GROQ_API_KEY='${GROQ_API_KEY:-}' \
+        -e ANTHROPIC_API_KEY='${ANTHROPIC_API_KEY:-}' \
+        -e OPENROUTER_API_KEY='${OPENROUTER_API_KEY:-}' \
         -e PARENT_SITE_NAME='$PARENT_SITE_NAME' \
         -e PARENT_SITE_URL='$PARENT_SITE_URL' \
         -e PARENT_SITE_LOGO='$PARENT_SITE_LOGO' \

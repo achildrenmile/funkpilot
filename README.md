@@ -50,10 +50,20 @@ Die App läuft unter http://localhost:3001
 
 ## API-Keys
 
-FunkPilot unterstützt zwei KI-Provider. Mindestens einer muss konfiguriert werden:
+FunkPilot unterstützt drei KI-Provider. Mindestens einer muss konfiguriert werden:
 
-### Option 1: Anthropic Claude (Empfohlen)
-- Beste Qualität für deutschsprachige Antworten
+### Option 1: Groq (Empfohlen - Kostenlos)
+- **Llama 3.1 8B ist komplett kostenlos** mit großzügigen Rate Limits
+- Sehr schnelle Antwortzeiten
+- Gute Qualität für deutschsprachige Antworten
+- Key erstellen: [console.groq.com/keys](https://console.groq.com/keys)
+
+```bash
+GROQ_API_KEY=gsk_...
+```
+
+### Option 2: Anthropic Claude (Beste Qualität)
+- Höchste Qualität für deutschsprachige Antworten
 - Kosten: ~$3/Million Tokens
 - Key erstellen: [console.anthropic.com](https://console.anthropic.com)
 
@@ -61,14 +71,21 @@ FunkPilot unterstützt zwei KI-Provider. Mindestens einer muss konfiguriert werd
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-### Option 2: OpenRouter (Kostenlose Modelle verfügbar)
-- Zugang zu vielen Modellen inkl. kostenlose
-- Llama 3.1 8B ist kostenlos nutzbar
+### Option 3: OpenRouter (Fallback)
+- Zugang zu vielen Modellen
+- Backup-Option falls andere Provider nicht verfügbar
 - Key erstellen: [openrouter.ai/keys](https://openrouter.ai/keys)
 
 ```bash
 OPENROUTER_API_KEY=sk-or-...
 ```
+
+### Provider-Priorität
+
+FunkPilot versucht die Provider in dieser Reihenfolge:
+1. **Groq** (kostenlos, schnell)
+2. **Anthropic** (beste Qualität)
+3. **OpenRouter** (Fallback)
 
 ## Entwicklung
 
@@ -97,7 +114,9 @@ npm run dev:server
 Erstelle eine `.env` Datei im Root-Verzeichnis:
 
 ```bash
-# Mindestens einen API-Key setzen
+# Mindestens einen API-Key setzen (Groq empfohlen)
+GROQ_API_KEY=gsk_...
+# oder
 ANTHROPIC_API_KEY=sk-ant-...
 # oder
 OPENROUTER_API_KEY=sk-or-...
@@ -134,10 +153,10 @@ docker compose down
 # Image bauen
 docker build -t funkpilot .
 
-# Container starten
+# Container starten (mit Groq - empfohlen)
 docker run -d \
   -p 3001:3001 \
-  -e ANTHROPIC_API_KEY=sk-ant-... \
+  -e GROQ_API_KEY=gsk_... \
   --name funkpilot \
   funkpilot
 ```
@@ -181,12 +200,12 @@ funkpilot/
 │  │  /api/solar    - Solar Daten Proxy                  │   │
 │  └─────────────────────────┬───────────────────────────┘   │
 │                            │                               │
-│           ┌────────────────┼────────────────┐             │
-│           ▼                ▼                ▼             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│  │ Anthropic   │  │ OpenRouter  │  │   HamQSL    │       │
-│  │ Claude API  │  │     API     │  │ Solar Data  │       │
-│  └─────────────┘  └─────────────┘  └─────────────┘       │
+│      ┌─────────────────────┼─────────────────────┐        │
+│      ▼           ▼         ▼         ▼           ▼        │
+│  ┌───────┐  ┌─────────┐  ┌──────────┐  ┌─────────────┐   │
+│  │ Groq  │  │Anthropic│  │OpenRouter│  │   HamQSL    │   │
+│  │ (rec) │  │ Claude  │  │(fallback)│  │ Solar Data  │   │
+│  └───────┘  └─────────┘  └──────────┘  └─────────────┘   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```

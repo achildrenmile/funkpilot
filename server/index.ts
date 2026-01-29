@@ -10,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // API Keys from environment
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 
@@ -30,77 +31,143 @@ app.use(express.static(join(__dirname, '../dist')));
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
+    groq: !!GROQ_API_KEY,
+    anthropic: !!ANTHROPIC_API_KEY,
+    openRouter: !!OPENROUTER_API_KEY,
+    // Legacy fields for backwards compatibility
     hasAnthropicKey: !!ANTHROPIC_API_KEY,
     hasOpenRouterKey: !!OPENROUTER_API_KEY,
   });
 });
 
+// Helper function to call Groq API
+async function callGroq(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024) {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 429) {
+      throw new Error('Rate Limit erreicht. Bitte warte einen Moment und versuche es erneut.');
+    }
+    throw new Error(`Groq API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// Helper function to call Anthropic API
+async function callAnthropic(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Anthropic API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0]?.text || '';
+}
+
+// Helper function to call OpenRouter API
+async function callOpenRouter(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://funkpilot.oeradio.at',
+    },
+    body: JSON.stringify({
+      model: 'liquid/lfm-2.5-1.2b-instruct:free',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// Generic AI call function with fallback chain: Groq -> Anthropic -> OpenRouter
+async function callAI(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024): Promise<string> {
+  // Try Groq first (free, fast)
+  if (GROQ_API_KEY) {
+    try {
+      console.log('AI: Using Groq');
+      return await callGroq(messages, systemPrompt, maxTokens);
+    } catch (error) {
+      console.error('Groq failed:', error);
+      // Fall through to next provider
+    }
+  }
+
+  // Try Anthropic second (paid, best quality)
+  if (ANTHROPIC_API_KEY) {
+    try {
+      console.log('AI: Using Anthropic');
+      return await callAnthropic(messages, systemPrompt, maxTokens);
+    } catch (error) {
+      console.error('Anthropic failed:', error);
+      // Fall through to next provider
+    }
+  }
+
+  // Try OpenRouter last (fallback)
+  if (OPENROUTER_API_KEY) {
+    try {
+      console.log('AI: Using OpenRouter');
+      return await callOpenRouter(messages, systemPrompt, maxTokens);
+    } catch (error) {
+      console.error('OpenRouter failed:', error);
+      throw error;
+    }
+  }
+
+  throw new Error('Kein KI-Provider konfiguriert. Bitte GROQ_API_KEY, ANTHROPIC_API_KEY oder OPENROUTER_API_KEY setzen.');
+}
+
 // Chat endpoint
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, system } = req.body;
-
-    // Try Anthropic first, fall back to OpenRouter
-    if (ANTHROPIC_API_KEY) {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1024,
-          system,
-          messages,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Anthropic API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      res.json({ content: data.content[0]?.text || '' });
-      return;
-    }
-
-    if (OPENROUTER_API_KEY) {
-      console.log('Chat: Sending to OpenRouter');
-      const requestBody = {
-        model: 'liquid/lfm-2.5-1.2b-instruct:free',
-        messages: [
-          { role: 'system', content: system || SYSTEM_PROMPT },
-          ...messages,
-        ],
-        max_tokens: 1024,
-      };
-
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://funkpilot.oeradio.at',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenRouter error:', response.status, errorText);
-        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || '';
-      console.log('Chat: Response received, length:', content.length);
-      res.json({ content });
-      return;
-    }
-
-    res.status(503).json({ error: 'No AI API key configured' });
+    const content = await callAI(messages, system || SYSTEM_PROMPT, 1024);
+    res.json({ content });
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
@@ -136,55 +203,8 @@ Gib eine strukturierte Analyse auf Deutsch mit:
 3. **Verbesserungspotential** (3-5 Punkte)
 4. **Empfehlungen** (3-5 Punkte)`;
 
-    // Use the same logic as chat
-    if (ANTHROPIC_API_KEY) {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 2000,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Anthropic API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      res.json({ content: data.content[0]?.text || '' });
-      return;
-    }
-
-    if (OPENROUTER_API_KEY) {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'liquid/lfm-2.5-1.2b-instruct:free',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 2000,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      res.json({ content: data.choices[0]?.message?.content || '' });
-      return;
-    }
-
-    res.status(503).json({ error: 'No AI API key configured' });
+    const content = await callAI([{ role: 'user', content: prompt }], SYSTEM_PROMPT, 2000);
+    res.json({ content });
   } catch (error) {
     console.error('Analyze error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
@@ -216,54 +236,8 @@ Gib detaillierte Empfehlungen auf Deutsch:
 3. **Nicht empfohlen**
 4. **Alternative Zeiten**`;
 
-    if (ANTHROPIC_API_KEY) {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Anthropic API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      res.json({ content: data.content[0]?.text || '' });
-      return;
-    }
-
-    if (OPENROUTER_API_KEY) {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'liquid/lfm-2.5-1.2b-instruct:free',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1500,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      res.json({ content: data.choices[0]?.message?.content || '' });
-      return;
-    }
-
-    res.status(503).json({ error: 'No AI API key configured' });
+    const content = await callAI([{ role: 'user', content: prompt }], SYSTEM_PROMPT, 1500);
+    res.json({ content });
   } catch (error) {
     console.error('Propagation error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
@@ -316,6 +290,7 @@ app.get('*', (_req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 FunkPilot server running on port ${PORT}`);
+  console.log(`   Groq API: ${GROQ_API_KEY ? '✓ configured' : '✗ not set'}`);
   console.log(`   Anthropic API: ${ANTHROPIC_API_KEY ? '✓ configured' : '✗ not set'}`);
   console.log(`   OpenRouter API: ${OPENROUTER_API_KEY ? '✓ configured' : '✗ not set'}`);
 });

@@ -8,7 +8,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      # AI API Keys (set at least one)
+      # AI API Keys (set at least one, Groq recommended)
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
     healthcheck:
