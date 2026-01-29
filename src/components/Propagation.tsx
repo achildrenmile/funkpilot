@@ -461,7 +461,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
           },
         ];
 
-        const getColorClasses = (color: string, open: boolean) => {
+        const getColorClasses = (color: string, _open: boolean) => {
           if (color === 'green') return 'bg-green-500/20 border-green-500/50';
           if (color === 'yellow') return 'bg-yellow-500/20 border-yellow-500/50';
           if (color === 'red') return 'bg-red-500/20 border-red-500/50';
