@@ -83,9 +83,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+    <div className="h-screen bg-slate-900 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700">
+      <header className="flex-shrink-0 bg-slate-800 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -136,7 +136,7 @@ function App() {
       </header>
 
       {/* Tab Navigation */}
-      <nav className="bg-slate-800/50 border-b border-slate-700">
+      <nav className="flex-shrink-0 bg-slate-800/50 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto">
             {TABS.map((tab) => {
@@ -165,12 +165,14 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-        {renderContent()}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 py-6 w-full">
+          {renderContent()}
+        </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-4 border-t border-slate-700 bg-slate-800/50">
+      <footer className="flex-shrink-0 py-4 border-t border-slate-700 bg-slate-800/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-500">
             <span>FunkPilot v1.0 - 73 de OE8YML</span>

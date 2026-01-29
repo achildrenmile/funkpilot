@@ -106,21 +106,21 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 w-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Volume2 className="w-6 h-6 text-sky-400" />
-            Voice CQ Generator
+            <Volume2 className="w-6 h-6 text-sky-400 flex-shrink-0" />
+            <span className="truncate">Voice CQ Generator</span>
           </h2>
-          <p className="text-slate-400 mt-1">
-            Generiere natürlich klingende CQ-Rufe und Contest-Phrasen
+          <p className="text-slate-400 mt-1 text-sm sm:text-base">
+            Generiere CQ-Rufe und Contest-Phrasen
           </p>
         </div>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
             showSettings ? 'bg-sky-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
           }`}
         >
@@ -130,9 +130,9 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
           <h3 className="text-lg font-semibold mb-4">Einstellungen</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Callsign */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Mein Rufzeichen</label>
@@ -249,22 +249,22 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
       {/* Quick Info */}
       {voiceSettings.callsign && (
-        <div className="bg-slate-800/50 rounded-lg px-4 py-2 flex items-center gap-4 text-sm">
+        <div className="bg-slate-800/50 rounded-lg px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm overflow-hidden">
           <span className="text-slate-400">Aktiv:</span>
           <span className="font-mono text-sky-400">{voiceSettings.callsign}</span>
-          <span className="text-slate-600">|</span>
+          <span className="text-slate-600 hidden sm:inline">|</span>
           <span className="text-slate-400">Contest:</span>
           <span>{CONTESTS.find(c => c.id === voiceSettings.contest)?.name}</span>
-          <span className="text-slate-600">|</span>
+          <span className="text-slate-600 hidden sm:inline">|</span>
           <span className="text-slate-400">Zone:</span>
           <span>{voiceSettings.zone}</span>
         </div>
       )}
 
       {/* Standard Phrases */}
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+      <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
         <h3 className="text-lg font-semibold mb-4">Standard-Phrasen</h3>
-        <div className="grid gap-3">
+        <div className="space-y-3">
           {filteredPhrases.map((phrase) => {
             const variables = getVariables();
             const previewText = processTemplate(phrase.template, variables, phrase.phonetik);
@@ -273,31 +273,30 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
             return (
               <div
                 key={phrase.id}
-                className={`bg-slate-700/50 rounded-lg p-4 border transition-colors ${
+                className={`bg-slate-700/50 rounded-lg p-3 sm:p-4 border transition-colors ${
                   isPlaying ? 'border-sky-500 bg-sky-900/20' : 'border-slate-600'
                 }`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <Volume2 className="w-4 h-4 text-sky-400" />
-                      <span className="font-medium">{phrase.nameDE}</span>
-                      <span className="text-xs text-slate-500">({phrase.name})</span>
+                      <Volume2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                      <span className="font-medium text-sm sm:text-base truncate">{phrase.nameDE}</span>
                     </div>
-                    <p className="text-sm text-slate-400 font-mono truncate">
-                      "{previewText}"
+                    <p className="text-xs sm:text-sm text-slate-400 font-mono truncate">
+                      {previewText}
                     </p>
                   </div>
                   <button
                     onClick={() => playPhrase(phrase.template, phrase.phonetik)}
                     disabled={isSpeaking && currentPhrase !== previewText}
-                    className={`p-3 rounded-lg transition-colors flex-shrink-0 ${
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg transition-colors flex-shrink-0 flex items-center justify-center ${
                       isPlaying
                         ? 'bg-red-600 hover:bg-red-700 text-white'
                         : 'bg-sky-600 hover:bg-sky-700 text-white disabled:opacity-50'
                     }`}
                   >
-                    {isPlaying ? <Square className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                    {isPlaying ? <Square className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 </div>
               </div>
@@ -307,12 +306,12 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
       </div>
 
       {/* Custom Phrase */}
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+      <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
         <h3 className="text-lg font-semibold mb-4">Eigene Phrase</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-2">
-              Verwende {'{CALL}'} für dein Rufzeichen, {'{CALL_PHONETIC}'} für Phonetik
+            <label className="block text-xs sm:text-sm text-slate-400 mb-2">
+              Verwende {'{CALL}'} oder {'{CALL_PHONETIC}'}
             </label>
             <input
               type="text"
@@ -324,11 +323,11 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
           </div>
 
           {customPhrase && (
-            <div className="bg-slate-700/50 rounded-lg p-3">
+            <div className="bg-slate-700/50 rounded-lg p-3 min-w-0">
               <span className="text-xs text-slate-400">Vorschau: </span>
-              <span className="text-sm font-mono text-slate-300">
+              <p className="text-xs sm:text-sm font-mono text-slate-300 truncate">
                 {processTemplate(customPhrase, getVariables(), voiceSettings.phonetikMode !== 'none')}
-              </span>
+              </p>
             </div>
           )}
 
