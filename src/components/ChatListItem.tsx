@@ -45,7 +45,7 @@ export default function ChatListItem({
           : 'hover:bg-slate-700/50 border border-transparent'
       }`}
     >
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2 pr-8">
         <MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isActive ? 'text-sky-400' : 'text-slate-500'}`} />
         <div className="min-w-0 flex-1">
           <p className={`text-sm font-medium truncate ${isActive ? 'text-sky-100' : 'text-slate-200'}`}>
@@ -60,10 +60,10 @@ export default function ChatListItem({
         </div>
       </div>
 
-      {/* Delete button - visible on hover */}
+      {/* Delete button - always visible */}
       <button
         onClick={handleDelete}
-        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded text-slate-500 hover:text-red-400 hover:bg-slate-600/50 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/20 active:bg-red-500/30 transition-colors"
         title="Löschen"
       >
         <Trash2 className="w-4 h-4" />
