@@ -146,11 +146,16 @@ function PrivacyContent() {
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
           KI-API-Kommunikation
         </h3>
-        <p>
+        <p className="mb-2">
           Bei Nutzung der KI-Features werden Ihre Anfragen an den konfigurierten
           KI-Dienst (Anthropic oder OpenRouter) gesendet. Die Verarbeitung
           erfolgt gemäß den Datenschutzrichtlinien des jeweiligen Anbieters.
           Es werden keine persönlichen Daten über die Anfrage hinaus übermittelt.
+        </p>
+        <p>
+          Der KI-Assistent ist ausschließlich auf Amateurfunk-Themen beschränkt
+          und verweigert Antworten auf themenfremde, illegale oder unangemessene
+          Anfragen.
         </p>
       </section>
 

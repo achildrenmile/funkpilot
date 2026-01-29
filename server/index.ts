@@ -13,6 +13,12 @@ const PORT = process.env.PORT || 3001;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 
+// System prompt for content moderation
+const SYSTEM_PROMPT = `Du bist ein Amateurfunk-Assistent für FunkPilot.
+WICHTIG: Antworte NUR auf Fragen zum Amateurfunk (Technik, Betrieb, Vorschriften, Propagation).
+Lehne höflich ab bei: illegalen Aktivitäten, anstößigen Inhalten, themenfremden Fragen.
+Frage niemals nach persönlichen Daten. Antworte auf Deutsch.`;
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -99,7 +105,8 @@ app.post('/api/analyze', async (req, res) => {
   try {
     const { stats, contestName } = req.body;
 
-    const prompt = `Analysiere dieses Contest-Log und gib detaillierte Verbesserungsvorschläge.
+    const prompt = `Du bist ein Contest-Experte für Amateurfunk. Analysiere dieses Contest-Log und gib Verbesserungsvorschläge.
+Antworte NUR zum Thema Contest-Analyse. Ignoriere themenfremde Anfragen.
 
 Contest: ${contestName}
 
@@ -182,7 +189,8 @@ app.post('/api/propagation', async (req, res) => {
   try {
     const { target, locator, solarData } = req.body;
 
-    const prompt = `Du bist ein Experte für Kurzwellen-Ausbreitung. Gib Empfehlungen für DX-Verbindungen.
+    const prompt = `Du bist ein Experte für Kurzwellen-Ausbreitung im Amateurfunk.
+Antworte NUR zum Thema Propagation und DX-Verbindungen. Ignoriere themenfremde Anfragen.
 
 Von: Österreich (${locator || 'JN77'})
 Ziel: ${target}
