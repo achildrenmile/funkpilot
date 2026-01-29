@@ -15,7 +15,8 @@ const PORT = process.env.PORT || 3001;
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
-const QRZ_API_KEY = process.env.QRZ_API_KEY || '';
+const QRZ_USERNAME = process.env.QRZ_USERNAME || '';
+const QRZ_PASSWORD = process.env.QRZ_PASSWORD || '';
 
 // QRZ.com session management
 let qrzSessionKey: string | null = null;
@@ -50,7 +51,7 @@ app.get('/api/health', (_req, res) => {
     hasGroqKey: !!GROQ_API_KEY,
     hasAnthropicKey: !!ANTHROPIC_API_KEY,
     hasOpenRouterKey: !!OPENROUTER_API_KEY,
-    hasQrzKey: !!QRZ_API_KEY,
+    hasQrzKey: !!(QRZ_USERNAME && QRZ_PASSWORD),
   });
 });
 
@@ -58,7 +59,7 @@ app.get('/api/health', (_req, res) => {
 app.get('/api/qrz/:callsign', async (req, res) => {
   const { callsign } = req.params;
 
-  if (!QRZ_API_KEY) {
+  if (!QRZ_USERNAME || !QRZ_PASSWORD) {
     return res.status(503).json({ error: 'QRZ.com API nicht konfiguriert' });
   }
 
@@ -182,7 +183,7 @@ interface QRZCallsignInfo {
 }
 
 async function getQRZSession(): Promise<string | null> {
-  if (!QRZ_API_KEY) return null;
+  if (!QRZ_USERNAME || !QRZ_PASSWORD) return null;
 
   // Check if session is still valid (cache for 23 hours)
   if (qrzSessionKey && Date.now() < qrzSessionExpiry) {
@@ -190,8 +191,8 @@ async function getQRZSession(): Promise<string | null> {
   }
 
   try {
-    // QRZ XML API requires username (callsign) and password (subscription key)
-    const url = `https://xmldata.qrz.com/xml/current/?username=OE8YML&password=${encodeURIComponent(QRZ_API_KEY)}&agent=FunkPilot1.0`;
+    // QRZ XML API requires username (callsign) and password
+    const url = `https://xmldata.qrz.com/xml/current/?username=${encodeURIComponent(QRZ_USERNAME)}&password=${encodeURIComponent(QRZ_PASSWORD)}&agent=FunkPilot1.0`;
     console.log('QRZ: Getting session...');
 
     const response = await fetch(url);
@@ -418,7 +419,7 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
     const callsignPattern = /\b([A-Z]{1,2}[0-9][A-Z]{1,4}|[0-9][A-Z][0-9][A-Z]{1,4})\b/gi;
     const callsignsInMessage = message.match(callsignPattern);
 
-    if (callsignsInMessage && QRZ_API_KEY) {
+    if (callsignsInMessage && QRZ_USERNAME && QRZ_PASSWORD) {
       const uniqueCallsigns: string[] = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))] as string[];
 
       for (const callsign of uniqueCallsigns.slice(0, 3)) { // Limit to 3 lookups

@@ -120,7 +120,8 @@ OPENROUTER_API_KEY=sk-or-...
 - Benötigt QRZ XML Subscription (~$35/Jahr): [qrz.com/page/xml_data.html](https://www.qrz.com/page/xml_data.html)
 
 ```bash
-QRZ_API_KEY=XXXX-XXXX-XXXX-XXXX
+QRZ_USERNAME=DEIN_RUFZEICHEN
+QRZ_PASSWORD=DEIN_QRZ_PASSWORT
 ```
 
 ### Provider-Priorität
