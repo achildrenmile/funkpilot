@@ -4,7 +4,87 @@ export interface VoiceInfo {
   id: string;
   name: string;
   lang: string;
+  provider: 'browser' | 'edge';
 }
+
+export interface EdgeVoice {
+  id: string;
+  name: string;
+  locale: string;
+  gender: string;
+}
+
+const API_BASE = import.meta.env.DEV ? 'http://localhost:3001' : '';
+
+// Currently playing audio element
+let currentAudio: HTMLAudioElement | null = null;
+
+// ==================== Edge TTS ====================
+
+async function getEdgeVoices(): Promise<VoiceInfo[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/tts/voices`);
+    if (!response.ok) throw new Error('Failed to fetch Edge voices');
+
+    const voices: EdgeVoice[] = await response.json();
+    return voices.map(v => ({
+      id: `edge:${v.id}`,
+      name: `${v.name} (Edge)`,
+      lang: v.locale,
+      provider: 'edge' as const,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch Edge voices:', error);
+    return [];
+  }
+}
+
+async function speakWithEdge(text: string, settings: TTSSettings): Promise<void> {
+  // Stop any current playback
+  stopSpeaking();
+
+  // Extract voice ID (remove 'edge:' prefix)
+  const voiceId = settings.voice?.startsWith('edge:')
+    ? settings.voice.slice(5)
+    : 'en-US-GuyNeural';
+
+  const response = await fetch(`${API_BASE}/api/tts/speak`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text,
+      voice: voiceId,
+      rate: settings.speed,
+      pitch: settings.pitch,
+      volume: 1.0,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'TTS failed');
+  }
+
+  const audioBlob = await response.blob();
+  const audioUrl = URL.createObjectURL(audioBlob);
+
+  return new Promise((resolve, reject) => {
+    currentAudio = new Audio(audioUrl);
+    currentAudio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+      currentAudio = null;
+      resolve();
+    };
+    currentAudio.onerror = (e) => {
+      URL.revokeObjectURL(audioUrl);
+      currentAudio = null;
+      reject(e);
+    };
+    currentAudio.play();
+  });
+}
+
+// ==================== Browser TTS ====================
 
 class WebSpeechTTS {
   private synth: SpeechSynthesis;
@@ -50,14 +130,17 @@ class WebSpeechTTS {
     return this.voices
       .filter(v => v.lang.startsWith('de') || v.lang.startsWith('en'))
       .map(v => ({
-        id: v.voiceURI,
-        name: `${v.name} (${v.lang})`,
+        id: `browser:${v.voiceURI}`,
+        name: `${v.name} (Browser)`,
         lang: v.lang,
+        provider: 'browser' as const,
       }));
   }
 
   private getVoice(voiceId: string): SpeechSynthesisVoice | null {
-    return this.voices.find(v => v.voiceURI === voiceId) || null;
+    // Remove 'browser:' prefix
+    const id = voiceId.startsWith('browser:') ? voiceId.slice(8) : voiceId;
+    return this.voices.find(v => v.voiceURI === id) || null;
   }
 
   async speak(text: string, settings: TTSSettings): Promise<void> {
@@ -98,63 +181,59 @@ class WebSpeechTTS {
   stop(): void {
     this.synth.cancel();
   }
-
-  isPaused(): boolean {
-    return this.synth.paused;
-  }
-
-  isSpeaking(): boolean {
-    return this.synth.speaking;
-  }
 }
 
 // Singleton instance
 let ttsInstance: WebSpeechTTS | null = null;
 
-export function getTTS(): WebSpeechTTS {
+function getBrowserTTS(): WebSpeechTTS {
   if (!ttsInstance) {
     ttsInstance = new WebSpeechTTS();
   }
   return ttsInstance;
 }
 
+// ==================== Public API ====================
+
 export async function speak(text: string, settings: TTSSettings): Promise<void> {
-  const tts = getTTS();
-  return tts.speak(text, settings);
+  const isEdgeVoice = settings.voice?.startsWith('edge:');
+
+  if (isEdgeVoice) {
+    return speakWithEdge(text, settings);
+  } else {
+    const tts = getBrowserTTS();
+    return tts.speak(text, settings);
+  }
 }
 
 export function stopSpeaking(): void {
-  const tts = getTTS();
+  // Stop Edge TTS audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  // Stop browser TTS
+  const tts = getBrowserTTS();
   tts.stop();
 }
 
 export async function getAvailableVoices(): Promise<VoiceInfo[]> {
-  const tts = getTTS();
-  await tts.waitForVoices();
-  return tts.getVoices();
+  // Get both Edge and Browser voices
+  const [edgeVoices, browserVoices] = await Promise.all([
+    getEdgeVoices(),
+    (async () => {
+      const tts = getBrowserTTS();
+      await tts.waitForVoices();
+      return tts.getVoices();
+    })(),
+  ]);
+
+  // Edge voices first (better quality), then browser voices
+  return [...edgeVoices, ...browserVoices];
 }
 
-/**
- * Generate audio blob from text (for download)
- * Note: This uses the MediaRecorder API to capture the audio output
- * In practice, you might want to use a server-side TTS service for this
- */
-export async function generateAudioBlob(
-  _text: string,
-  _settings: TTSSettings
-): Promise<Blob | null> {
-  // Web Speech API doesn't directly support audio export
-  // This would require either:
-  // 1. A server-side TTS service like ElevenLabs
-  // 2. Recording the system audio (not generally possible in browsers)
-  // For now, return null and show a message to use browser playback
-  console.warn('Audio download not supported with Web Speech API. Use browser playback instead.');
-  return null;
-}
-
-/**
- * Check if TTS is supported in the current browser
- */
 export function isTTSSupported(): boolean {
   return 'speechSynthesis' in window;
 }

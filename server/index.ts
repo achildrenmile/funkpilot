@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { tts, getVoices } from 'edge-tts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -280,6 +281,67 @@ app.get('/api/solar', async (_req, res) => {
       xrayFlux: 'B2.0',
       updatedAt: new Date().toISOString(),
     });
+  }
+});
+
+// Edge TTS - Get available voices
+app.get('/api/tts/voices', async (_req, res) => {
+  try {
+    const voices = await getVoices();
+    // Filter to German and English voices only
+    const filteredVoices = voices.filter(v =>
+      v.Locale.startsWith('de') || v.Locale.startsWith('en')
+    ).map(v => ({
+      id: v.ShortName,
+      name: v.FriendlyName,
+      locale: v.Locale,
+      gender: v.Gender,
+    }));
+    res.json(filteredVoices);
+  } catch (error) {
+    console.error('TTS voices error:', error);
+    res.status(500).json({ error: 'Failed to fetch voices' });
+  }
+});
+
+// Edge TTS - Generate speech
+app.post('/api/tts/speak', async (req, res) => {
+  try {
+    const { text, voice, rate, pitch, volume } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    // Default to German Austrian voice if not specified
+    const selectedVoice = voice || 'en-US-GuyNeural';
+
+    // Convert rate from multiplier (1.0) to percentage string ('+0%')
+    const rateStr = rate ? `${rate >= 1 ? '+' : ''}${Math.round((rate - 1) * 100)}%` : '+0%';
+
+    // Convert pitch from multiplier to Hz offset
+    const pitchStr = pitch ? `${pitch >= 1 ? '+' : ''}${Math.round((pitch - 1) * 50)}Hz` : '+0Hz';
+
+    // Volume percentage
+    const volumeStr = volume ? `${volume >= 1 ? '+' : ''}${Math.round((volume - 1) * 100)}%` : '+0%';
+
+    console.log(`TTS: "${text.substring(0, 50)}..." voice=${selectedVoice} rate=${rateStr}`);
+
+    const audioBuffer = await tts(text, {
+      voice: selectedVoice,
+      rate: rateStr,
+      pitch: pitchStr,
+      volume: volumeStr,
+    });
+
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length,
+    });
+    res.send(audioBuffer);
+  } catch (error) {
+    console.error('TTS error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'TTS generation failed' });
   }
 });
 
