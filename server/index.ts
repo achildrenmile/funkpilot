@@ -409,7 +409,7 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
     const callsignsInMessage = message.match(callsignPattern);
 
     if (callsignsInMessage && QRZ_API_KEY) {
-      const uniqueCallsigns = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))];
+      const uniqueCallsigns: string[] = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))] as string[];
 
       for (const callsign of uniqueCallsigns.slice(0, 3)) { // Limit to 3 lookups
         const qrzInfo = await lookupQRZ(callsign);
