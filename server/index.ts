@@ -69,7 +69,7 @@ app.post('/api/chat', async (req, res) => {
           'HTTP-Referer': 'https://funkpilot.local',
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free',
+          model: 'meta-llama/llama-4-maverick:free',
           messages: [
             { role: 'system', content: system },
             ...messages,
@@ -155,7 +155,7 @@ Gib eine strukturierte Analyse auf Deutsch mit:
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free',
+          model: 'meta-llama/llama-4-maverick:free',
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 2000,
         }),
@@ -233,7 +233,7 @@ Gib detaillierte Empfehlungen auf Deutsch:
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free',
+          model: 'meta-llama/llama-4-maverick:free',
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 1500,
         }),
