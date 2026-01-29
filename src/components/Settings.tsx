@@ -12,6 +12,7 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
   const [saved, setSaved] = useState(false);
   const [serverStatus, setServerStatus] = useState<{
     connected: boolean;
+    hasGroqKey: boolean;
     hasAnthropicKey: boolean;
     hasOpenRouterKey: boolean;
   } | null>(null);
@@ -21,12 +22,13 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
       .then(health => {
         setServerStatus({
           connected: true,
+          hasGroqKey: health.hasGroqKey,
           hasAnthropicKey: health.hasAnthropicKey,
           hasOpenRouterKey: health.hasOpenRouterKey,
         });
       })
       .catch(() => {
-        setServerStatus({ connected: false, hasAnthropicKey: false, hasOpenRouterKey: false });
+        setServerStatus({ connected: false, hasGroqKey: false, hasAnthropicKey: false, hasOpenRouterKey: false });
       });
   }, []);
 
@@ -71,6 +73,10 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
             {serverStatus.connected && (
               <>
                 <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${serverStatus.hasGroqKey ? 'bg-green-400' : 'bg-slate-500'}`} />
+                  <span>Groq API: {serverStatus.hasGroqKey ? 'Konfiguriert (Empfohlen)' : 'Nicht konfiguriert'}</span>
+                </div>
+                <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasAnthropicKey ? 'bg-green-400' : 'bg-slate-500'}`} />
                   <span>Anthropic API: {serverStatus.hasAnthropicKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
                 </div>
@@ -88,10 +94,10 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
               </div>
             )}
 
-            {serverStatus.connected && !serverStatus.hasAnthropicKey && !serverStatus.hasOpenRouterKey && (
+            {serverStatus.connected && !serverStatus.hasGroqKey && !serverStatus.hasAnthropicKey && !serverStatus.hasOpenRouterKey && (
               <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-3 text-sm text-amber-200">
                 <p className="font-medium">Kein KI-API-Key konfiguriert</p>
-                <p className="mt-1">Setze ANTHROPIC_API_KEY oder OPENROUTER_API_KEY als Umgebungsvariable.</p>
+                <p className="mt-1">Setze GROQ_API_KEY (empfohlen, kostenlos) als Umgebungsvariable.</p>
               </div>
             )}
           </div>

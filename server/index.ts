@@ -34,7 +34,7 @@ app.get('/api/health', (_req, res) => {
     groq: !!GROQ_API_KEY,
     anthropic: !!ANTHROPIC_API_KEY,
     openRouter: !!OPENROUTER_API_KEY,
-    // Legacy fields for backwards compatibility
+    hasGroqKey: !!GROQ_API_KEY,
     hasAnthropicKey: !!ANTHROPIC_API_KEY,
     hasOpenRouterKey: !!OPENROUTER_API_KEY,
   });

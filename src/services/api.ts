@@ -31,6 +31,7 @@ async function apiRequest<T>(
 
 export async function checkHealth(): Promise<{
   status: string;
+  hasGroqKey: boolean;
   hasAnthropicKey: boolean;
   hasOpenRouterKey: boolean;
 }> {
