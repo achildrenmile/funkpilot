@@ -190,20 +190,30 @@ async function getQRZSession(): Promise<string | null> {
   }
 
   try {
-    const response = await fetch(
-      `https://xmldata.qrz.com/xml/current/?username=OE8YML&password=${QRZ_API_KEY}&agent=FunkPilot`
-    );
+    // QRZ XML API requires username (callsign) and password (subscription key)
+    const url = `https://xmldata.qrz.com/xml/current/?username=OE8YML&password=${encodeURIComponent(QRZ_API_KEY)}&agent=FunkPilot1.0`;
+    console.log('QRZ: Getting session...');
+
+    const response = await fetch(url);
     const xml = await response.text();
+
+    // Check for error message
+    const errorMatch = xml.match(/<Error>([^<]+)<\/Error>/);
+    if (errorMatch) {
+      console.error('QRZ session error:', errorMatch[1]);
+      return null;
+    }
 
     // Parse session key from XML
     const keyMatch = xml.match(/<Key>([^<]+)<\/Key>/);
     if (keyMatch) {
       qrzSessionKey = keyMatch[1];
       qrzSessionExpiry = Date.now() + 23 * 60 * 60 * 1000; // 23 hours
+      console.log('QRZ: Session obtained successfully');
       return qrzSessionKey;
     }
 
-    console.error('QRZ session error:', xml);
+    console.error('QRZ: No session key in response:', xml.substring(0, 500));
     return null;
   } catch (error) {
     console.error('QRZ session error:', error);
