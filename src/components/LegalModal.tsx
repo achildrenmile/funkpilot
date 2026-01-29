@@ -52,7 +52,7 @@ function ImprintContent() {
   return (
     <div className="space-y-6 text-slate-300">
       <p className="text-sm text-slate-400">
-        Angaben gemäß § 5 TMG und § 25 MedienG (Österreich)
+        Angaben gemäß § 5 ECG und § 25 MedienG (Österreich)
       </p>
 
       <section>
@@ -60,9 +60,9 @@ function ImprintContent() {
           Betreiber
         </h3>
         <div className="space-y-1">
-          <p className="font-medium">Michael Ernemann</p>
+          <p className="font-medium">Michael Linder</p>
           <p>Amateurfunkrufzeichen: OE8YML</p>
-          <p>Spittal an der Drau</p>
+          <p>Nötsch 219, 9611 Nötsch</p>
           <p>Österreich</p>
         </div>
       </section>
@@ -72,22 +72,23 @@ function ImprintContent() {
           Kontakt
         </h3>
         <a
-          href="mailto:oe8yml@oevsv.at"
+          href="mailto:oe8yml@rednil.at"
           className="text-sky-400 hover:underline"
         >
-          oe8yml@oevsv.at
+          oe8yml@rednil.at
         </a>
       </section>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          Haftungsausschluss
+          Haftung für Inhalte
         </h3>
         <p>
-          Diese Webseite wird als Hobby-Projekt betrieben und dient ausschließlich
-          Informationszwecken für Funkamateure. Die bereitgestellten Informationen
-          wurden sorgfältig zusammengestellt, dennoch kann keine Gewähr für
-          Richtigkeit, Vollständigkeit und Aktualität übernommen werden.
+          Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die
+          Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernehmen wir
+          jedoch keine Gewähr. Diese Website dient als KI-gestützter Assistent
+          für den Amateurfunk. KI-generierte Inhalte sollten stets kritisch
+          geprüft werden.
         </p>
       </section>
 
@@ -96,9 +97,9 @@ function ImprintContent() {
           Urheberrecht
         </h3>
         <p>
-          Die Inhalte dieser Webseite unterliegen dem Urheberrecht. Die Anwendung
-          ist als Open-Source-Projekt unter der MIT-Lizenz veröffentlicht.
-          Der Quellcode ist auf GitHub verfügbar.
+          Die durch den Betreiber erstellten Inhalte und Werke auf dieser Website
+          unterliegen dem österreichischen Urheberrecht. Der Quellcode ist unter
+          der MIT-Lizenz auf GitHub verfügbar.
         </p>
       </section>
     </div>
@@ -109,76 +110,114 @@ function PrivacyContent() {
   return (
     <div className="space-y-6 text-slate-300">
       <p>
-        FunkPilot nimmt den Schutz Ihrer persönlichen Daten sehr ernst.
-        Diese Datenschutzerklärung informiert Sie über die Art, den Umfang
-        und Zweck der Verarbeitung personenbezogener Daten.
+        Der Schutz Ihrer persönlichen Daten ist uns wichtig. Diese Datenschutzerklärung
+        informiert Sie gemäß Art. 13 DSGVO (EU 2016/679) und dem österreichischen
+        Datenschutzgesetz (DSG) über die Datenverarbeitung auf dieser Website.
       </p>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          Keine Datenerfassung
+          Verantwortlicher
         </h3>
         <p className="mb-2">
-          Diese Anwendung wurde so konzipiert, dass sie minimal in Ihre
-          Privatsphäre eingreift:
+          Verantwortlich für die Datenverarbeitung gemäß Art. 4 Nr. 7 DSGVO:
+        </p>
+        <div className="space-y-1 ml-2">
+          <p>Michael Linder (OE8YML)</p>
+          <p>Nötsch 219, 9611 Nötsch, Österreich</p>
+          <p>E-Mail: <a href="mailto:oe8yml@rednil.at" className="text-sky-400 hover:underline">oe8yml@rednil.at</a></p>
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          Keine Erhebung personenbezogener Daten
+        </h3>
+        <p className="mb-2">
+          Diese Anwendung wurde datenschutzfreundlich konzipiert:
         </p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>Keine Registrierung oder Anmeldung erforderlich</li>
-          <li>Keine Tracking-Cookies oder Analyse-Tools</li>
-          <li>Keine Weitergabe von Daten an Dritte</li>
+          <li>Keine Cookies (außer technisch notwendige lokale Speicherung)</li>
+          <li>Kein Tracking oder Analytics</li>
           <li>Keine serverseitige Speicherung Ihrer Eingaben</li>
         </ul>
       </section>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          Lokale Speicherung
+          Lokale Speicherung (LocalStorage)
         </h3>
         <p>
-          Ihre Einstellungen (Rufzeichen, Locator, Präferenzen) werden
-          ausschließlich lokal in Ihrem Browser gespeichert (LocalStorage).
-          Diese Daten verlassen Ihr Gerät nicht und können jederzeit durch
-          Löschen der Browser-Daten entfernt werden.
+          Ihre Einstellungen (Rufzeichen, Locator, Präferenzen) werden ausschließlich
+          lokal in Ihrem Browser gespeichert. Diese Daten werden nicht an Server
+          übertragen und können jederzeit durch Löschen der Browser-Daten entfernt werden.
+          Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse).
         </p>
       </section>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          KI-API-Kommunikation
+          KI-Dienste (Groq)
         </h3>
         <p className="mb-2">
-          Bei Nutzung der KI-Features werden Ihre Anfragen an den konfigurierten
-          KI-Dienst (Anthropic oder OpenRouter) gesendet. Die Verarbeitung
-          erfolgt gemäß den Datenschutzrichtlinien des jeweiligen Anbieters.
-          Es werden keine persönlichen Daten über die Anfrage hinaus übermittelt.
+          Bei Nutzung der KI-Features werden Ihre Anfragen an Groq Inc. (USA) übermittelt.
+          Dies erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
+          an der Bereitstellung der KI-Funktionalität).
         </p>
-        <p>
-          Der KI-Assistent ist ausschließlich auf Amateurfunk-Themen beschränkt
-          und verweigert Antworten auf themenfremde, illegale oder unangemessene
-          Anfragen.
-        </p>
-      </section>
-
-      <section>
-        <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          Hosting
-        </h3>
-        <p>
-          Bei selbst-gehosteten Installationen gelten die Datenschutzrichtlinien
-          des jeweiligen Hosting-Anbieters. Bei Docker-Installationen auf
-          eigenem Server verlassen Ihre Daten nicht Ihre Infrastruktur.
+        <ul className="list-disc list-inside space-y-1 ml-2">
+          <li>Es werden nur die für die Anfrage notwendigen Daten übermittelt</li>
+          <li>Keine Übermittlung personenbezogener Daten wie Name oder Adresse</li>
+          <li>Der KI-Assistent ist auf Amateurfunk-Themen beschränkt</li>
+          <li>Anfragen werden nicht dauerhaft gespeichert</li>
+        </ul>
+        <p className="mt-2 text-sm text-slate-400">
+          Groq Inc. ist unter dem EU-U.S. Data Privacy Framework zertifiziert.
+          Datenschutzerklärung: <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">groq.com/privacy-policy</a>
         </p>
       </section>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          Ihre Rechte
+          Cloudflare
         </h3>
         <p>
-          Da keine personenbezogenen Daten serverseitig gespeichert werden,
-          entfallen die üblichen Betroffenenrechte (Auskunft, Berichtigung,
-          Löschung). Lokal gespeicherte Daten können Sie jederzeit selbst
-          in den Browser-Einstellungen löschen.
+          Diese Website wird über Cloudflare Inc. (USA) bereitgestellt. Cloudflare kann
+          technisch notwendige Verbindungsdaten (IP-Adresse, Browser-Typ) verarbeiten.
+          Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.
+          Datenschutzerklärung: <a href="https://www.cloudflare.com/de-de/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">cloudflare.com/privacypolicy</a>
+        </p>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          Ihre Rechte nach DSGVO
+        </h3>
+        <p className="mb-2">
+          Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:
+        </p>
+        <ul className="list-disc list-inside space-y-1 ml-2">
+          <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
+          <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
+          <li>Recht auf Löschung (Art. 17 DSGVO)</li>
+          <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+          <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
+          <li>Widerspruchsrecht (Art. 21 DSGVO)</li>
+        </ul>
+        <p className="mt-2">
+          Da wir keine personenbezogenen Daten serverseitig speichern, sind diese Rechte
+          praktisch bereits erfüllt. Lokal gespeicherte Daten können Sie selbst löschen.
+        </p>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          Beschwerderecht
+        </h3>
+        <p>
+          Sie haben das Recht, sich bei der zuständigen Aufsichtsbehörde zu beschweren:
+          Österreichische Datenschutzbehörde, Barichgasse 40-42, 1030 Wien,
+          <a href="mailto:dsb@dsb.gv.at" className="text-sky-400 hover:underline ml-1">dsb@dsb.gv.at</a>
         </p>
       </section>
 
@@ -187,15 +226,19 @@ function PrivacyContent() {
           Kontakt
         </h3>
         <p className="mb-2">
-          Bei Fragen zum Datenschutz können Sie mich kontaktieren:
+          Bei Fragen zur Datenverarbeitung wenden Sie sich an:
         </p>
         <a
-          href="mailto:oe8yml@oevsv.at"
+          href="mailto:oe8yml@rednil.at"
           className="text-sky-400 hover:underline"
         >
-          oe8yml@oevsv.at
+          oe8yml@rednil.at
         </a>
       </section>
+
+      <p className="text-sm text-slate-400 pt-4 border-t border-slate-700">
+        Stand: Januar 2026
+      </p>
     </div>
   );
 }
