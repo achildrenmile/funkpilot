@@ -220,9 +220,10 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 <Trash2 className="w-5 h-5" />
               </button>
             )}
+            </div>
           </div>
           {/* Subtitle - separate row */}
-          <p className="text-slate-400 text-xs sm:text-sm mt-1 ml-0 md:ml-0">
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">
             Frag mich zu Amateurfunk, Propagation, Technik und mehr
           </p>
         </div>
