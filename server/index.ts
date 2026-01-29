@@ -67,29 +67,36 @@ app.post('/api/chat', async (req, res) => {
     }
 
     if (OPENROUTER_API_KEY) {
+      console.log('Chat: Sending to OpenRouter');
+      const requestBody = {
+        model: 'liquid/lfm-2.5-1.2b-instruct:free',
+        messages: [
+          { role: 'system', content: system || SYSTEM_PROMPT },
+          ...messages,
+        ],
+        max_tokens: 1024,
+      };
+
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://funkpilot.local',
+          'HTTP-Referer': 'https://funkpilot.oeradio.at',
         },
-        body: JSON.stringify({
-          model: 'nvidia/nemotron-3-nano-30b-a3b:free',
-          messages: [
-            { role: 'system', content: system },
-            ...messages,
-          ],
-          max_tokens: 1024,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('OpenRouter error:', response.status, errorText);
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      res.json({ content: data.choices[0]?.message?.content || '' });
+      const content = data.choices?.[0]?.message?.content || '';
+      console.log('Chat: Response received, length:', content.length);
+      res.json({ content });
       return;
     }
 
@@ -162,7 +169,7 @@ Gib eine strukturierte Analyse auf Deutsch mit:
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+          model: 'liquid/lfm-2.5-1.2b-instruct:free',
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 2000,
         }),
@@ -241,7 +248,7 @@ Gib detaillierte Empfehlungen auf Deutsch:
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+          model: 'liquid/lfm-2.5-1.2b-instruct:free',
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 1500,
         }),
