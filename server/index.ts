@@ -22,6 +22,33 @@ const QRZ_PASSWORD = process.env.QRZ_PASSWORD || '';
 let qrzSessionKey: string | null = null;
 let qrzSessionExpiry: number = 0;
 
+// Content moderation - blocked words (German & English profanity, insults, hate speech)
+const BLOCKED_WORDS = [
+  // German profanity
+  'scheiße', 'scheisse', 'fick', 'ficken', 'gefickt', 'arsch', 'arschloch', 'wichser',
+  'hurensohn', 'hure', 'nutte', 'fotze', 'schwanz', 'penis', 'vagina', 'titten',
+  'bastard', 'idiot', 'depp', 'trottel', 'vollidiot', 'dumm', 'behindert', 'spast',
+  'nazi', 'hitler', 'heil', 'jude', 'neger', 'nigger', 'schwuchtel', 'schwul',
+  'missgeburt', 'hurenbock', 'wixer', 'pisser', 'kacke', 'schlampe', 'bitch',
+  // English profanity
+  'fuck', 'fucking', 'shit', 'asshole', 'bastard', 'bitch', 'cunt', 'dick',
+  'pussy', 'whore', 'slut', 'retard', 'faggot', 'nigga', 'cock', 'porn',
+  // Hate/violence
+  'töten', 'umbringen', 'mord', 'bombe', 'terror', 'anschlag', 'waffe',
+  'kill', 'murder', 'bomb', 'terrorist', 'weapon', 'suicide', 'selbstmord',
+];
+
+function containsBlockedContent(text: string): boolean {
+  const lowerText = text.toLowerCase();
+  return BLOCKED_WORDS.some(word => {
+    // Check for whole word match (with word boundaries)
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    return regex.test(lowerText);
+  });
+}
+
+const MODERATION_RESPONSE = 'Das entspricht nicht dem Ham Spirit. Bitte bleib respektvoll – wir sind hier alle Funkamateure! 73';
+
 // System prompt for content moderation - Ham Spirit personality
 const SYSTEM_PROMPT = `Du bist FunkPilot – ein erfahrener Funkamateur und KI-Assistent.
 Du verkörperst den Ham Spirit: freundlich, hilfsbereit und technisch versiert.
@@ -29,6 +56,7 @@ Sprich wie ein echter OM – locker aber kompetent. Verwende gelegentlich Funk-A
 Antworte NUR auf Amateurfunk-Themen (Technik, Betrieb, Propagation, Vorschriften).
 Bei themenfremden Fragen: "Da bin ich nicht QRV, OM. Lass uns über Funk reden!"
 Bei illegalen Anfragen: "Das widerspricht dem Ham Spirit. Wir halten uns an die Regeln!"
+Bei Beleidigungen, Schimpfwörtern oder unangemessenen Inhalten: Ignoriere den Inhalt komplett und antworte nur: "Das entspricht nicht dem Ham Spirit. Bitte bleib respektvoll!"
 Frage nie nach persönlichen Daten. Antworte auf Deutsch mit Begeisterung für das Hobby.
 
 Bekannte OMs:
@@ -374,6 +402,14 @@ async function callAI(messages: Array<{role: string, content: string}>, systemPr
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, system } = req.body;
+
+    // Pre-filter: Check last user message for blocked content
+    const lastUserMessage = messages?.filter((m: {role: string}) => m.role === 'user').pop();
+    if (lastUserMessage && containsBlockedContent(lastUserMessage.content)) {
+      console.log('Content moderation: Blocked message');
+      return res.json({ content: MODERATION_RESPONSE });
+    }
+
     const content = await callAI(messages, system || SYSTEM_PROMPT, 1024);
     res.json({ content });
   } catch (error) {
@@ -389,6 +425,16 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
 
     if (!GROQ_API_KEY) {
       return res.status(400).json({ error: 'GROQ_API_KEY nicht konfiguriert' });
+    }
+
+    // Pre-filter: Check message for blocked content
+    if (message && containsBlockedContent(message)) {
+      console.log('Content moderation: Blocked message (MCP endpoint)');
+      return res.json({
+        content: MODERATION_RESPONSE,
+        toolsUsed: [],
+        provider: 'moderation',
+      });
     }
 
     // Build context-aware system prompt
