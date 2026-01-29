@@ -26,7 +26,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
   useEffect(() => {
     checkHealth()
       .then(health => {
-        setApiAvailable(health.hasAnthropicKey || health.hasOpenRouterKey);
+        setApiAvailable(health.hasGroqKey || health.hasAnthropicKey || health.hasOpenRouterKey);
       })
       .catch(() => {
         setApiAvailable(false);
@@ -281,7 +281,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
           <div className="mt-4 bg-amber-900/30 border border-amber-700 rounded-lg p-3 flex items-center gap-2 text-sm">
             <AlertCircle className="w-4 h-4 text-amber-500" />
             <span className="text-amber-200">
-              Starte den Server mit API-Keys für KI-Empfehlungen.
+              KI-Backend nicht verfügbar. Bitte GROQ_API_KEY konfigurieren.
             </span>
           </div>
         )}

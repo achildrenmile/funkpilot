@@ -25,7 +25,7 @@ export default function LogAnalysis({ settings: _settings }: LogAnalysisProps) {
   useEffect(() => {
     checkHealth()
       .then(health => {
-        setApiAvailable(health.hasAnthropicKey || health.hasOpenRouterKey);
+        setApiAvailable(health.hasGroqKey || health.hasAnthropicKey || health.hasOpenRouterKey);
       })
       .catch(() => {
         setApiAvailable(false);
@@ -357,7 +357,7 @@ ${analysis}
                   <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
                   <p className="text-amber-200">KI-Backend nicht verfügbar</p>
                   <p className="text-slate-400 text-sm">
-                    Starte den Server mit API-Keys für die KI-Analyse.
+                    Bitte GROQ_API_KEY konfigurieren.
                   </p>
                 </div>
               ) : (

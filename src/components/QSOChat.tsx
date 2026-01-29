@@ -24,7 +24,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   useEffect(() => {
     checkHealth()
       .then(health => {
-        setApiAvailable(health.hasAnthropicKey || health.hasOpenRouterKey);
+        setApiAvailable(health.hasGroqKey || health.hasAnthropicKey || health.hasOpenRouterKey);
       })
       .catch(() => {
         setApiAvailable(false);
@@ -131,7 +131,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           <div>
             <p className="text-amber-200 font-medium">KI-Backend nicht verfügbar</p>
             <p className="text-amber-300/80 text-sm">
-              Bitte starte den Server mit konfigurierten API-Keys (ANTHROPIC_API_KEY oder OPENROUTER_API_KEY).
+              Bitte GROQ_API_KEY konfigurieren.
             </p>
           </div>
         </div>
