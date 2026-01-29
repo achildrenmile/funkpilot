@@ -328,8 +328,11 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       {/* Band Status Summary */}
       {solarData && (
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h3 className="text-lg font-semibold mb-4">Band-Einschätzung (basierend auf SFI {solarData.sfi})</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <h3 className="text-lg font-semibold mb-4">Band-Einschätzung (basierend auf SFI {solarData.sfi}, K={solarData.kIndex})</h3>
+
+          {/* HF High Bands */}
+          <p className="text-sm text-slate-400 mb-2">Obere Kurzwelle</p>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-4">
             {[
               { band: '10m', muf: 180, label: '28 MHz' },
               { band: '12m', muf: 160, label: '24 MHz' },
@@ -342,7 +345,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
               return (
                 <div
                   key={band}
-                  className={`rounded-lg p-3 text-center border ${
+                  className={`rounded-lg p-2 sm:p-3 text-center border ${
                     isOpen
                       ? 'bg-green-500/20 border-green-500/50'
                       : isMarginal
@@ -350,17 +353,86 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
                       : 'bg-slate-700/50 border-slate-600'
                   }`}
                 >
-                  <p className="font-bold">{band}</p>
-                  <p className="text-xs text-slate-400">{label}</p>
-                  <p className={`text-sm mt-1 ${isOpen ? 'text-green-400' : isMarginal ? 'text-yellow-400' : 'text-slate-500'}`}>
-                    {isOpen ? 'Offen' : isMarginal ? 'Marginal' : 'Geschlossen'}
+                  <p className="font-bold text-sm sm:text-base">{band}</p>
+                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
+                  <p className={`text-xs sm:text-sm mt-1 ${isOpen ? 'text-green-400' : isMarginal ? 'text-yellow-400' : 'text-slate-500'}`}>
+                    {isOpen ? 'Offen' : isMarginal ? 'Marginal' : 'Zu'}
                   </p>
                 </div>
               );
             })}
           </div>
+
+          {/* HF Low Bands */}
+          <p className="text-sm text-slate-400 mb-2">Untere Kurzwelle (Nachtbänder)</p>
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-4">
+            {[
+              { band: '30m', label: '10 MHz', night: false, kSensitive: true },
+              { band: '40m', label: '7 MHz', night: true, kSensitive: true },
+              { band: '60m', label: '5 MHz', night: true, kSensitive: true },
+              { band: '80m', label: '3.5 MHz', night: true, kSensitive: true },
+              { band: '160m', label: '1.8 MHz', night: true, kSensitive: true },
+            ].map(({ band, label, night, kSensitive }) => {
+              const hour = new Date().getUTCHours();
+              const isNightTime = hour >= 17 || hour <= 7;
+              const isOpen = night ? isNightTime && solarData.kIndex <= 3 : solarData.kIndex <= 4;
+              const isMarginal = night ? (isNightTime && solarData.kIndex > 3 && solarData.kIndex <= 5) : false;
+              const kWarning = kSensitive && solarData.kIndex > 3;
+              return (
+                <div
+                  key={band}
+                  className={`rounded-lg p-2 sm:p-3 text-center border ${
+                    isOpen && !kWarning
+                      ? 'bg-green-500/20 border-green-500/50'
+                      : isMarginal || kWarning
+                      ? 'bg-yellow-500/20 border-yellow-500/50'
+                      : 'bg-slate-700/50 border-slate-600'
+                  }`}
+                >
+                  <p className="font-bold text-sm sm:text-base">{band}</p>
+                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
+                  <p className={`text-xs sm:text-sm mt-1 ${
+                    isOpen && !kWarning ? 'text-green-400' : isMarginal || kWarning ? 'text-yellow-400' : 'text-slate-500'
+                  }`}>
+                    {night && !isNightTime ? 'Tag' : kWarning ? 'K!' : isOpen ? 'Offen' : 'Zu'}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* VHF/UHF */}
+          <p className="text-sm text-slate-400 mb-2">VHF/UHF (Sporadic-E, Tropo)</p>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { band: '6m', label: '50 MHz', esProb: solarData.sfi > 100 },
+              { band: '4m', label: '70 MHz', esProb: solarData.sfi > 120 },
+              { band: '2m', label: '144 MHz', tropo: true },
+              { band: '70cm', label: '432 MHz', tropo: true },
+            ].map(({ band, label, esProb, tropo }) => {
+              const status = esProb ? 'ES möglich' : tropo ? 'Tropo' : 'Lokal';
+              const isActive = esProb;
+              return (
+                <div
+                  key={band}
+                  className={`rounded-lg p-2 sm:p-3 text-center border ${
+                    isActive
+                      ? 'bg-purple-500/20 border-purple-500/50'
+                      : 'bg-slate-700/50 border-slate-600'
+                  }`}
+                >
+                  <p className="font-bold text-sm sm:text-base">{band}</p>
+                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
+                  <p className={`text-xs sm:text-sm mt-1 ${isActive ? 'text-purple-400' : 'text-slate-500'}`}>
+                    {status}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
           <p className="text-xs text-slate-500 mt-4">
-            * Vereinfachte Einschätzung basierend auf SFI. Tatsächliche Bedingungen hängen von vielen Faktoren ab.
+            * Vereinfachte Einschätzung. Nachtbänder (40-160m) optimal nach Sonnenuntergang. K! = hoher K-Index beeinträchtigt Ausbreitung.
           </p>
         </div>
       )}
