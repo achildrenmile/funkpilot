@@ -136,6 +136,47 @@ export async function sendChatMessage(
   return { content, provider: 'standard' };
 }
 
+// Streaming chat function
+export async function* sendChatMessageStream(
+  message: string,
+  history: ChatMessage[],
+  context: {
+    userCall?: string;
+    userLocator?: string;
+    solarData?: SolarData;
+  }
+): AsyncGenerator<{ content: string; done: boolean; error?: string }> {
+  // Build context-aware system prompt
+  let systemPrompt = CHAT_SYSTEM_PROMPT;
+
+  systemPrompt += `\n\nAktuelles Datum: ${new Date().toLocaleDateString('de-AT')}`;
+
+  if (context.userCall) {
+    systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
+  }
+  if (context.userLocator) {
+    systemPrompt += `\nBenutzer-Locator: ${context.userLocator}`;
+  }
+  if (context.solarData) {
+    systemPrompt += `\n\nAktuelle Solar-Daten:
+- Solar Flux Index: ${context.solarData.sfi}
+- K-Index: ${context.solarData.kIndex}
+- A-Index: ${context.solarData.aIndex}
+- Sonnenflecken: ${context.solarData.sunspots}
+- X-Ray Flux: ${context.solarData.xrayFlux}`;
+  }
+
+  // Build messages for streaming
+  const messages = history.slice(-10).map(m => ({
+    role: m.role,
+    content: m.content,
+  }));
+  messages.push({ role: 'user', content: message });
+
+  // Use streaming API
+  yield* api.sendChatStream(messages, systemPrompt);
+}
+
 export async function analyzeContestLog(
   stats: LogStats,
   contestName: string

@@ -139,6 +139,64 @@ async function callGroq(messages: Array<{role: string, content: string}>, system
   return data.choices?.[0]?.message?.content || '';
 }
 
+// Helper function to call Groq API with streaming
+async function* callGroqStream(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024): AsyncGenerator<string> {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.7,
+      stream: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 429) {
+      throw new Error('Rate Limit erreicht. Bitte warte einen Moment und versuche es erneut.');
+    }
+    throw new Error(`Groq API error: ${response.status} - ${errorText}`);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('No response body');
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6);
+        if (data === '[DONE]') return;
+        try {
+          const parsed = JSON.parse(data);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) yield content;
+        } catch {
+          // Ignore parse errors for incomplete chunks
+        }
+      }
+    }
+  }
+}
+
 // Helper function to call Anthropic API
 async function callAnthropic(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -415,6 +473,54 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
+// Streaming chat endpoint (Server-Sent Events)
+app.post('/api/chat-stream', async (req, res) => {
+  try {
+    const { messages, system } = req.body;
+
+    if (!GROQ_API_KEY) {
+      return res.status(400).json({ error: 'GROQ_API_KEY nicht konfiguriert (Streaming benötigt Groq)' });
+    }
+
+    // Pre-filter: Check last user message for blocked content
+    const lastUserMessage = messages?.filter((m: {role: string}) => m.role === 'user').pop();
+    if (lastUserMessage && containsBlockedContent(lastUserMessage.content)) {
+      console.log('Content moderation: Blocked message (stream)');
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write(`data: ${JSON.stringify({ content: MODERATION_RESPONSE, done: true })}\n\n`);
+      return res.end();
+    }
+
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    console.log('Streaming: Starting Groq stream');
+
+    const stream = callGroqStream(messages, system || SYSTEM_PROMPT, 1024);
+
+    for await (const chunk of stream) {
+      res.write(`data: ${JSON.stringify({ content: chunk, done: false })}\n\n`);
+    }
+
+    res.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
+    res.end();
+
+  } catch (error) {
+    console.error('Stream error:', error);
+    // If headers not sent yet, send error as JSON
+    if (!res.headersSent) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
+      res.end();
+    }
   }
 });
 

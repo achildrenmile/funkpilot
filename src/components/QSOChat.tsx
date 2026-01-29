@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { sendChatMessage, ChatProvider } from '../services/claude';
+import { sendChatMessage, sendChatMessageStream, ChatProvider } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { useChatHistory } from '../hooks/useChatHistory';
 import ChatSidebar from './ChatSidebar';
@@ -69,6 +69,10 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Streaming message state
+  const [streamingContent, setStreamingContent] = useState<string>('');
+  const [isStreaming, setIsStreaming] = useState(false);
+
   const sendMessageToChat = async (text: string) => {
     if (!text.trim()) return;
 
@@ -88,32 +92,77 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
     setInput('');
     setIsLoading(true);
     setError(null);
+    setStreamingContent('');
 
     try {
-      const response = await sendChatMessage(
-        text.trim(),
-        messages,
-        {
-          userCall: settings.callsign,
-          userLocator: settings.locator,
-          solarData: solarData || undefined,
-        },
-        provider
-      );
+      // Use streaming for standard provider, non-streaming for MCP (tools need full response)
+      if (provider === 'groq-mcp' || provider === 'auto') {
+        // Non-streaming for MCP (to support tool calls)
+        const response = await sendChatMessage(
+          text.trim(),
+          messages,
+          {
+            userCall: settings.callsign,
+            userLocator: settings.locator,
+            solarData: solarData || undefined,
+          },
+          provider
+        );
 
-      const assistantMessage: ExtendedChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.content,
-        timestamp: new Date(),
-        provider: response.provider,
-        toolsUsed: response.toolsUsed,
-      };
+        const assistantMessage: ExtendedChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response.content,
+          timestamp: new Date(),
+          provider: response.provider,
+          toolsUsed: response.toolsUsed,
+        };
 
-      addMessage(assistantMessage);
+        addMessage(assistantMessage);
+      } else {
+        // Streaming for standard provider
+        setIsStreaming(true);
+        let fullContent = '';
+
+        const stream = sendChatMessageStream(
+          text.trim(),
+          messages,
+          {
+            userCall: settings.callsign,
+            userLocator: settings.locator,
+            solarData: solarData || undefined,
+          }
+        );
+
+        for await (const chunk of stream) {
+          if (chunk.error) {
+            throw new Error(chunk.error);
+          }
+          if (chunk.content) {
+            fullContent += chunk.content;
+            setStreamingContent(fullContent);
+          }
+          if (chunk.done) break;
+        }
+
+        setIsStreaming(false);
+        setStreamingContent('');
+
+        const assistantMessage: ExtendedChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: fullContent,
+          timestamp: new Date(),
+          provider: 'groq-stream',
+        };
+
+        addMessage(assistantMessage);
+      }
     } catch (err) {
       console.error('Chat error:', err);
       setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.');
+      setIsStreaming(false);
+      setStreamingContent('');
     } finally {
       setIsLoading(false);
     }
@@ -304,7 +353,26 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             ))
           )}
 
-          {isLoading && (
+          {/* Streaming content display */}
+          {isStreaming && streamingContent && (
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center flex-shrink-0">
+                <span className="text-sm">AI</span>
+              </div>
+              <div className="max-w-[80%] rounded-xl px-4 py-3 bg-slate-700 text-slate-100">
+                <div className="prose prose-invert prose-sm max-w-none">
+                  <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                </div>
+                <div className="flex items-center gap-2 mt-2 text-xs opacity-50">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <span>Schreibt...</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Loading indicator (only when not streaming) */}
+          {isLoading && !isStreaming && (
             <div className="flex gap-3">
               <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center flex-shrink-0">
                 <span className="text-sm">AI</span>
