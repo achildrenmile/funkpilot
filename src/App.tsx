@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Mic, MessageCircle, BarChart3, Globe, Settings } from 'lucide-react';
+import { Mic, MessageCircle, BarChart3, Globe, Settings, HelpCircle } from 'lucide-react';
 import VoiceCQ from './components/VoiceCQ';
 import QSOChat from './components/QSOChat';
 import LogAnalysis from './components/LogAnalysis';
 import Propagation from './components/Propagation';
 import SettingsPanel from './components/Settings';
 import { LegalModal } from './components/LegalModal';
+import { HelpModal } from './components/HelpModal';
 import { ParentSiteLogo } from './components/ParentSiteLogo';
 import { useConfig } from './hooks/useConfig';
 import { getUserSettings, saveUserSettings } from './utils/storage';
@@ -26,7 +27,23 @@ function App() {
   const [solarData, setSolarData] = useState<SolarData | null>(null);
   const [isLoadingSolar, setIsLoadingSolar] = useState(true);
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   const { config } = useConfig();
+
+  // Keyboard shortcut for help
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const target = e.target as HTMLElement;
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          setShowHelp(true);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   // Load settings on mount
   useEffect(() => {
@@ -212,6 +229,14 @@ function App() {
             >
               GitHub
             </a>
+            <span className="hidden sm:inline">|</span>
+            <button
+              onClick={() => setShowHelp(true)}
+              className="text-sky-400 hover:underline flex items-center gap-1"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Hilfe
+            </button>
           </div>
         </div>
       </footer>
@@ -219,6 +244,11 @@ function App() {
       {/* Legal Modals */}
       {legalModal && (
         <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />
+      )}
+
+      {/* Help Modal */}
+      {showHelp && (
+        <HelpModal onClose={() => setShowHelp(false)} />
       )}
     </div>
   );
