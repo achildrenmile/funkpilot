@@ -82,6 +82,7 @@ ssh "$SYNOLOGY_HOST" "
         -e GROQ_API_KEY='${GROQ_API_KEY:-}' \
         -e ANTHROPIC_API_KEY='${ANTHROPIC_API_KEY:-}' \
         -e OPENROUTER_API_KEY='${OPENROUTER_API_KEY:-}' \
+        -e QRZ_API_KEY='${QRZ_API_KEY:-}' \
         -e PARENT_SITE_NAME='$PARENT_SITE_NAME' \
         -e PARENT_SITE_URL='$PARENT_SITE_URL' \
         -e PARENT_SITE_LOGO='$PARENT_SITE_LOGO' \

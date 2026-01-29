@@ -15,6 +15,11 @@ const PORT = process.env.PORT || 3001;
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
+const QRZ_API_KEY = process.env.QRZ_API_KEY || '';
+
+// QRZ.com session management
+let qrzSessionKey: string | null = null;
+let qrzSessionExpiry: number = 0;
 
 // System prompt for content moderation - Ham Spirit personality
 const SYSTEM_PROMPT = `Du bist FunkPilot – ein erfahrener Funkamateur und KI-Assistent.
@@ -45,7 +50,33 @@ app.get('/api/health', (_req, res) => {
     hasGroqKey: !!GROQ_API_KEY,
     hasAnthropicKey: !!ANTHROPIC_API_KEY,
     hasOpenRouterKey: !!OPENROUTER_API_KEY,
+    hasQrzKey: !!QRZ_API_KEY,
   });
+});
+
+// QRZ.com callsign lookup
+app.get('/api/qrz/:callsign', async (req, res) => {
+  const { callsign } = req.params;
+
+  if (!QRZ_API_KEY) {
+    return res.status(503).json({ error: 'QRZ.com API nicht konfiguriert' });
+  }
+
+  if (!callsign || callsign.length < 3) {
+    return res.status(400).json({ error: 'Ungültiges Rufzeichen' });
+  }
+
+  const info = await lookupQRZ(callsign);
+
+  if (!info) {
+    return res.status(500).json({ error: 'QRZ.com Abfrage fehlgeschlagen' });
+  }
+
+  if (info.error) {
+    return res.status(404).json({ error: info.error, call: info.call });
+  }
+
+  res.json(info);
 });
 
 // Helper function to call Groq API
@@ -130,6 +161,97 @@ async function callOpenRouter(messages: Array<{role: string, content: string}>, 
 
   const data = await response.json();
   return data.choices?.[0]?.message?.content || '';
+}
+
+// QRZ.com API functions
+interface QRZCallsignInfo {
+  call: string;
+  name?: string;
+  fname?: string;
+  addr1?: string;
+  addr2?: string;
+  country?: string;
+  grid?: string;
+  lat?: string;
+  lon?: string;
+  email?: string;
+  class?: string;
+  qslmgr?: string;
+  image?: string;
+  error?: string;
+}
+
+async function getQRZSession(): Promise<string | null> {
+  if (!QRZ_API_KEY) return null;
+
+  // Check if session is still valid (cache for 23 hours)
+  if (qrzSessionKey && Date.now() < qrzSessionExpiry) {
+    return qrzSessionKey;
+  }
+
+  try {
+    const response = await fetch(
+      `https://xmldata.qrz.com/xml/current/?username=OE8YML&password=${QRZ_API_KEY}&agent=FunkPilot`
+    );
+    const xml = await response.text();
+
+    // Parse session key from XML
+    const keyMatch = xml.match(/<Key>([^<]+)<\/Key>/);
+    if (keyMatch) {
+      qrzSessionKey = keyMatch[1];
+      qrzSessionExpiry = Date.now() + 23 * 60 * 60 * 1000; // 23 hours
+      return qrzSessionKey;
+    }
+
+    console.error('QRZ session error:', xml);
+    return null;
+  } catch (error) {
+    console.error('QRZ session error:', error);
+    return null;
+  }
+}
+
+async function lookupQRZ(callsign: string): Promise<QRZCallsignInfo | null> {
+  const session = await getQRZSession();
+  if (!session) return null;
+
+  try {
+    const response = await fetch(
+      `https://xmldata.qrz.com/xml/current/?s=${session}&callsign=${encodeURIComponent(callsign.toUpperCase())}`
+    );
+    const xml = await response.text();
+
+    // Check for errors
+    if (xml.includes('<Error>')) {
+      const errorMatch = xml.match(/<Error>([^<]+)<\/Error>/);
+      return { call: callsign.toUpperCase(), error: errorMatch?.[1] || 'Unbekannter Fehler' };
+    }
+
+    // Parse callsign data
+    const getValue = (tag: string): string | undefined => {
+      const match = xml.match(new RegExp(`<${tag}>([^<]*)</${tag}>`));
+      return match?.[1];
+    };
+
+    return {
+      call: getValue('call') || callsign.toUpperCase(),
+      name: getValue('name'),
+      fname: getValue('fname'),
+      addr1: getValue('addr1'),
+      addr2: getValue('addr2'),
+      country: getValue('country'),
+      grid: getValue('grid'),
+      lat: getValue('lat'),
+      lon: getValue('lon'),
+      email: getValue('email'),
+      class: getValue('class'),
+      qslmgr: getValue('qslmgr'),
+      image: getValue('image'),
+    };
+  } catch (error) {
+    console.error('QRZ lookup error:', error);
+    return null;
+  }
 }
 
 // MCP Server URL for Ham Radio Tools
@@ -280,6 +402,30 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
     }
     if (context?.solarData) {
       systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
+    }
+
+    // Check for callsign in message and look up in QRZ.com
+    const callsignPattern = /\b([A-Z]{1,2}[0-9][A-Z]{1,4}|[0-9][A-Z][0-9][A-Z]{1,4})\b/gi;
+    const callsignsInMessage = message.match(callsignPattern);
+
+    if (callsignsInMessage && QRZ_API_KEY) {
+      const uniqueCallsigns = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))];
+
+      for (const callsign of uniqueCallsigns.slice(0, 3)) { // Limit to 3 lookups
+        const qrzInfo = await lookupQRZ(callsign);
+        if (qrzInfo && !qrzInfo.error) {
+          const infoStr = [
+            qrzInfo.fname && qrzInfo.name ? `${qrzInfo.fname} ${qrzInfo.name}` : qrzInfo.name,
+            qrzInfo.addr2,
+            qrzInfo.country,
+            qrzInfo.grid ? `Grid: ${qrzInfo.grid}` : null,
+            qrzInfo.class ? `Lizenzklasse: ${qrzInfo.class}` : null,
+          ].filter(Boolean).join(', ');
+
+          systemPrompt += `\n\nQRZ.com Info für ${callsign}: ${infoStr}`;
+          console.log(`QRZ lookup: ${callsign} -> ${infoStr}`);
+        }
+      }
     }
 
     console.log('Groq MCP: Processing request with Ham Radio Tools');
