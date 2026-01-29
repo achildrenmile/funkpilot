@@ -10,9 +10,12 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 
 ### 🎙️ Voice CQ Generator
 - Generiere natürlich klingende CQ-Rufe und Contest-Phrasen
+- **Edge TTS Neural Voices** (kostenlos, hochwertig)
+  - Englisch: Guy, Christopher, Jenny (US), Ryan, Sonia (UK)
+  - Deutsch: Ingrid, Jonas (AT), Conrad, Katja (DE)
 - NATO-Phonetik Unterstützung für Rufzeichen
-- Verschiedene TTS-Stimmen (Browser-basiert)
 - Vorlagen für alle gängigen Contests (CQWW, WPX, SOTA, POTA)
+- Browser TTS als Fallback
 
 ### 🤖 QSO-Chat-Assistent
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
@@ -26,8 +29,14 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 
 ### 🌍 Propagation-Berater
 - Echtzeit Solar-Daten (SFI, K-Index, A-Index)
+- **QTH-basierte Berechnungen** (Tag/Nacht/Greyline basierend auf deinem Standort)
+- Band-Status für alle Bänder (6m - 160m)
 - KI-Empfehlungen für DX-Verbindungen
-- Band-Öffnungs-Prognosen
+
+### ❓ Hilfe
+- Integrierte Hilfe-Seite mit Feature-Dokumentation
+- Tastenkürzel: `?` öffnet Hilfe-Modal
+- `Esc` schließt Dialoge
 
 ## Quick Start mit Docker
 
