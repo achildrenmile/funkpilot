@@ -150,27 +150,23 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="flex items-start sm:items-center justify-between gap-2 mb-3 sm:mb-4 px-1">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors"
-              title="Chat-Verlauf"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold truncate">
+        <div className="mb-3 sm:mb-4 px-1">
+          {/* Top row: Menu, Title, Actions */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="md:hidden p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
+                title="Chat-Verlauf"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
                 {activeConversation?.title || 'QSO-Assistent'}
               </h2>
-              <p className="text-slate-400 text-xs sm:text-sm">
-                <span className="hidden sm:inline">Frag mich zu Amateurfunk, Propagation, Technik und mehr</span>
-                <span className="sm:hidden">Amateurfunk-Fragen</span>
-              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Provider Selector */}
             <div className="relative">
               <button
@@ -225,6 +221,10 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               </button>
             )}
           </div>
+          {/* Subtitle - separate row */}
+          <p className="text-slate-400 text-xs sm:text-sm mt-1 ml-0 md:ml-0">
+            Frag mich zu Amateurfunk, Propagation, Technik und mehr
+          </p>
         </div>
 
         {/* API Availability Warning */}
