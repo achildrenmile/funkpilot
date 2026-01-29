@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, User, MapPin, Save, Check, Server } from 'lucide-react';
+import { Settings as SettingsIcon, User, MapPin, Save, Check, Server, Sun, Moon } from 'lucide-react';
 import { checkHealth } from '../services/api';
 import type { UserSettings } from '../types';
 
@@ -215,17 +215,30 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Theme</label>
-            <select
-              value={settings.theme}
-              onChange={(e) => updateField('theme', e.target.value as 'dark' | 'light')}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
-            >
-              <option value="dark">Dunkel (Standard)</option>
-              <option value="light">Hell</option>
-            </select>
-            <p className="text-xs text-slate-500 mt-1">
-              Hell-Modus wird in einer späteren Version verfügbar sein.
-            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => updateField('theme', 'dark')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                  settings.theme === 'dark'
+                    ? 'bg-sky-600 border-sky-500 text-white'
+                    : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
+                }`}
+              >
+                <Moon className="w-4 h-4" />
+                Dunkel
+              </button>
+              <button
+                onClick={() => updateField('theme', 'light')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                  settings.theme === 'light'
+                    ? 'bg-sky-600 border-sky-500 text-white'
+                    : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
+                }`}
+              >
+                <Sun className="w-4 h-4" />
+                Hell
+              </button>
+            </div>
           </div>
         </div>
       </div>

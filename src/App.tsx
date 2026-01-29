@@ -51,6 +51,14 @@ function App() {
     setSettings(stored);
   }, []);
 
+  // Apply theme class to document
+  useEffect(() => {
+    document.documentElement.classList.remove('theme-light');
+    if (settings.theme === 'light') {
+      document.documentElement.classList.add('theme-light');
+    }
+  }, [settings.theme]);
+
   // Fetch solar data on mount and periodically
   useEffect(() => {
     const fetchSolar = async () => {

@@ -133,6 +133,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
                 <li>Rufzeichen und Name für personalisierte Ausgabe</li>
                 <li>Locator (Maidenhead) für Propagation-Berechnung</li>
                 <li>TTS-Sprache und Geschwindigkeit</li>
+                <li>Theme: Dunkel oder Hell-Modus</li>
                 <li>Server-Status und API-Verbindung</li>
               </ul>
             </section>

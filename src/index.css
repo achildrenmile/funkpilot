@@ -6,14 +6,76 @@
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: dark;
-  color: #e2e8f0;
-  background-color: #0f172a;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Dark theme (default) */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: #1e293b;
+  --bg-input: #334155;
+  --border-color: #475569;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent: #0ea5e9;
+  --accent-hover: #0284c7;
+  color-scheme: dark;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 }
+
+/* Light theme */
+.theme-light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --border-color: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  color-scheme: light;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+/* Light theme overrides for Tailwind classes */
+.theme-light .bg-slate-900 { background-color: var(--bg-primary); }
+.theme-light .bg-slate-800 { background-color: var(--bg-card); }
+.theme-light .bg-slate-800\/50 { background-color: rgba(255, 255, 255, 0.8); }
+.theme-light .bg-slate-700 { background-color: var(--bg-secondary); }
+.theme-light .bg-slate-700\/50 { background-color: rgba(241, 245, 249, 0.8); }
+.theme-light .bg-slate-700\/30 { background-color: rgba(241, 245, 249, 0.5); }
+.theme-light .bg-slate-600 { background-color: var(--bg-tertiary); }
+
+.theme-light .text-slate-100 { color: var(--text-primary); }
+.theme-light .text-slate-200 { color: var(--text-primary); }
+.theme-light .text-slate-300 { color: var(--text-secondary); }
+.theme-light .text-slate-400 { color: var(--text-muted); }
+.theme-light .text-slate-500 { color: var(--text-muted); }
+.theme-light .text-white { color: var(--text-primary); }
+
+.theme-light .border-slate-700 { border-color: var(--border-color); }
+.theme-light .border-slate-600 { border-color: var(--border-color); }
+
+.theme-light .hover\:bg-slate-700:hover { background-color: var(--bg-tertiary); }
+.theme-light .hover\:bg-slate-600:hover { background-color: #cbd5e1; }
+.theme-light .hover\:bg-slate-700\/20:hover { background-color: rgba(226, 232, 240, 0.5); }
+
+/* Light theme specific component overrides */
+.theme-light .prose-invert { --tw-prose-body: var(--text-secondary); --tw-prose-headings: var(--text-primary); }
+
+/* Light theme scrollbar */
+.theme-light::-webkit-scrollbar-track { background: #e2e8f0; }
+.theme-light::-webkit-scrollbar-thumb { background: #94a3b8; }
+.theme-light::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
 body {
   margin: 0;
