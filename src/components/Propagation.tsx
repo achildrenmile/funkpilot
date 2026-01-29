@@ -326,116 +326,270 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       )}
 
       {/* Band Status Summary */}
-      {solarData && (
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h3 className="text-lg font-semibold mb-4">Band-Einschätzung (basierend auf SFI {solarData.sfi}, K={solarData.kIndex})</h3>
+      {solarData && (() => {
+        const hour = new Date().getUTCHours();
+        const isDay = hour >= 6 && hour <= 18;
+        const isNight = !isDay;
+        const isTwilight = (hour >= 5 && hour <= 7) || (hour >= 17 && hour <= 19);
 
-          {/* HF High Bands */}
-          <p className="text-sm text-slate-400 mb-2">Obere Kurzwelle</p>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-4">
-            {[
-              { band: '10m', muf: 180, label: '28 MHz' },
-              { band: '12m', muf: 160, label: '24 MHz' },
-              { band: '15m', muf: 130, label: '21 MHz' },
-              { band: '17m', muf: 110, label: '18 MHz' },
-              { band: '20m', muf: 80, label: '14 MHz' },
-            ].map(({ band, muf, label }) => {
-              const isOpen = solarData.sfi >= muf && solarData.kIndex <= 4;
-              const isMarginal = solarData.sfi >= muf * 0.8 && solarData.sfi < muf;
-              return (
-                <div
-                  key={band}
-                  className={`rounded-lg p-2 sm:p-3 text-center border ${
-                    isOpen
-                      ? 'bg-green-500/20 border-green-500/50'
-                      : isMarginal
-                      ? 'bg-yellow-500/20 border-yellow-500/50'
-                      : 'bg-slate-700/50 border-slate-600'
-                  }`}
-                >
-                  <p className="font-bold text-sm sm:text-base">{band}</p>
-                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
-                  <p className={`text-xs sm:text-sm mt-1 ${isOpen ? 'text-green-400' : isMarginal ? 'text-yellow-400' : 'text-slate-500'}`}>
-                    {isOpen ? 'Offen' : isMarginal ? 'Marginal' : 'Zu'}
-                  </p>
-                </div>
-              );
-            })}
+        // Band definitions with real propagation characteristics
+        const allBands = [
+          // VHF - Magic Band
+          { band: '6m', freq: 50, label: '50 MHz', category: 'vhf',
+            getStatus: () => {
+              const esLikely = solarData.sfi > 120 && solarData.kIndex <= 3;
+              const esPossible = solarData.sfi > 90;
+              const fOpen = solarData.sfi > 150;
+              if (fOpen) return { status: 'F2 offen', color: 'green', open: true };
+              if (esLikely) return { status: 'ES wahrsch.', color: 'green', open: true };
+              if (esPossible) return { status: 'ES möglich', color: 'yellow', open: false };
+              return { status: 'Lokal', color: 'slate', open: false };
+            }
+          },
+          // Upper HF - Day bands, SFI dependent
+          { band: '10m', freq: 28, label: '28 MHz', category: 'upper',
+            getStatus: () => {
+              const mufOk = solarData.sfi >= 150;
+              const marginal = solarData.sfi >= 120 && solarData.sfi < 150;
+              const kOk = solarData.kIndex <= 4;
+              if (mufOk && kOk && isDay) return { status: 'Offen', color: 'green', open: true };
+              if (marginal && kOk && isDay) return { status: 'Marginal', color: 'yellow', open: false };
+              if (!isDay) return { status: 'Nacht', color: 'slate', open: false };
+              return { status: 'Zu', color: 'slate', open: false };
+            }
+          },
+          { band: '12m', freq: 24, label: '24 MHz', category: 'upper',
+            getStatus: () => {
+              const mufOk = solarData.sfi >= 130;
+              const marginal = solarData.sfi >= 100 && solarData.sfi < 130;
+              const kOk = solarData.kIndex <= 4;
+              if (mufOk && kOk && isDay) return { status: 'Offen', color: 'green', open: true };
+              if (marginal && kOk && isDay) return { status: 'Marginal', color: 'yellow', open: false };
+              if (!isDay) return { status: 'Nacht', color: 'slate', open: false };
+              return { status: 'Zu', color: 'slate', open: false };
+            }
+          },
+          { band: '15m', freq: 21, label: '21 MHz', category: 'upper',
+            getStatus: () => {
+              const mufOk = solarData.sfi >= 100;
+              const marginal = solarData.sfi >= 80 && solarData.sfi < 100;
+              const kOk = solarData.kIndex <= 4;
+              if (mufOk && kOk) return { status: 'Offen', color: 'green', open: true };
+              if (marginal && kOk) return { status: 'Marginal', color: 'yellow', open: false };
+              if (solarData.kIndex > 4) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Zu', color: 'slate', open: false };
+            }
+          },
+          { band: '17m', freq: 18, label: '18 MHz', category: 'upper',
+            getStatus: () => {
+              const mufOk = solarData.sfi >= 85;
+              const marginal = solarData.sfi >= 70 && solarData.sfi < 85;
+              const kOk = solarData.kIndex <= 4;
+              if (mufOk && kOk) return { status: 'Offen', color: 'green', open: true };
+              if (marginal && kOk) return { status: 'Marginal', color: 'yellow', open: false };
+              if (solarData.kIndex > 4) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Zu', color: 'slate', open: false };
+            }
+          },
+          { band: '20m', freq: 14, label: '14 MHz', category: 'middle',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 4;
+              const goodConditions = solarData.sfi >= 70 && kOk;
+              // 20m is almost always open during day
+              if (goodConditions && isDay) return { status: 'Offen', color: 'green', open: true };
+              if (isDay && kOk) return { status: 'Offen', color: 'green', open: true };
+              if (isTwilight) return { status: 'Greyline', color: 'green', open: true };
+              if (isNight && solarData.sfi > 100) return { status: 'LP mögl.', color: 'yellow', open: false };
+              if (solarData.kIndex > 4) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Nacht', color: 'slate', open: false };
+            }
+          },
+          { band: '30m', freq: 10, label: '10 MHz', category: 'middle',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 3;
+              // 30m works day and night, very K-sensitive
+              if (kOk) return { status: 'Offen', color: 'green', open: true };
+              if (solarData.kIndex <= 5) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Gestört', color: 'red', open: false };
+            }
+          },
+          { band: '40m', freq: 7, label: '7 MHz', category: 'lower',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 3;
+              // 40m: Day = EU, Night = DX
+              if (isNight && kOk) return { status: 'DX offen', color: 'green', open: true };
+              if (isDay && kOk) return { status: 'EU offen', color: 'green', open: true };
+              if (isTwilight && kOk) return { status: 'Greyline', color: 'green', open: true };
+              if (solarData.kIndex > 3) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Marginal', color: 'yellow', open: false };
+            }
+          },
+          { band: '60m', freq: 5, label: '5 MHz', category: 'lower',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 3;
+              if (isNight && kOk) return { status: 'Offen', color: 'green', open: true };
+              if (isTwilight && kOk) return { status: 'Greyline', color: 'green', open: true };
+              if (isDay) return { status: 'Tag', color: 'slate', open: false };
+              if (solarData.kIndex > 3) return { status: 'K!', color: 'yellow', open: false };
+              return { status: 'Marginal', color: 'yellow', open: false };
+            }
+          },
+          { band: '80m', freq: 3.5, label: '3.5 MHz', category: 'lower',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 2;
+              const kMarginal = solarData.kIndex <= 4;
+              // 80m: Night band, very noise and K sensitive
+              if (isNight && kOk) return { status: 'DX offen', color: 'green', open: true };
+              if (isNight && kMarginal) return { status: 'EU offen', color: 'green', open: true };
+              if (isTwilight && kMarginal) return { status: 'Greyline', color: 'green', open: true };
+              if (isDay) return { status: 'Tag/QRN', color: 'slate', open: false };
+              if (solarData.kIndex > 4) return { status: 'K!', color: 'red', open: false };
+              return { status: 'Marginal', color: 'yellow', open: false };
+            }
+          },
+          { band: '160m', freq: 1.8, label: '1.8 MHz', category: 'lower',
+            getStatus: () => {
+              const kOk = solarData.kIndex <= 2;
+              const aOk = solarData.aIndex <= 10;
+              // 160m: Night only, extremely K and A sensitive
+              if (isNight && kOk && aOk) return { status: 'Offen', color: 'green', open: true };
+              if (isNight && solarData.kIndex <= 3) return { status: 'Marginal', color: 'yellow', open: false };
+              if (isDay) return { status: 'Tag/D-Abs', color: 'slate', open: false };
+              if (solarData.kIndex > 3 || solarData.aIndex > 15) return { status: 'Gestört', color: 'red', open: false };
+              return { status: 'Schwierig', color: 'yellow', open: false };
+            }
+          },
+        ];
+
+        const getColorClasses = (color: string, open: boolean) => {
+          if (color === 'green') return 'bg-green-500/20 border-green-500/50';
+          if (color === 'yellow') return 'bg-yellow-500/20 border-yellow-500/50';
+          if (color === 'red') return 'bg-red-500/20 border-red-500/50';
+          if (color === 'purple') return 'bg-purple-500/20 border-purple-500/50';
+          return 'bg-slate-700/50 border-slate-600';
+        };
+
+        const getTextColor = (color: string) => {
+          if (color === 'green') return 'text-green-400';
+          if (color === 'yellow') return 'text-yellow-400';
+          if (color === 'red') return 'text-red-400';
+          if (color === 'purple') return 'text-purple-400';
+          return 'text-slate-500';
+        };
+
+        return (
+          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 className="text-lg font-semibold">
+                Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})
+              </h3>
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <span className="px-2 py-1 bg-slate-700 rounded">
+                  {hour.toString().padStart(2, '0')}:{new Date().getUTCMinutes().toString().padStart(2, '0')} UTC
+                </span>
+                <span className={`px-2 py-1 rounded ${isDay ? 'bg-yellow-500/20 text-yellow-400' : isTwilight ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                  {isDay ? 'Tag' : isTwilight ? 'Greyline' : 'Nacht'}
+                </span>
+              </div>
+            </div>
+
+            {/* 6m Magic Band */}
+            <p className="text-sm text-slate-400 mb-2">Magic Band</p>
+            <div className="grid grid-cols-1 gap-2 mb-4">
+              {allBands.filter(b => b.category === 'vhf').map((bandInfo) => {
+                const result = bandInfo.getStatus();
+                return (
+                  <div
+                    key={bandInfo.band}
+                    className={`rounded-lg p-3 border flex items-center justify-between ${getColorClasses(result.color, result.open)}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <p className="font-bold text-lg">{bandInfo.band}</p>
+                      <p className="text-sm text-slate-400">{bandInfo.label}</p>
+                    </div>
+                    <p className={`text-sm font-medium ${getTextColor(result.color)}`}>
+                      {result.status}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Upper HF Bands (10m - 17m) */}
+            <p className="text-sm text-slate-400 mb-2">Obere Kurzwelle (SFI-abhängig, Tagbänder)</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              {allBands.filter(b => b.category === 'upper').map((bandInfo) => {
+                const result = bandInfo.getStatus();
+                return (
+                  <div
+                    key={bandInfo.band}
+                    className={`rounded-lg p-2 sm:p-3 text-center border ${getColorClasses(result.color, result.open)}`}
+                  >
+                    <p className="font-bold text-sm sm:text-base">{bandInfo.band}</p>
+                    <p className="text-xs text-slate-400 hidden sm:block">{bandInfo.label}</p>
+                    <p className={`text-xs sm:text-sm mt-1 ${getTextColor(result.color)}`}>
+                      {result.status}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Middle HF Bands (20m - 30m) */}
+            <p className="text-sm text-slate-400 mb-2">Mittlere Kurzwelle (Allrounder)</p>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {allBands.filter(b => b.category === 'middle').map((bandInfo) => {
+                const result = bandInfo.getStatus();
+                return (
+                  <div
+                    key={bandInfo.band}
+                    className={`rounded-lg p-2 sm:p-3 text-center border ${getColorClasses(result.color, result.open)}`}
+                  >
+                    <p className="font-bold text-sm sm:text-base">{bandInfo.band}</p>
+                    <p className="text-xs text-slate-400 hidden sm:block">{bandInfo.label}</p>
+                    <p className={`text-xs sm:text-sm mt-1 ${getTextColor(result.color)}`}>
+                      {result.status}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Lower HF Bands (40m - 160m) */}
+            <p className="text-sm text-slate-400 mb-2">Untere Kurzwelle (K-sensitiv, Nacht/Greyline)</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              {allBands.filter(b => b.category === 'lower').map((bandInfo) => {
+                const result = bandInfo.getStatus();
+                return (
+                  <div
+                    key={bandInfo.band}
+                    className={`rounded-lg p-2 sm:p-3 text-center border ${getColorClasses(result.color, result.open)}`}
+                  >
+                    <p className="font-bold text-sm sm:text-base">{bandInfo.band}</p>
+                    <p className="text-xs text-slate-400 hidden sm:block">{bandInfo.label}</p>
+                    <p className={`text-xs sm:text-sm mt-1 ${getTextColor(result.color)}`}>
+                      {result.status}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Legend */}
+            <div className="border-t border-slate-700 pt-3 mt-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                <span><span className="text-green-400">●</span> Offen/Gut</span>
+                <span><span className="text-yellow-400">●</span> Marginal/K-Warnung</span>
+                <span><span className="text-red-400">●</span> Gestört</span>
+                <span><span className="text-slate-400">●</span> Geschlossen</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">
+                K! = hoher K-Index, LP = Long Path, ES = Sporadic-E, D-Abs = D-Layer Absorption, QRN = Atmospheric Noise
+              </p>
+            </div>
           </div>
-
-          {/* HF Low Bands */}
-          <p className="text-sm text-slate-400 mb-2">Untere Kurzwelle (Nachtbänder)</p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-4">
-            {[
-              { band: '30m', label: '10 MHz', night: false, kSensitive: true },
-              { band: '40m', label: '7 MHz', night: true, kSensitive: true },
-              { band: '60m', label: '5 MHz', night: true, kSensitive: true },
-              { band: '80m', label: '3.5 MHz', night: true, kSensitive: true },
-              { band: '160m', label: '1.8 MHz', night: true, kSensitive: true },
-            ].map(({ band, label, night, kSensitive }) => {
-              const hour = new Date().getUTCHours();
-              const isNightTime = hour >= 17 || hour <= 7;
-              const isOpen = night ? isNightTime && solarData.kIndex <= 3 : solarData.kIndex <= 4;
-              const isMarginal = night ? (isNightTime && solarData.kIndex > 3 && solarData.kIndex <= 5) : false;
-              const kWarning = kSensitive && solarData.kIndex > 3;
-              return (
-                <div
-                  key={band}
-                  className={`rounded-lg p-2 sm:p-3 text-center border ${
-                    isOpen && !kWarning
-                      ? 'bg-green-500/20 border-green-500/50'
-                      : isMarginal || kWarning
-                      ? 'bg-yellow-500/20 border-yellow-500/50'
-                      : 'bg-slate-700/50 border-slate-600'
-                  }`}
-                >
-                  <p className="font-bold text-sm sm:text-base">{band}</p>
-                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
-                  <p className={`text-xs sm:text-sm mt-1 ${
-                    isOpen && !kWarning ? 'text-green-400' : isMarginal || kWarning ? 'text-yellow-400' : 'text-slate-500'
-                  }`}>
-                    {night && !isNightTime ? 'Tag' : kWarning ? 'K!' : isOpen ? 'Offen' : 'Zu'}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* VHF/UHF */}
-          <p className="text-sm text-slate-400 mb-2">VHF/UHF (Sporadic-E, Tropo)</p>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { band: '6m', label: '50 MHz', esProb: solarData.sfi > 100 },
-              { band: '4m', label: '70 MHz', esProb: solarData.sfi > 120 },
-              { band: '2m', label: '144 MHz', tropo: true },
-              { band: '70cm', label: '432 MHz', tropo: true },
-            ].map(({ band, label, esProb, tropo }) => {
-              const status = esProb ? 'ES möglich' : tropo ? 'Tropo' : 'Lokal';
-              const isActive = esProb;
-              return (
-                <div
-                  key={band}
-                  className={`rounded-lg p-2 sm:p-3 text-center border ${
-                    isActive
-                      ? 'bg-purple-500/20 border-purple-500/50'
-                      : 'bg-slate-700/50 border-slate-600'
-                  }`}
-                >
-                  <p className="font-bold text-sm sm:text-base">{band}</p>
-                  <p className="text-xs text-slate-400 hidden sm:block">{label}</p>
-                  <p className={`text-xs sm:text-sm mt-1 ${isActive ? 'text-purple-400' : 'text-slate-500'}`}>
-                    {status}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          <p className="text-xs text-slate-500 mt-4">
-            * Vereinfachte Einschätzung. Nachtbänder (40-160m) optimal nach Sonnenuntergang. K! = hoher K-Index beeinträchtigt Ausbreitung.
-          </p>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
