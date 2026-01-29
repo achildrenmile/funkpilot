@@ -34,6 +34,8 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  provider?: string;
+  toolsUsed?: string[];
 }
 
 export interface ChatContext {

@@ -1,23 +1,37 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Trash2, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { sendChatMessage } from '../services/claude';
+import { sendChatMessage, ChatProvider } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { getChatHistory, saveChatHistory, clearChatHistory } from '../utils/storage';
 import { QUICK_QUESTIONS } from '../data/phrases';
 import type { UserSettings, SolarData, ChatMessage } from '../types';
+
+interface ExtendedChatMessage extends ChatMessage {
+  provider?: string;
+  toolsUsed?: string[];
+}
 
 interface QSOChatProps {
   settings: UserSettings;
   solarData: SolarData | null;
 }
 
+const PROVIDER_OPTIONS: { id: ChatProvider; name: string; description: string }[] = [
+  { id: 'auto', name: 'Auto (Empfohlen)', description: 'Groq + Ham Radio Tools mit Fallback' },
+  { id: 'groq-mcp', name: 'Groq + Ham Radio Tools', description: 'Mit Berechnungs-Tools' },
+  { id: 'standard', name: 'Standard Chat', description: 'Ohne spezielle Tools' },
+];
+
 export default function QSOChat({ settings, solarData }: QSOChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ExtendedChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
+  const [hasGroqKey, setHasGroqKey] = useState(false);
+  const [provider, setProvider] = useState<ChatProvider>('auto');
+  const [showProviderMenu, setShowProviderMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Check API availability on mount
@@ -25,6 +39,11 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
     checkHealth()
       .then(health => {
         setApiAvailable(health.hasGroqKey || health.hasAnthropicKey || health.hasOpenRouterKey);
+        setHasGroqKey(health.hasGroqKey);
+        // Default to standard if no Groq key
+        if (!health.hasGroqKey && provider === 'auto') {
+          setProvider('standard');
+        }
       })
       .catch(() => {
         setApiAvailable(false);
@@ -52,7 +71,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
 
-    const userMessage: ChatMessage = {
+    const userMessage: ExtendedChatMessage = {
       id: Date.now().toString(),
       role: 'user',
       content: text.trim(),
@@ -72,14 +91,17 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           userCall: settings.callsign,
           userLocator: settings.locator,
           solarData: solarData || undefined,
-        }
+        },
+        provider
       );
 
-      const assistantMessage: ChatMessage = {
+      const assistantMessage: ExtendedChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response,
+        content: response.content,
         timestamp: new Date(),
+        provider: response.provider,
+        toolsUsed: response.toolsUsed,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -113,15 +135,61 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             Frag mich zu Amateurfunk, Propagation, Technik und mehr
           </p>
         </div>
-        {messages.length > 0 && (
-          <button
-            onClick={handleClearHistory}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
-            title="Verlauf löschen"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Provider Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setShowProviderMenu(!showProviderMenu)}
+              className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm transition-colors"
+              title="KI-Provider wählen"
+            >
+              {provider === 'groq-mcp' || (provider === 'auto' && hasGroqKey) ? (
+                <Wrench className="w-4 h-4 text-amber-400" />
+              ) : null}
+              <span className="hidden sm:inline">
+                {PROVIDER_OPTIONS.find(p => p.id === provider)?.name || 'Auto'}
+              </span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {showProviderMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-slate-700 border border-slate-600 rounded-lg shadow-xl z-10 min-w-[220px]">
+                {PROVIDER_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => {
+                      setProvider(opt.id);
+                      setShowProviderMenu(false);
+                    }}
+                    disabled={opt.id !== 'standard' && !hasGroqKey}
+                    className={`w-full text-left px-4 py-2 hover:bg-slate-600 first:rounded-t-lg last:rounded-b-lg transition-colors ${
+                      provider === opt.id ? 'bg-slate-600' : ''
+                    } ${opt.id !== 'standard' && !hasGroqKey ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {opt.id === 'groq-mcp' && <Wrench className="w-4 h-4 text-amber-400" />}
+                      <span className="font-medium">{opt.name}</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">{opt.description}</p>
+                    {opt.id !== 'standard' && !hasGroqKey && (
+                      <p className="text-xs text-red-400 mt-0.5">GROQ_API_KEY erforderlich</p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {messages.length > 0 && (
+            <button
+              onClick={handleClearHistory}
+              className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
+              title="Verlauf löschen"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* API Availability Warning */}
@@ -177,9 +245,17 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 ) : (
                   <p>{message.content}</p>
                 )}
-                <p className="text-xs opacity-50 mt-2">
-                  {message.timestamp.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}
-                </p>
+                <div className="flex items-center gap-2 mt-2 text-xs opacity-50">
+                  <span>
+                    {message.timestamp.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  {message.toolsUsed && message.toolsUsed.length > 0 && (
+                    <span className="flex items-center gap-1 text-amber-400/70">
+                      <Wrench className="w-3 h-3" />
+                      {message.toolsUsed.join(', ')}
+                    </span>
+                  )}
+                </div>
               </div>
               {message.role === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0">

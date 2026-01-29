@@ -126,6 +126,18 @@ function App() {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* AI Badge - EU AI Act Art. 50 compliance */}
+              <div
+                className="hidden sm:flex items-center gap-1.5 bg-amber-600/20 text-amber-400 px-2.5 py-1 rounded-md text-xs cursor-pointer hover:bg-amber-600/30 transition-colors"
+                onClick={() => setLegalModal('privacy')}
+                title="Dieses System verwendet Künstliche Intelligenz"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span>KI-System</span>
+              </div>
+
               {/* Solar Conditions Badge */}
               {solarData && (
                 <div className="hidden sm:flex items-center gap-2 bg-slate-700/50 px-3 py-1.5 rounded-lg text-sm">
@@ -218,11 +230,11 @@ function App() {
               onClick={() => setLegalModal('privacy')}
               className="text-sky-400 hover:underline"
             >
-              Datenschutz
+              Datenschutz & KI-Hinweis
             </button>
             <span className="hidden sm:inline">|</span>
             <a
-              href="https://github.com/achildrenmile/funkpilot"
+              href="https://github.com/oe8yml/funkpilot"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sky-400 hover:underline"

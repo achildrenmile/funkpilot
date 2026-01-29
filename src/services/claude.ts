@@ -1,6 +1,14 @@
 import type { ChatMessage, SolarData, LogStats } from '../types';
 import * as api from './api';
 
+export type ChatProvider = 'auto' | 'groq-mcp' | 'standard';
+
+export interface ChatResponse {
+  content: string;
+  provider: string;
+  toolsUsed?: string[];
+}
+
 const CHAT_SYSTEM_PROMPT = `Du bist ein erfahrener Amateurfunk-Assistent für FunkPilot (funkpilot.oeradio.at).
 
 **ERLAUBTE THEMEN** (NUR diese beantworten):
@@ -45,8 +53,9 @@ export async function sendChatMessage(
     userCall?: string;
     userLocator?: string;
     solarData?: SolarData;
-  }
-): Promise<string> {
+  },
+  provider: ChatProvider = 'auto'
+): Promise<ChatResponse> {
   // Build context-aware system prompt
   let systemPrompt = CHAT_SYSTEM_PROMPT;
 
@@ -67,16 +76,55 @@ export async function sendChatMessage(
 - X-Ray Flux: ${context.solarData.xrayFlux}`;
   }
 
-  // Convert history to API format
+  // Use Groq MCP for ham radio tools
+  if (provider === 'groq-mcp' || provider === 'auto') {
+    try {
+      const mcpContext = {
+        userCall: context.userCall,
+        userLocator: context.userLocator,
+        solarData: context.solarData ? {
+          sfi: context.solarData.sfi,
+          kIndex: context.solarData.kIndex,
+          aIndex: context.solarData.aIndex,
+        } : undefined,
+      };
+
+      // Include history in the message for context
+      const historyContext = history.slice(-5).map(m =>
+        `${m.role === 'user' ? 'Benutzer' : 'Assistent'}: ${m.content}`
+      ).join('\n');
+
+      const fullMessage = historyContext
+        ? `Bisheriger Verlauf:\n${historyContext}\n\nNeue Frage: ${message}`
+        : message;
+
+      const result = await api.sendChatGroqMCP(fullMessage, systemPrompt, mcpContext);
+
+      return {
+        content: result.content,
+        provider: result.provider,
+        toolsUsed: result.toolsUsed,
+      };
+    } catch (error) {
+      console.error('Groq MCP failed:', error);
+      // If auto mode, fall back to standard chat
+      if (provider === 'auto') {
+        console.log('Falling back to standard chat');
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  // Standard chat (without MCP tools)
   const messages = history.slice(-10).map(m => ({
     role: m.role,
     content: m.content,
   }));
-
-  // Add current message
   messages.push({ role: 'user', content: message });
 
-  return api.sendChat(messages, systemPrompt);
+  const content = await api.sendChat(messages, systemPrompt);
+  return { content, provider: 'standard' };
 }
 
 export async function analyzeContestLog(

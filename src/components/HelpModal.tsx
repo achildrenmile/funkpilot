@@ -1,4 +1,4 @@
-import { X, Mic, MessageSquare, FileText, Radio, Settings, HelpCircle } from 'lucide-react';
+import { X, Mic, MessageSquare, FileText, Radio, Settings, HelpCircle, Wrench } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface HelpModalProps {
@@ -77,6 +77,16 @@ export function HelpModal({ onClose }: HelpModalProps) {
                 <li>Vorschriften: Lizenzklassen, Bandpläne</li>
                 <li>Propagation: Ausbreitungsbedingungen</li>
               </ul>
+              <div className="mt-3 p-2 bg-amber-900/30 border border-amber-700/50 rounded">
+                <h4 className="text-sm font-medium text-amber-200 flex items-center gap-1">
+                  <Wrench className="w-4 h-4" />
+                  Ham Radio Tools (Groq MCP)
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  Mit GROQ_API_KEY aktiviert: Bandplan-Abfragen, Wellenlängen-, EIRP-,
+                  Kabelverlust-, SWR- und Akkulaufzeit-Berechnungen direkt im Chat.
+                </p>
+              </div>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">

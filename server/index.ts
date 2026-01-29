@@ -126,6 +126,73 @@ async function callOpenRouter(messages: Array<{role: string, content: string}>, 
   return data.choices?.[0]?.message?.content || '';
 }
 
+// MCP Server URL for Ham Radio Tools
+const OERADIO_MCP_URL = 'https://oeradio-mcp.oeradio.at/mcp';
+
+// Helper function to call Groq API with MCP (Remote Tools)
+async function callGroqWithMCP(userMessage: string, systemPrompt: string): Promise<{ content: string; toolsUsed: string[] }> {
+  const response = await fetch('https://api.groq.com/openai/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      tools: [{
+        type: 'mcp',
+        server_label: 'oeradio',
+        server_url: OERADIO_MCP_URL,
+        require_approval: 'never',
+      }],
+      input: `${systemPrompt}\n\nBenutzer-Anfrage: ${userMessage}`,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 429) {
+      throw new Error('Rate Limit erreicht. Bitte warte einen Moment und versuche es erneut.');
+    }
+    throw new Error(`Groq MCP API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+
+  // Parse the response - Groq Responses API returns different format
+  const toolsUsed: string[] = [];
+  let content = '';
+
+  // Handle the output array from Responses API
+  if (data.output && Array.isArray(data.output)) {
+    for (const item of data.output) {
+      if (item.type === 'message' && item.content) {
+        // Extract text content
+        for (const block of item.content) {
+          if (block.type === 'output_text' || block.type === 'text') {
+            content += block.text || '';
+          }
+        }
+      }
+      if (item.type === 'mcp_call' || item.type === 'tool_use') {
+        toolsUsed.push(item.name || item.tool_name || 'unknown');
+      }
+    }
+  }
+
+  // Fallback: check for direct content
+  if (!content && data.choices?.[0]?.message?.content) {
+    content = data.choices[0].message.content;
+  }
+
+  if (!content) {
+    console.log('Groq MCP response:', JSON.stringify(data, null, 2));
+    throw new Error('Keine Antwort von Groq MCP erhalten');
+  }
+
+  return { content, toolsUsed };
+}
+
 // Generic AI call function with fallback chain: Groq -> Anthropic -> OpenRouter
 async function callAI(messages: Array<{role: string, content: string}>, systemPrompt: string, maxTokens: number = 1024): Promise<string> {
   // Try Groq first (free, fast)
@@ -164,7 +231,7 @@ async function callAI(messages: Array<{role: string, content: string}>, systemPr
   throw new Error('Kein KI-Provider konfiguriert. Bitte GROQ_API_KEY, ANTHROPIC_API_KEY oder OPENROUTER_API_KEY setzen.');
 }
 
-// Chat endpoint
+// Chat endpoint (standard - without MCP tools)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, system } = req.body;
@@ -172,6 +239,76 @@ app.post('/api/chat', async (req, res) => {
     res.json({ content });
   } catch (error) {
     console.error('Chat error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
+// Chat endpoint with Groq MCP (Ham Radio Tools)
+app.post('/api/chat-groq-mcp', async (req, res) => {
+  try {
+    const { message, system, context } = req.body;
+
+    if (!GROQ_API_KEY) {
+      return res.status(400).json({ error: 'GROQ_API_KEY nicht konfiguriert' });
+    }
+
+    // Build context-aware system prompt
+    let systemPrompt = system || SYSTEM_PROMPT;
+    systemPrompt += `\n\nDir stehen folgende Amateur Radio Tools zur Verfügung (nutze sie bei relevanten Fragen):
+- get_band_plan: Bandplan für ein bestimmtes Band abrufen
+- calculate_wavelength: Wellenlänge aus Frequenz berechnen
+- calculate_eirp: EIRP aus Leistung und Antennengewinn berechnen
+- calculate_cable_loss: Kabelverlust berechnen
+- compare_cables: Kabeltypen vergleichen
+- calculate_battery_runtime: Akkulaufzeit berechnen
+- check_frequency: Prüfen ob Frequenz im Bandplan erlaubt ist
+- convert_power: Leistung zwischen Watt und dBm umrechnen
+- calculate_swr_loss: SWR-Verlust berechnen
+- get_antenna_gain: Antennengewinn nachschlagen`;
+
+    if (context?.userCall) {
+      systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
+    }
+    if (context?.userLocator) {
+      systemPrompt += `\nBenutzer-Locator: ${context.userLocator}`;
+    }
+    if (context?.solarData) {
+      systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
+    }
+
+    console.log('Groq MCP: Processing request with Ham Radio Tools');
+
+    try {
+      const result = await callGroqWithMCP(message, systemPrompt);
+
+      if (result.toolsUsed.length > 0) {
+        console.log(`Groq MCP: Used tools: ${result.toolsUsed.join(', ')}`);
+      }
+
+      res.json({
+        content: result.content,
+        toolsUsed: result.toolsUsed,
+        provider: 'groq-mcp',
+      });
+    } catch (mcpError) {
+      // Fallback to regular Groq if MCP fails
+      console.error('Groq MCP failed, falling back to standard Groq:', mcpError);
+
+      const fallbackContent = await callGroq(
+        [{ role: 'user', content: message }],
+        systemPrompt,
+        1024
+      );
+
+      res.json({
+        content: fallbackContent,
+        toolsUsed: [],
+        provider: 'groq',
+        fallback: true,
+      });
+    }
+  } catch (error) {
+    console.error('Groq MCP chat error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });

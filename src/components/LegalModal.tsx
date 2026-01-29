@@ -158,7 +158,37 @@ function PrivacyContent() {
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          KI-Dienste
+          Hinweis gemäß EU AI Act (Verordnung 2024/1689)
+        </h3>
+        <div className="bg-amber-900/30 border border-amber-700/50 rounded-lg p-4 mb-4">
+          <p className="font-medium text-amber-200 mb-2">
+            KI-Transparenzhinweis nach Art. 50 EU AI Act
+          </p>
+          <p className="text-sm mb-3">
+            FunkPilot verwendet <strong>Künstliche Intelligenz</strong> zur Beantwortung
+            Ihrer Fragen. Sie interagieren mit einem KI-System, nicht mit einem Menschen.
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-sm text-slate-300">
+            <li><strong>KI-Einschränkungen:</strong> KI-Antworten können Fehler enthalten,
+            unvollständig sein oder veraltete Informationen wiedergeben</li>
+            <li><strong>Keine Rechts- oder Sicherheitsberatung:</strong> KI-generierte
+            Inhalte ersetzen keine fachkundige Beratung</li>
+            <li><strong>Menschliche Überprüfung empfohlen:</strong> Kritische Informationen
+            sollten stets aus offiziellen Quellen verifiziert werden</li>
+            <li><strong>Synthetische Sprache:</strong> Der Voice CQ Generator erzeugt
+            KI-generierte Audioinhalte (Microsoft Edge TTS)</li>
+          </ul>
+        </div>
+        <p className="text-sm text-slate-400 mb-4">
+          FunkPilot wird gemäß EU AI Act als KI-System mit begrenztem Risiko (Chatbot)
+          eingestuft. Die Nutzung unterliegt den Transparenzpflichten nach Art. 50 der
+          Verordnung (EU) 2024/1689.
+        </p>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          KI-Dienste und Datenverarbeitung
         </h3>
         <p className="mb-2">
           Bei Nutzung der KI-Features werden Ihre Anfragen an externe KI-Anbieter übermittelt.

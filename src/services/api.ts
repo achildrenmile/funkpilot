@@ -49,6 +49,37 @@ export async function sendChat(
   });
 }
 
+export interface GroqMCPResponse {
+  content: string;
+  toolsUsed: string[];
+  provider: 'groq-mcp' | 'groq';
+  fallback?: boolean;
+}
+
+export async function sendChatGroqMCP(
+  message: string,
+  system: string,
+  context?: {
+    userCall?: string;
+    userLocator?: string;
+    solarData?: Record<string, unknown>;
+  }
+): Promise<GroqMCPResponse> {
+  const response = await fetch(`${API_BASE}/api/chat-groq-mcp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, system, context }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.error) {
+    throw new Error(data.error || `API error: ${response.status}`);
+  }
+
+  return data as GroqMCPResponse;
+}
+
 export async function analyzeLog(
   stats: Record<string, unknown>,
   contestName: string

@@ -21,6 +21,14 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
 - Technik, Betriebsverfahren, Vorschriften
 - Propagation-Beratung mit aktuellen Solar-Daten
+- **Ham Radio Tools** (mit Groq MCP):
+  - Bandplan-Abfragen
+  - Wellenlängen-Berechnung
+  - EIRP-Berechnung
+  - Kabelverlust-Berechnung
+  - SWR-Verlust-Berechnung
+  - Akkulaufzeit-Berechnung
+  - Leistungs-Umrechnung (W ↔ dBm)
 
 ### 📊 Contest-Log-Analyse
 - ADIF-Import für Contest-Logs
@@ -61,10 +69,11 @@ Die App läuft unter http://localhost:3001
 
 FunkPilot unterstützt drei KI-Provider. Mindestens einer muss konfiguriert werden:
 
-### Option 1: Groq (Empfohlen - Kostenlos)
-- **Llama 3.1 8B ist komplett kostenlos** mit großzügigen Rate Limits
+### Option 1: Groq (Empfohlen - Kostenlos + Ham Radio Tools)
+- **Llama 3.3 70B ist komplett kostenlos** mit großzügigen Rate Limits
 - Sehr schnelle Antwortzeiten
-- Gute Qualität für deutschsprachige Antworten
+- **MCP Integration**: Zugang zu Ham Radio Berechnungs-Tools
+  - Bandplan, Wellenlänge, EIRP, Kabelverlust, SWR, Akkulaufzeit
 - Key erstellen: [console.groq.com/keys](https://console.groq.com/keys)
 
 ```bash
@@ -92,9 +101,27 @@ OPENROUTER_API_KEY=sk-or-...
 ### Provider-Priorität
 
 FunkPilot versucht die Provider in dieser Reihenfolge:
-1. **Groq** (kostenlos, schnell)
-2. **Anthropic** (beste Qualität)
-3. **OpenRouter** (Fallback)
+1. **Groq + MCP** (kostenlos, schnell, mit Ham Radio Tools)
+2. **Groq** (Fallback ohne MCP)
+3. **Anthropic** (beste Qualität)
+4. **OpenRouter** (Fallback)
+
+### Ham Radio Tools (MCP)
+
+Mit GROQ_API_KEY hat der Chat-Assistent Zugang zu speziellen Amateurfunk-Tools:
+
+| Tool | Beschreibung |
+|------|-------------|
+| `get_band_plan` | IARU Region 1 Bandplan abrufen |
+| `calculate_wavelength` | Wellenlänge aus Frequenz |
+| `calculate_eirp` | EIRP aus TX-Leistung + Antennengewinn |
+| `calculate_cable_loss` | Kabeldämpfung berechnen |
+| `compare_cables` | Kabeltypen vergleichen |
+| `calculate_battery_runtime` | Akkulaufzeit berechnen |
+| `check_frequency` | Frequenz im Bandplan prüfen |
+| `convert_power` | Watt ↔ dBm umrechnen |
+| `calculate_swr_loss` | Verlust durch SWR |
+| `get_antenna_gain` | Antennengewinn nachschlagen |
 
 ## Entwicklung
 
@@ -189,34 +216,43 @@ funkpilot/
 ## Architektur
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     FUNKPILOT                               │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              FRONTEND (React + Vite)                 │   │
-│  │                                                      │   │
-│  │  Voice CQ │ Chat │ Log-Analyse │ Propagation        │   │
-│  └─────────────────────────┬───────────────────────────┘   │
-│                            │                               │
-│                            ▼                               │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              BACKEND (Express.js)                    │   │
-│  │                                                      │   │
-│  │  /api/chat     - KI Chat                            │   │
-│  │  /api/analyze  - Log Analyse                        │   │
-│  │  /api/propagation - DX Empfehlungen                 │   │
-│  │  /api/solar    - Solar Daten Proxy                  │   │
-│  └─────────────────────────┬───────────────────────────┘   │
-│                            │                               │
-│      ┌─────────────────────┼─────────────────────┐        │
-│      ▼           ▼         ▼         ▼           ▼        │
-│  ┌───────┐  ┌─────────┐  ┌──────────┐  ┌─────────────┐   │
-│  │ Groq  │  │Anthropic│  │OpenRouter│  │   HamQSL    │   │
-│  │ (rec) │  │ Claude  │  │(fallback)│  │ Solar Data  │   │
-│  └───────┘  └─────────┘  └──────────┘  └─────────────┘   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        FUNKPILOT                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │               FRONTEND (React + Vite)                    │   │
+│  │                                                          │   │
+│  │  Voice CQ │ Chat │ Log-Analyse │ Propagation            │   │
+│  └─────────────────────────┬───────────────────────────────┘   │
+│                            │                                   │
+│                            ▼                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │               BACKEND (Express.js)                       │   │
+│  │                                                          │   │
+│  │  /api/chat          - KI Chat (Standard)                │   │
+│  │  /api/chat-groq-mcp - KI Chat + Ham Radio Tools         │   │
+│  │  /api/analyze       - Log Analyse                       │   │
+│  │  /api/propagation   - DX Empfehlungen                   │   │
+│  │  /api/solar         - Solar Daten Proxy                 │   │
+│  │  /api/tts/*         - Edge TTS Neural Voices            │   │
+│  └─────────────────────────┬───────────────────────────────┘   │
+│                            │                                   │
+│      ┌─────────────────────┼─────────────────────────┐        │
+│      ▼           ▼         ▼         ▼               ▼        │
+│  ┌────────┐ ┌─────────┐ ┌──────────┐ ┌───────────┐ ┌──────┐  │
+│  │ Groq   │ │Anthropic│ │OpenRouter│ │  HamQSL   │ │ Edge │  │
+│  │ + MCP  │ │ Claude  │ │(fallback)│ │Solar Data │ │ TTS  │  │
+│  └───┬────┘ └─────────┘ └──────────┘ └───────────┘ └──────┘  │
+│      │                                                        │
+│      ▼                                                        │
+│  ┌──────────────────────┐                                    │
+│  │   oeradio-mcp        │                                    │
+│  │   Ham Radio Tools    │                                    │
+│  │   (Remote MCP)       │                                    │
+│  └──────────────────────┘                                    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Parent-Site Branding
