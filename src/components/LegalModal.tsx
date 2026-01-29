@@ -158,10 +158,10 @@ function PrivacyContent() {
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
-          KI-Dienste (Groq)
+          KI-Dienste
         </h3>
         <p className="mb-2">
-          Bei Nutzung der KI-Features werden Ihre Anfragen an Groq Inc. (USA) übermittelt.
+          Bei Nutzung der KI-Features werden Ihre Anfragen an externe KI-Anbieter übermittelt.
           Dies erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
           an der Bereitstellung der KI-Funktionalität).
         </p>
@@ -171,9 +171,39 @@ function PrivacyContent() {
           <li>Der KI-Assistent ist auf Amateurfunk-Themen beschränkt</li>
           <li>Anfragen werden nicht dauerhaft gespeichert</li>
         </ul>
-        <p className="mt-2 text-sm text-slate-400">
-          Groq Inc. ist unter dem EU-U.S. Data Privacy Framework zertifiziert.
-          Datenschutzerklärung: <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">groq.com/privacy-policy</a>
+
+        <div className="mt-4 space-y-3">
+          <div className="bg-slate-700/50 rounded-lg p-3">
+            <p className="font-medium text-slate-200">Groq Inc. (USA) - Primär</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Modell: Llama 3.1 8B. Zertifiziert unter dem EU-U.S. Data Privacy Framework.
+              <br />
+              <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">groq.com/privacy-policy</a>
+            </p>
+          </div>
+
+          <div className="bg-slate-700/50 rounded-lg p-3">
+            <p className="font-medium text-slate-200">Anthropic PBC (USA) - Fallback</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Modell: Claude. Zertifiziert unter dem EU-U.S. Data Privacy Framework.
+              <br />
+              <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">anthropic.com/privacy</a>
+            </p>
+          </div>
+
+          <div className="bg-slate-700/50 rounded-lg p-3">
+            <p className="font-medium text-slate-200">OpenRouter Inc. (USA) - Fallback</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Vermittelt Zugang zu verschiedenen KI-Modellen.
+              <br />
+              <a href="https://openrouter.ai/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">openrouter.ai/privacy</a>
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-slate-400">
+          Die Datenübermittlung in die USA erfolgt auf Basis von Art. 49 Abs. 1 lit. a DSGVO
+          (ausdrückliche Einwilligung durch Nutzung) sowie Standardvertragsklauseln (SCCs).
         </p>
       </section>
 
