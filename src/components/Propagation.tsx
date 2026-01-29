@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Globe, RefreshCw, Loader2, AlertCircle, Minus } from 'lucide-react';
+import { Globe, RefreshCw, Loader2, AlertCircle, Minus, MapPin } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getSolarData, getConditionQuality } from '../services/solar';
 import { getPropagationAdvice } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { PROPAGATION_TARGETS } from '../data/phrases';
+import { locatorToLatLng, getSolarPosition } from '../utils/locator';
 import type { UserSettings, SolarData } from '../types';
 
 interface PropagationProps {
@@ -327,10 +328,45 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
 
       {/* Band Status Summary */}
       {solarData && (() => {
-        const hour = new Date().getUTCHours();
-        const isDay = hour >= 6 && hour <= 18;
-        const isNight = !isDay;
-        const isTwilight = (hour >= 5 && hour <= 7) || (hour >= 17 && hour <= 19);
+        // Use configured locator or default to JN77 (Austria)
+        const userLocator = settings.locator || 'JN77';
+        const coords = locatorToLatLng(userLocator);
+
+        // Calculate day/night based on user's QTH
+        const now = new Date();
+        const utcHour = now.getUTCHours();
+        const utcMin = now.getUTCMinutes();
+
+        let isDay: boolean;
+        let isNight: boolean;
+        let isTwilight: boolean;
+        let localTimeStr: string;
+        let solarStatus: string;
+
+        if (coords) {
+          const solar = getSolarPosition(coords.lat, coords.lng, now);
+          isDay = solar.isDay && !solar.isTwilight;
+          isNight = solar.isNight;
+          isTwilight = solar.isTwilight;
+
+          // Calculate local time
+          const localHour = Math.floor(solar.localSolarTime);
+          const localMin = Math.round((solar.localSolarTime - localHour) * 60);
+          localTimeStr = `${localHour.toString().padStart(2, '0')}:${localMin.toString().padStart(2, '0')} LOC`;
+
+          // Solar status based on elevation
+          if (solar.solarElevation > 6) solarStatus = 'Tag';
+          else if (solar.solarElevation > 0) solarStatus = 'Greyline';
+          else if (solar.solarElevation > -6) solarStatus = 'Dämmerung';
+          else solarStatus = 'Nacht';
+        } else {
+          // Fallback to UTC-based estimation
+          isDay = utcHour >= 6 && utcHour <= 18;
+          isNight = !isDay;
+          isTwilight = (utcHour >= 5 && utcHour <= 7) || (utcHour >= 17 && utcHour <= 19);
+          localTimeStr = `${utcHour.toString().padStart(2, '0')}:${utcMin.toString().padStart(2, '0')} UTC`;
+          solarStatus = isDay ? 'Tag' : isTwilight ? 'Greyline' : 'Nacht';
+        }
 
         // Band definitions with real propagation characteristics
         const allBands = [
@@ -480,15 +516,25 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
         return (
           <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <h3 className="text-lg font-semibold">
-                Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})
-              </h3>
+              <div>
+                <h3 className="text-lg font-semibold">
+                  Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})
+                </h3>
+                <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                  <MapPin className="w-3 h-3" />
+                  QTH: {userLocator}
+                  {coords && <span className="text-slate-500">({coords.lat.toFixed(1)}°N, {coords.lng.toFixed(1)}°E)</span>}
+                </p>
+              </div>
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <span className="px-2 py-1 bg-slate-700 rounded">
-                  {hour.toString().padStart(2, '0')}:{new Date().getUTCMinutes().toString().padStart(2, '0')} UTC
+                  {utcHour.toString().padStart(2, '0')}:{utcMin.toString().padStart(2, '0')} UTC
+                </span>
+                <span className="px-2 py-1 bg-slate-700 rounded">
+                  {localTimeStr}
                 </span>
                 <span className={`px-2 py-1 rounded ${isDay ? 'bg-yellow-500/20 text-yellow-400' : isTwilight ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                  {isDay ? 'Tag' : isTwilight ? 'Greyline' : 'Nacht'}
+                  {solarStatus}
                 </span>
               </div>
             </div>
