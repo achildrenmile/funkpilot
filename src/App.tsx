@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, MessageCircle, BarChart3, Globe, Settings, HelpCircle } from 'lucide-react';
+import { Mic, MessageCircle, BarChart3, Globe, Settings, HelpCircle, Github } from 'lucide-react';
 import VoiceCQ from './components/VoiceCQ';
 import QSOChat from './components/QSOChat';
 import LogAnalysis from './components/LogAnalysis';
@@ -251,6 +251,17 @@ function App() {
               <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Hilfe</span>
             </button>
+            <span>|</span>
+            <a
+              href="https://github.com/achildrenmile/funkpilot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-400 hover:underline flex items-center gap-1"
+              title="GitHub Repository"
+            >
+              <Github className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
           </div>
         </div>
       </footer>
