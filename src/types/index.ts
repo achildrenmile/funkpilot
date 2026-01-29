@@ -38,6 +38,14 @@ export interface ChatMessage {
   toolsUsed?: string[];
 }
 
+export interface ChatConversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface ChatContext {
   userCall?: string;
   userLocator?: string;
