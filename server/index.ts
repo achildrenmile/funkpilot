@@ -476,7 +476,9 @@ app.post('/api/chat', async (req, res) => {
       return res.json({ content: MODERATION_RESPONSE });
     }
 
-    const content = await callAI(messages, system || SYSTEM_PROMPT, 1024);
+    // Always use server SYSTEM_PROMPT as base to ensure "Bekannte OMs" is included
+    const effectiveSystem = system ? `${SYSTEM_PROMPT}\n\n${system}` : SYSTEM_PROMPT;
+    const content = await callAI(messages, effectiveSystem, 1024);
     res.json({ content });
   } catch (error) {
     console.error('Chat error:', error);
@@ -511,7 +513,9 @@ app.post('/api/chat-stream', async (req, res) => {
 
     console.log('Streaming: Starting Groq stream');
 
-    const stream = callGroqStream(messages, system || SYSTEM_PROMPT, 1024);
+    // Always use server SYSTEM_PROMPT as base to ensure "Bekannte OMs" is included
+    const effectiveSystemStream = system ? `${SYSTEM_PROMPT}\n\n${system}` : SYSTEM_PROMPT;
+    const stream = callGroqStream(messages, effectiveSystemStream, 1024);
 
     for await (const chunk of stream) {
       res.write(`data: ${JSON.stringify({ content: chunk, done: false })}\n\n`);
@@ -551,8 +555,13 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
       });
     }
 
-    // Build context-aware system prompt
-    let systemPrompt = system || SYSTEM_PROMPT;
+    // Build context-aware system prompt - ALWAYS use server SYSTEM_PROMPT as base
+    // This ensures "Bekannte OMs" section is always included
+    let systemPrompt = SYSTEM_PROMPT;
+    if (system) {
+      // Append any additional context from frontend, but keep server's base prompt
+      systemPrompt += `\n\n${system}`;
+    }
     systemPrompt += `\n\nDir stehen folgende Amateur Radio Tools zur Verfügung (nutze sie bei relevanten Fragen):
 - get_band_plan: Bandplan für ein bestimmtes Band abrufen
 - calculate_wavelength: Wellenlänge aus Frequenz berechnen
