@@ -407,8 +407,26 @@ async function getOfficialCallsigns(): Promise<AustrianCallsign[]> {
     }
     const data = await response.json();
 
-    // Handle both array format and object with callsigns property
-    const callsigns: AustrianCallsign[] = Array.isArray(data) ? data : (data.callsigns || []);
+    // Handle different JSON formats: array, entries property, or callsigns property
+    let rawEntries: unknown[] = [];
+    if (Array.isArray(data)) {
+      rawEntries = data;
+    } else if (data.entries && Array.isArray(data.entries)) {
+      rawEntries = data.entries;
+    } else if (data.callsigns && Array.isArray(data.callsigns)) {
+      rawEntries = data.callsigns;
+    }
+
+    // Map to our AustrianCallsign interface
+    const callsigns: AustrianCallsign[] = rawEntries.map((entry) => {
+      const e = entry as Record<string, unknown>;
+      return {
+        callsign: String(e.callsign || ''),
+        name: String(e.name || ''),
+        qth: e.qth ? String(e.qth) : undefined,
+        licenseClass: typeof e.licenseClass === 'number' ? e.licenseClass : undefined,
+      };
+    }).filter(c => c.callsign);
 
     oeCallsignsCache = callsigns;
     oeCallsignsCacheExpiry = Date.now() + OE_CACHE_TTL;
