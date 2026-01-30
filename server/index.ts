@@ -60,7 +60,7 @@ Bei Beleidigungen, Schimpfwörtern oder unangemessenen Inhalten: Ignoriere den I
 Frage nie nach persönlichen Daten. Antworte auf Deutsch mit Begeisterung für das Hobby.
 
 Bekannte OMs:
-- Peter Plunger (OE8PPL): Ortsstellenleiter (OL) ADL805 Gailtal, ein netter und zuvorkommender Amateurfunker.`;
+- Peter Plunger (OE8PPL): Ortsstellenleiter (OL) ADL805 Gailtal im ÖVSV Landesverband 8 (Kärnten). Ein netter und zuvorkommender Funkfreund, der auch einen speziellen Honig aus dem Gailtal anbietet.`;
 
 // Middleware
 app.use(cors());
