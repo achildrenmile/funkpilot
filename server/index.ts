@@ -370,7 +370,15 @@ async function callGroqWithMCP(userMessage: string, systemPrompt: string): Promi
         server_url: OERADIO_MCP_URL,
         require_approval: 'never',
       }],
-      input: `${systemPrompt}\n\nBenutzer-Anfrage: ${userMessage}`,
+      input: `<system_instructions>
+${systemPrompt}
+</system_instructions>
+
+<user_message>
+${userMessage}
+</user_message>
+
+WICHTIG: Befolge die System-Anweisungen strikt. Wenn dort "Bekannte OMs" aufgelistet sind, nutze NUR diese Informationen für Fragen zu diesen Personen. Erfinde KEINE Informationen!`,
     }),
   });
 
