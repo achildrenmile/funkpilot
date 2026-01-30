@@ -22,6 +22,31 @@ const QRZ_PASSWORD = process.env.QRZ_PASSWORD || '';
 let qrzSessionKey: string | null = null;
 let qrzSessionExpiry: number = 0;
 
+// Austrian callsigns cache (from GitHub JSON)
+interface AustrianCallsign {
+  callsign: string;
+  name: string;
+  qth?: string;
+  licenseClass?: number;
+}
+let oeCallsignsCache: AustrianCallsign[] | null = null;
+let oeCallsignsCacheExpiry: number = 0;
+const OE_CALLSIGNS_URL = 'https://raw.githubusercontent.com/achildrenmile/oeradio-mcp/main/data/callsigns_oe.json';
+const OE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+// Austrian districts
+const AUSTRIAN_DISTRICTS = [
+  { prefix: 'OE1', name: 'Wien' },
+  { prefix: 'OE2', name: 'Salzburg' },
+  { prefix: 'OE3', name: 'Niederösterreich' },
+  { prefix: 'OE4', name: 'Burgenland' },
+  { prefix: 'OE5', name: 'Oberösterreich' },
+  { prefix: 'OE6', name: 'Steiermark' },
+  { prefix: 'OE7', name: 'Tirol' },
+  { prefix: 'OE8', name: 'Kärnten' },
+  { prefix: 'OE9', name: 'Vorarlberg' },
+];
+
 // Content moderation - blocked words (German & English profanity, insults, hate speech)
 const BLOCKED_WORDS = [
   // German profanity
@@ -368,6 +393,96 @@ async function lookupQRZ(callsign: string): Promise<QRZCallsignInfo | null> {
   }
 }
 
+// Fetch and cache Austrian callsigns from GitHub
+async function getOfficialCallsigns(): Promise<AustrianCallsign[]> {
+  if (oeCallsignsCache && Date.now() < oeCallsignsCacheExpiry) {
+    return oeCallsignsCache;
+  }
+
+  try {
+    console.log('Fetching OE callsigns from GitHub...');
+    const response = await fetch(OE_CALLSIGNS_URL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
+    }
+    const data = await response.json();
+
+    // Handle both array format and object with callsigns property
+    const callsigns: AustrianCallsign[] = Array.isArray(data) ? data : (data.callsigns || []);
+
+    oeCallsignsCache = callsigns;
+    oeCallsignsCacheExpiry = Date.now() + OE_CACHE_TTL;
+    console.log(`Cached ${callsigns.length} OE callsigns`);
+    return callsigns;
+  } catch (error) {
+    console.error('Failed to fetch OE callsigns:', error);
+    // Return cached data if available, even if expired
+    if (oeCallsignsCache) {
+      console.log('Using expired cache');
+      return oeCallsignsCache;
+    }
+    return [];
+  }
+}
+
+// Find callsign in official list
+function findOfficialCallsign(callsigns: AustrianCallsign[], callsign: string): AustrianCallsign | undefined {
+  const upper = callsign.toUpperCase();
+  return callsigns.find(c => c.callsign.toUpperCase() === upper);
+}
+
+// Check if suffix is taken in a specific district
+function isSuffixTaken(callsigns: AustrianCallsign[], prefix: string, suffix: string): AustrianCallsign | undefined {
+  const fullCallsign = `${prefix}${suffix}`.toUpperCase();
+  return callsigns.find(c => c.callsign.toUpperCase() === fullCallsign);
+}
+
+// HamQTH API lookup (fallback)
+interface HamQTHInfo {
+  callsign: string;
+  nick?: string;
+  qth?: string;
+  country?: string;
+  grid?: string;
+  latitude?: string;
+  longitude?: string;
+  error?: string;
+}
+
+async function lookupHamQTH(callsign: string): Promise<HamQTHInfo | null> {
+  try {
+    // HamQTH has a free XML API without authentication for basic lookups
+    const response = await fetch(
+      `https://www.hamqth.com/xml.php?id=&callsign=${encodeURIComponent(callsign.toUpperCase())}`
+    );
+    const xml = await response.text();
+
+    // Check for errors
+    if (xml.includes('<error>')) {
+      const errorMatch = xml.match(/<error>([^<]+)<\/error>/);
+      return { callsign: callsign.toUpperCase(), error: errorMatch?.[1] || 'Not found' };
+    }
+
+    const getValue = (tag: string): string | undefined => {
+      const match = xml.match(new RegExp(`<${tag}>([^<]*)</${tag}>`));
+      return match?.[1];
+    };
+
+    return {
+      callsign: getValue('callsign') || callsign.toUpperCase(),
+      nick: getValue('nick'),
+      qth: getValue('qth'),
+      country: getValue('country'),
+      grid: getValue('grid'),
+      latitude: getValue('latitude'),
+      longitude: getValue('longitude'),
+    };
+  } catch (error) {
+    console.error('HamQTH lookup error:', error);
+    return null;
+  }
+}
+
 // MCP Server URL for Ham Radio Tools
 const OERADIO_MCP_URL = 'https://oeradio-mcp.oeradio.at/mcp';
 
@@ -666,6 +781,205 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
   } catch (error) {
     console.error('Groq MCP chat error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
+// ========== Callsign Finder API Endpoints ==========
+
+// Callsign lookup endpoint
+app.get('/api/callsign/lookup', async (req, res) => {
+  const callsign = (req.query.callsign as string || '').toUpperCase().trim();
+
+  if (!callsign || callsign.length < 3) {
+    return res.status(400).json({ error: 'Ungültiges Rufzeichen' });
+  }
+
+  console.log(`Callsign lookup: ${callsign}`);
+
+  try {
+    // Get official OE callsigns
+    const officialCallsigns = await getOfficialCallsigns();
+    const official = findOfficialCallsign(officialCallsigns, callsign);
+
+    // Try QRZ.com lookup
+    let qrz: QRZCallsignInfo | null = null;
+    if (QRZ_USERNAME && QRZ_PASSWORD) {
+      qrz = await lookupQRZ(callsign);
+    }
+
+    // Try HamQTH as additional source
+    let hamqth: HamQTHInfo | null = null;
+    if (!official && (!qrz || qrz.error)) {
+      hamqth = await lookupHamQTH(callsign);
+    }
+
+    // Determine source and Schwarzfunker status
+    const foundInQRZ = qrz && !qrz.error;
+    const foundInHamQTH = hamqth && !hamqth.error;
+    const isOECallsign = callsign.startsWith('OE');
+
+    // Schwarzfunker: Found in QRZ/HamQTH but NOT in official Austrian list
+    const isSchwartzfunker = isOECallsign && !official && (foundInQRZ || foundInHamQTH);
+
+    let source: 'official' | 'qrz' | 'hamqth' | 'none' = 'none';
+    if (official) source = 'official';
+    else if (foundInQRZ) source = 'qrz';
+    else if (foundInHamQTH) source = 'hamqth';
+
+    res.json({
+      callsign,
+      found: !!(official || foundInQRZ || foundInHamQTH),
+      source,
+      isOfficial: !!official,
+      isSchwartzfunker,
+      official: official || undefined,
+      qrz: qrz && !qrz.error ? qrz : undefined,
+      hamqth: hamqth && !hamqth.error ? hamqth : undefined,
+    });
+  } catch (error) {
+    console.error('Callsign lookup error:', error);
+    res.status(500).json({ error: 'Fehler bei der Rufzeichen-Abfrage' });
+  }
+});
+
+// Suffix availability check endpoint
+app.get('/api/callsign/available', async (req, res) => {
+  const suffix = (req.query.suffix as string || '').toUpperCase().trim();
+
+  if (!suffix || suffix.length < 1 || suffix.length > 4) {
+    return res.status(400).json({ error: 'Ungültiges Suffix (1-4 Zeichen)' });
+  }
+
+  // Validate suffix format (letters only, optionally starting with X for clubs)
+  if (!/^[A-Z]{1,4}$/.test(suffix)) {
+    return res.status(400).json({ error: 'Suffix darf nur Buchstaben enthalten' });
+  }
+
+  console.log(`Suffix availability check: ${suffix}`);
+
+  try {
+    const officialCallsigns = await getOfficialCallsigns();
+
+    const districts = AUSTRIAN_DISTRICTS.map(district => {
+      const holder = isSuffixTaken(officialCallsigns, district.prefix, suffix);
+      return {
+        prefix: district.prefix,
+        name: district.name,
+        callsign: `${district.prefix}${suffix}`,
+        available: !holder,
+        holder: holder?.name || undefined,
+      };
+    });
+
+    res.json({
+      suffix,
+      districts,
+    });
+  } catch (error) {
+    console.error('Suffix availability error:', error);
+    res.status(500).json({ error: 'Fehler bei der Verfügbarkeitsprüfung' });
+  }
+});
+
+// Callsign suggestion endpoint
+app.post('/api/callsign/suggest', async (req, res) => {
+  const { firstName, lastName, preferredDistrict } = req.body;
+
+  if (!firstName || !lastName) {
+    return res.status(400).json({ error: 'Vor- und Nachname erforderlich' });
+  }
+
+  const district = Math.max(1, Math.min(9, parseInt(preferredDistrict) || 8));
+  const prefix = `OE${district}`;
+
+  console.log(`Callsign suggestion: ${firstName} ${lastName}, district ${district}`);
+
+  try {
+    const officialCallsigns = await getOfficialCallsigns();
+    const suggestions: Array<{
+      callsign: string;
+      suffix: string;
+      reason: string;
+      available: boolean;
+      district: string;
+    }> = [];
+
+    // Clean names
+    const fn = firstName.toUpperCase().replace(/[^A-Z]/g, '');
+    const ln = lastName.toUpperCase().replace(/[^A-Z]/g, '');
+
+    if (!fn || !ln) {
+      return res.status(400).json({ error: 'Namen müssen Buchstaben enthalten' });
+    }
+
+    // Generate candidate suffixes with reasons
+    const candidates: Array<{ suffix: string; reason: string }> = [];
+
+    // 1. Initials (2 letters) - e.g., MM for Max Mustermann
+    candidates.push({ suffix: `${fn[0]}${ln[0]}`, reason: 'Initialen' });
+
+    // 2. First initial + first 2 of last name - e.g., MMU
+    if (ln.length >= 2) {
+      candidates.push({ suffix: `${fn[0]}${ln.slice(0, 2)}`, reason: 'Initial + Nachname' });
+    }
+
+    // 3. X + Initials (club style) - e.g., XMM
+    candidates.push({ suffix: `X${fn[0]}${ln[0]}`, reason: 'X + Initialen' });
+
+    // 4. First 2 letters of first name + last initial - e.g., MAM
+    if (fn.length >= 2) {
+      candidates.push({ suffix: `${fn.slice(0, 2)}${ln[0]}`, reason: 'Vorname + Initial' });
+    }
+
+    // 5. First 3 letters of last name - e.g., MUS
+    if (ln.length >= 3) {
+      candidates.push({ suffix: ln.slice(0, 3), reason: 'Nachname verkürzt' });
+    }
+
+    // 6. First letter + last 2 of last name - e.g., MNN
+    if (ln.length >= 2) {
+      candidates.push({ suffix: `${fn[0]}${ln.slice(-2)}`, reason: 'Initial + Nachname-Ende' });
+    }
+
+    // 7. Double initial + number indicator - e.g., MMA, MMB
+    for (const letter of ['A', 'B', 'C', 'D', 'E']) {
+      candidates.push({ suffix: `${fn[0]}${ln[0]}${letter}`, reason: `Initialen + ${letter}` });
+    }
+
+    // 8. Full initials repeated - e.g., MMMM (if short)
+    if (fn[0] === ln[0]) {
+      candidates.push({ suffix: `${fn[0]}${fn[0]}${fn[0]}`, reason: 'Triple Initial' });
+    }
+
+    // Check availability for each candidate
+    for (const candidate of candidates) {
+      if (candidate.suffix.length >= 2 && candidate.suffix.length <= 4) {
+        const holder = isSuffixTaken(officialCallsigns, prefix, candidate.suffix);
+        suggestions.push({
+          callsign: `${prefix}${candidate.suffix}`,
+          suffix: candidate.suffix,
+          reason: candidate.reason,
+          available: !holder,
+          district: AUSTRIAN_DISTRICTS[district - 1].name,
+        });
+      }
+    }
+
+    // Sort: available first, then by suffix length
+    suggestions.sort((a, b) => {
+      if (a.available !== b.available) return a.available ? -1 : 1;
+      return a.suffix.length - b.suffix.length;
+    });
+
+    // Return top 10 unique suggestions
+    const uniqueSuggestions = suggestions.filter(
+      (s, i, arr) => arr.findIndex(x => x.suffix === s.suffix) === i
+    ).slice(0, 10);
+
+    res.json({ suggestions: uniqueSuggestions });
+  } catch (error) {
+    console.error('Callsign suggestion error:', error);
+    res.status(500).json({ error: 'Fehler bei der Vorschlagsgenerierung' });
   }
 });
 

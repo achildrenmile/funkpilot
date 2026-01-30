@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Mic, MessageCircle, BarChart3, Globe, Settings, HelpCircle, Github } from 'lucide-react';
+import { Mic, MessageCircle, BarChart3, Globe, Radio, Settings, HelpCircle, Github } from 'lucide-react';
 import VoiceCQ from './components/VoiceCQ';
 import QSOChat from './components/QSOChat';
 import LogAnalysis from './components/LogAnalysis';
 import Propagation from './components/Propagation';
+import CallsignFinder from './components/CallsignFinder';
 import SettingsPanel from './components/Settings';
 import { LegalModal } from './components/LegalModal';
 import { HelpModal } from './components/HelpModal';
@@ -18,6 +19,7 @@ const TABS = [
   { id: 'chat' as TabId, name: 'QSO-Chat', icon: MessageCircle },
   { id: 'log' as TabId, name: 'Log-Analyse', icon: BarChart3 },
   { id: 'propagation' as TabId, name: 'Propagation', icon: Globe },
+  { id: 'rufzeichen' as TabId, name: 'Rufzeichen', icon: Radio },
   { id: 'settings' as TabId, name: 'Einstellungen', icon: Settings },
 ];
 
@@ -100,6 +102,8 @@ function App() {
             isLoading={isLoadingSolar}
           />
         );
+      case 'rufzeichen':
+        return <CallsignFinder />;
       case 'settings':
         return <SettingsPanel settings={settings} onUpdate={updateSettings} />;
       default:

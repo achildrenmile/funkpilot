@@ -1,4 +1,4 @@
-import { X, Mic, MessageSquare, FileText, Radio, Settings, HelpCircle, Wrench } from 'lucide-react';
+import { X, Mic, MessageSquare, FileText, Radio, Search, Settings, HelpCircle, Wrench } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface HelpModalProps {
@@ -118,6 +118,22 @@ export function HelpModal({ onClose }: HelpModalProps) {
                 <li>Band-Öffnungen für alle Bänder (160m - 70cm)</li>
                 <li>Wähle ein Ziel für personalisierte Empfehlungen</li>
                 <li>Berücksichtigt deinen Standort (Locator)</li>
+              </ul>
+            </section>
+
+            <section className="bg-slate-700/50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
+                <Search className="w-5 h-5 text-sky-400" />
+                Rufzeichen-Finder
+              </h3>
+              <p className="mb-2">
+                Österreichische Rufzeichen suchen, Verfügbarkeit prüfen und Vorschläge generieren.
+              </p>
+              <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
+                <li><strong>Suche:</strong> Rufzeichen in offizieller OE-Liste und QRZ.com nachschlagen</li>
+                <li><strong>Schwarzfunker-Warnung:</strong> Erkennt Rufzeichen die nur in QRZ, aber nicht offiziell registriert sind</li>
+                <li><strong>Verfügbarkeit:</strong> Prüft Suffix in allen 9 Bundesländern (OE1-OE9)</li>
+                <li><strong>Vorschläge:</strong> Generiert passende Rufzeichen basierend auf deinem Namen</li>
               </ul>
             </section>
 
