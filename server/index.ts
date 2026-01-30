@@ -741,26 +741,60 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
       systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
     }
 
-    // Check for callsign in message and look up in QRZ.com
+    // Check for callsigns in message and look up in official OE list and QRZ.com
     const callsignPattern = /\b([A-Z]{1,2}[0-9][A-Z]{1,4}|[0-9][A-Z][0-9][A-Z]{1,4})\b/gi;
     const callsignsInMessage = message.match(callsignPattern);
 
-    if (callsignsInMessage && QRZ_USERNAME && QRZ_PASSWORD) {
+    if (callsignsInMessage) {
       const uniqueCallsigns: string[] = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))] as string[];
+      const officialCallsigns = await getOfficialCallsigns();
 
       for (const callsign of uniqueCallsigns.slice(0, 3)) { // Limit to 3 lookups
-        const qrzInfo = await lookupQRZ(callsign);
-        if (qrzInfo && !qrzInfo.error) {
+        // First check official OE list
+        const officialInfo = findOfficialCallsign(officialCallsigns, callsign);
+        if (officialInfo) {
           const infoStr = [
-            qrzInfo.fname && qrzInfo.name ? `${qrzInfo.fname} ${qrzInfo.name}` : qrzInfo.name,
-            qrzInfo.addr2,
-            qrzInfo.country,
-            qrzInfo.grid ? `Grid: ${qrzInfo.grid}` : null,
-            qrzInfo.class ? `Lizenzklasse: ${qrzInfo.class}` : null,
+            officialInfo.name || 'Name nicht öffentlich',
+            officialInfo.qth,
+            officialInfo.licenseClass === 1 ? 'CEPT Klasse 1' : officialInfo.licenseClass === 3 ? 'Bewilligungsklasse' : null,
+          ].filter(Boolean).join(', ');
+          systemPrompt += `\n\nOffizielle OE-Daten für ${callsign}: ${infoStr}`;
+          console.log(`Official OE lookup: ${callsign} -> ${infoStr}`);
+          continue; // Skip QRZ if found in official list
+        }
+
+        // Fallback to QRZ.com if not in official list and credentials available
+        if (QRZ_USERNAME && QRZ_PASSWORD) {
+          const qrzInfo = await lookupQRZ(callsign);
+          if (qrzInfo && !qrzInfo.error) {
+            const infoStr = [
+              qrzInfo.fname && qrzInfo.name ? `${qrzInfo.fname} ${qrzInfo.name}` : qrzInfo.name,
+              qrzInfo.addr2,
+              qrzInfo.country,
+              qrzInfo.grid ? `Grid: ${qrzInfo.grid}` : null,
+              qrzInfo.class ? `Lizenzklasse: ${qrzInfo.class}` : null,
+            ].filter(Boolean).join(', ');
+
+            systemPrompt += `\n\nQRZ.com Info für ${callsign}: ${infoStr}`;
+            console.log(`QRZ lookup: ${callsign} -> ${infoStr}`);
+            continue;
+          }
+        }
+
+        // Fallback to HamQTH (free, no auth needed)
+        const hamqthInfo = await lookupHamQTH(callsign);
+        if (hamqthInfo && !hamqthInfo.error) {
+          const infoStr = [
+            hamqthInfo.nick,
+            hamqthInfo.qth,
+            hamqthInfo.country,
+            hamqthInfo.grid ? `Grid: ${hamqthInfo.grid}` : null,
           ].filter(Boolean).join(', ');
 
-          systemPrompt += `\n\nQRZ.com Info für ${callsign}: ${infoStr}`;
-          console.log(`QRZ lookup: ${callsign} -> ${infoStr}`);
+          if (infoStr) {
+            systemPrompt += `\n\nHamQTH Info für ${callsign}: ${infoStr}`;
+            console.log(`HamQTH lookup: ${callsign} -> ${infoStr}`);
+          }
         }
       }
     }
