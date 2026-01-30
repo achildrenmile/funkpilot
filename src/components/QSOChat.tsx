@@ -345,7 +345,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 {message.role === 'user' && (
                   <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0">
                     <span className="text-sm font-mono">
-                      {settings.callsign?.slice(0, 2) || 'OM'}
+                      {settings.callsign?.toUpperCase() === 'OE8PPL' ? 'OL' : (settings.callsign?.slice(0, 2) || 'OM')}
                     </span>
                   </div>
                 )}
