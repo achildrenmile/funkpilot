@@ -62,6 +62,23 @@ Frage nie nach persönlichen Daten. Antworte auf Deutsch mit Begeisterung für d
 Bekannte OMs:
 - Peter Plunger (OE8PPL): Ortsstellenleiter (OL) ADL805 Gailtal im ÖVSV Landesverband 8 (Kärnten). Ein netter und zuvorkommender Funkfreund, der auch einen speziellen Honig aus dem Gailtal anbietet.`;
 
+// Get personalized system prompt based on user callsign
+function getSystemPrompt(userCall?: string): string {
+  let prompt = SYSTEM_PROMPT;
+  // Special handling for OE8PPL (Peter Plunger) - use "OL" instead of "OM"
+  if (userCall?.toUpperCase() === 'OE8PPL') {
+    prompt = prompt.replace(/\bOM\b/g, 'OL');
+  }
+  return prompt;
+}
+
+// Extract user callsign from frontend system prompt
+function extractUserCall(systemText?: string): string | undefined {
+  if (!systemText) return undefined;
+  const match = systemText.match(/Benutzer-Rufzeichen:\s*(\S+)/i);
+  return match?.[1];
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -477,7 +494,10 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Always use server SYSTEM_PROMPT as base to ensure "Bekannte OMs" is included
-    const effectiveSystem = system ? `${SYSTEM_PROMPT}\n\n${system}` : SYSTEM_PROMPT;
+    // Extract userCall from frontend system prompt for personalization (OL for OE8PPL)
+    const userCall = extractUserCall(system);
+    const basePrompt = getSystemPrompt(userCall);
+    const effectiveSystem = system ? `${basePrompt}\n\n${system}` : basePrompt;
     const content = await callAI(messages, effectiveSystem, 1024);
     res.json({ content });
   } catch (error) {
@@ -514,7 +534,10 @@ app.post('/api/chat-stream', async (req, res) => {
     console.log('Streaming: Starting Groq stream');
 
     // Always use server SYSTEM_PROMPT as base to ensure "Bekannte OMs" is included
-    const effectiveSystemStream = system ? `${SYSTEM_PROMPT}\n\n${system}` : SYSTEM_PROMPT;
+    // Extract userCall from frontend system prompt for personalization (OL for OE8PPL)
+    const userCallStream = extractUserCall(system);
+    const basePromptStream = getSystemPrompt(userCallStream);
+    const effectiveSystemStream = system ? `${basePromptStream}\n\n${system}` : basePromptStream;
     const stream = callGroqStream(messages, effectiveSystemStream, 1024);
 
     for await (const chunk of stream) {
@@ -557,7 +580,8 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
 
     // Build context-aware system prompt - ALWAYS use server SYSTEM_PROMPT as base
     // This ensures "Bekannte OMs" section is always included
-    let systemPrompt = SYSTEM_PROMPT;
+    // Use personalized prompt (OL instead of OM for OE8PPL)
+    let systemPrompt = getSystemPrompt(context?.userCall);
     if (system) {
       // Append any additional context from frontend, but keep server's base prompt
       systemPrompt += `\n\n${system}`;
