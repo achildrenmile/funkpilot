@@ -54,14 +54,14 @@ export default function ProjectsTab() {
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <div className="flex items-center flex-1 bg-slate-800 border border-slate-700 rounded-lg focus-within:border-sky-500">
+          <Search className="w-4 h-4 text-slate-400 ml-3 flex-shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Projekt suchen..."
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-sky-500"
+            className="flex-1 bg-transparent px-3 py-2 focus:outline-none"
           />
         </div>
 
