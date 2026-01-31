@@ -745,25 +745,29 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
     const officialCallsigns = await getOfficialCallsigns();
 
     // Check for suffix availability queries (e.g., "Ist YML frei?", "Suffix ABC verfügbar?")
-    const suffixAvailabilityPattern = /(?:ist|ob|suffix|verfügbar|frei|noch frei)\s*[:\s]*([A-Z]{2,4})\b/gi;
-    const suffixMatches = message.match(suffixAvailabilityPattern);
-    if (suffixMatches) {
-      for (const match of suffixMatches.slice(0, 2)) {
-        const suffixMatch = match.match(/([A-Z]{2,4})\s*$/i);
-        if (suffixMatch) {
-          const suffix = suffixMatch[1].toUpperCase();
-          const availability = AUSTRIAN_DISTRICTS.map(district => {
-            const holder = isSuffixTaken(officialCallsigns, district.prefix, suffix);
-            return `${district.prefix}${suffix} (${district.name}): ${holder ? `vergeben an ${holder.name || 'unbekannt'}` : 'FREI'}`;
-          });
-          systemPrompt += `\n\nVerfügbarkeit Suffix "${suffix}" in Österreich:\n${availability.join('\n')}`;
-          console.log(`Suffix availability check in chat: ${suffix}`);
-        }
+    // Look for patterns like "suffix XYZ", "XYZ frei", "XYZ verfügbar", "OE_XYZ"
+    const suffixAvailabilityPattern = /\b(?:suffix\s+)?([A-Z]{2,4})(?:\s+(?:frei|verfügbar|noch\s+frei)|\s+in\s+österreich)/gi;
+    const suffixMatches = [...message.matchAll(suffixAvailabilityPattern)];
+
+    // Also check for direct suffix questions without keywords
+    const directSuffixPattern = /\bist\s+(?:das\s+)?(?:suffix\s+)?([A-Z]{2,4})\s+(?:noch\s+)?(?:frei|verfügbar)/gi;
+    const directMatches = [...message.matchAll(directSuffixPattern)];
+
+    const allSuffixMatches = [...suffixMatches, ...directMatches];
+    for (const match of allSuffixMatches.slice(0, 2)) {
+      const suffix = match[1].toUpperCase();
+      if (suffix.length >= 2 && suffix.length <= 4 && !['IST', 'DAS', 'FÜR', 'VON', 'UND', 'MIT'].includes(suffix)) {
+        const availability = AUSTRIAN_DISTRICTS.map(district => {
+          const holder = isSuffixTaken(officialCallsigns, district.prefix, suffix);
+          return `${district.prefix}${suffix} (${district.name}): ${holder ? `vergeben an ${holder.name || 'unbekannt'}` : 'FREI'}`;
+        });
+        systemPrompt += `\n\nVerfügbarkeit Suffix "${suffix}" in Österreich:\n${availability.join('\n')}`;
+        console.log(`Suffix availability check in chat: ${suffix}`);
       }
     }
 
     // Check for callsign suggestion queries (e.g., "Rufzeichen für Max Mustermann", "Vorschlag für Maria")
-    const suggestionPattern = /(?:rufzeichen|vorschlag|vorschläge|suffix)\s+(?:für|zu|von)\s+([A-ZÄÖÜa-zäöüß]+)\s+([A-ZÄÖÜa-zäöüß]+)/gi;
+    const suggestionPattern = /(?:rufzeichen|vorschl[aä]g|call(?:sign)?)[e\-\s]*(?:für|zu|von|f[uü]r)\s+([A-ZÄÖÜa-zäöüß]+)\s+([A-ZÄÖÜa-zäöüß]+)/gi;
     const suggestionMatches = [...message.matchAll(suggestionPattern)];
     if (suggestionMatches.length > 0) {
       for (const match of suggestionMatches.slice(0, 1)) {
