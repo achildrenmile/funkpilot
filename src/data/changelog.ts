@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.6.0',
+    date: '2026-01-31',
+    title: 'KI Code-Anpassung',
+    changes: [
+      { type: 'feature', text: 'KI-Chat zur Code-Anpassung direkt im Projekt' },
+      { type: 'feature', text: 'Code-Änderungen per Chat: "Ändere die Geschwindigkeit auf 25 WPM"' },
+      { type: 'feature', text: 'Angepasster Code kann direkt übernommen werden' },
+      { type: 'feature', text: 'Quick-Prompts für häufige Anfragen' },
+    ],
+  },
+  {
     version: '1.5.1',
     date: '2026-01-31',
     title: 'Code-Viewer Verbesserungen',

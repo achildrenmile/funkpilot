@@ -1613,6 +1613,123 @@ app.post('/api/tts/speak', async (req, res) => {
   }
 });
 
+// ========== Project Code Customization API ==========
+
+interface ProjectCustomizeRequest {
+  code: string;
+  projectName: string;
+  hardware: string;
+  language: string;
+  userRequest: string;
+  conversationHistory?: { role: 'user' | 'assistant'; content: string }[];
+}
+
+app.post('/api/project/customize', async (req, res) => {
+  try {
+    const { code, projectName, hardware, language, userRequest, conversationHistory } = req.body as ProjectCustomizeRequest;
+
+    if (!code || !userRequest) {
+      return res.status(400).json({ error: 'Code und Anfrage sind erforderlich' });
+    }
+
+    if (!GROQ_API_KEY) {
+      return res.status(500).json({ error: 'GROQ_API_KEY nicht konfiguriert' });
+    }
+
+    // Content moderation
+    if (containsBlockedContent(userRequest)) {
+      return res.json({
+        success: true,
+        response: MODERATION_RESPONSE,
+        modifiedCode: null,
+      });
+    }
+
+    console.log(`Project customize: ${projectName} - "${userRequest.substring(0, 50)}..."`);
+
+    const systemPrompt = `Du bist ein erfahrener Embedded-Entwickler und Funkamateur, spezialisiert auf Arduino und ESP32 Projekte.
+Du hilfst bei der Anpassung von Amateurfunk-Bastelprojekten.
+
+Aktuelles Projekt: ${projectName}
+Hardware-Plattform: ${hardware}
+Programmiersprache: ${language === 'cpp' ? 'C++ / Arduino' : language}
+
+AKTUELLER CODE:
+\`\`\`${language}
+${code}
+\`\`\`
+
+REGELN:
+1. Wenn der Benutzer Code-Änderungen wünscht, gib den KOMPLETTEN modifizierten Code zurück
+2. Markiere den Code mit \`\`\`${language} ... \`\`\`
+3. Erkläre kurz was du geändert hast
+4. Bei Fragen zum Code: erkläre verständlich, wie für einen Einsteiger
+5. Achte auf Arduino/ESP32 Best Practices
+6. Antworte auf Deutsch
+7. Verwende Ham Spirit - freundlich und hilfsbereit
+
+Beispiele für Anfragen:
+- "Ändere die Geschwindigkeit auf 25 WPM" → Passe den Code an und erkläre
+- "Erkläre die loop() Funktion" → Erkläre ohne Code-Änderung
+- "Füge ein Display hinzu" → Zeige den erweiterten Code mit neuen Includes`;
+
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+      { role: 'system', content: systemPrompt },
+    ];
+
+    // Add conversation history
+    if (conversationHistory && conversationHistory.length > 0) {
+      for (const msg of conversationHistory.slice(-10)) { // Last 10 messages
+        messages.push({ role: msg.role, content: msg.content });
+      }
+    }
+
+    messages.push({ role: 'user', content: userRequest });
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages,
+        max_tokens: 4096,
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API error:', errorText);
+      return res.status(500).json({ error: 'KI-Anfrage fehlgeschlagen' });
+    }
+
+    const data = await response.json() as { choices: { message: { content: string } }[] };
+    const aiResponse = data.choices[0]?.message?.content || '';
+
+    // Extract code from response if present
+    const codeMatch = aiResponse.match(/```(?:cpp|c\+\+|arduino|python|micropython)?\n([\s\S]*?)```/);
+    const modifiedCode = codeMatch ? codeMatch[1].trim() : null;
+
+    // Clean response text (remove code block for display)
+    let responseText = aiResponse;
+    if (modifiedCode) {
+      responseText = aiResponse.replace(/```(?:cpp|c\+\+|arduino|python|micropython)?\n[\s\S]*?```/g, '').trim();
+    }
+
+    res.json({
+      success: true,
+      response: responseText,
+      modifiedCode,
+    });
+  } catch (error) {
+    console.error('Project customize error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unbekannter Fehler' });
+  }
+});
+
 // SPA fallback
 app.get('*', (_req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));
