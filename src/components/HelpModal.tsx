@@ -134,6 +134,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
                 <li><strong>Schwarzfunker-Warnung:</strong> Erkennt Rufzeichen die nur in QRZ, aber nicht offiziell registriert sind</li>
                 <li><strong>Verfügbarkeit:</strong> Prüft Suffix in allen 9 Bundesländern (OE1-OE9)</li>
                 <li><strong>Vorschläge:</strong> Generiert passende Rufzeichen basierend auf deinem Namen</li>
+                <li><strong>Chat-Integration:</strong> Alle Features auch im Chat nutzbar ("Wer ist OE3NSC?", "Ist ABC frei?")</li>
               </ul>
             </section>
 

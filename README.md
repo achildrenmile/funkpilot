@@ -19,6 +19,7 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 
 ### 🤖 QSO-Chat-Assistent
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
+- **Rufzeichen-Abfrage**: Automatische Suche in offizieller OE-Liste, QRZ.com & HamQTH
 - Technik, Betriebsverfahren, Vorschriften
 - Propagation-Beratung mit aktuellen Solar-Daten
 - **Chat-Verlauf** mit mehreren Konversationen:
@@ -44,6 +45,17 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 - ADIF-Import für Contest-Logs
 - Detaillierte Statistiken
 - KI-generierte Analyse mit Verbesserungsvorschlägen
+
+### 📻 Rufzeichen-Finder
+- **Rufzeichen-Suche**: OE-Rufzeichen nachschlagen mit offiziellen Daten vom Fernmeldebüro
+- **Schwarzfunker-Erkennung**: Warnung wenn Rufzeichen in QRZ aber nicht offiziell registriert
+- **Verfügbarkeitsprüfung**: Suffix in allen 9 Bundesländern (OE1-OE9) prüfen
+- **Vorschlagsgenerator**: Passende Rufzeichen basierend auf Namen generieren
+- **Chat-Integration**: Alle Features auch direkt im Chat nutzbar
+  - "Wer ist OE3NSC?" → Rufzeichen-Lookup
+  - "Ist Suffix ABC noch frei?" → Verfügbarkeit prüfen
+  - "Rufzeichen für Max Mustermann" → Vorschläge generieren
+- Datenquelle: Offizielle Fernmeldebüro-Liste (7400+ OE-Rufzeichen)
 
 ### 🌍 Propagation-Berater
 - Echtzeit Solar-Daten (SFI, K-Index, A-Index)
@@ -249,27 +261,28 @@ funkpilot/
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │               FRONTEND (React + Vite)                    │   │
 │  │                                                          │   │
-│  │  Voice CQ │ Chat │ Log-Analyse │ Propagation            │   │
+│  │  Voice CQ │ Chat │ Log-Analyse │ Propagation │ Rufzeichen│   │
 │  └─────────────────────────┬───────────────────────────────┘   │
 │                            │                                   │
 │                            ▼                                   │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │               BACKEND (Express.js)                       │   │
 │  │                                                          │   │
-│  │  /api/chat          - KI Chat (Standard)                │   │
-│  │  /api/chat-groq-mcp - KI Chat + Ham Radio Tools         │   │
-│  │  /api/analyze       - Log Analyse                       │   │
-│  │  /api/propagation   - DX Empfehlungen                   │   │
-│  │  /api/solar         - Solar Daten Proxy                 │   │
-│  │  /api/tts/*         - Edge TTS Neural Voices            │   │
+│  │  /api/chat           - KI Chat (Standard)               │   │
+│  │  /api/chat-groq-mcp  - KI Chat + Ham Radio Tools        │   │
+│  │  /api/callsign/*     - Rufzeichen Suche/Vorschläge      │   │
+│  │  /api/analyze        - Log Analyse                      │   │
+│  │  /api/propagation    - DX Empfehlungen                  │   │
+│  │  /api/solar          - Solar Daten Proxy                │   │
+│  │  /api/tts/*          - Edge TTS Neural Voices           │   │
 │  └─────────────────────────┬───────────────────────────────┘   │
 │                            │                                   │
 │      ┌─────────────────────┼─────────────────────────┐        │
 │      ▼           ▼         ▼         ▼               ▼        │
-│  ┌────────┐ ┌─────────┐ ┌──────────┐ ┌───────────┐ ┌──────┐  │
-│  │ Groq   │ │Anthropic│ │OpenRouter│ │  HamQSL   │ │ Edge │  │
-│  │ + MCP  │ │ Claude  │ │(fallback)│ │Solar Data │ │ TTS  │  │
-│  └───┬────┘ └─────────┘ └──────────┘ └───────────┘ └──────┘  │
+│  ┌────────┐ ┌─────────┐ ┌──────────┐ ┌───────────┐ ┌──────┐ ┌────────┐│
+│  │ Groq   │ │Anthropic│ │OpenRouter│ │  HamQSL   │ │ Edge │ │  OE    ││
+│  │ + MCP  │ │ Claude  │ │(fallback)│ │Solar Data │ │ TTS  │ │Callsign││
+│  └───┬────┘ └─────────┘ └──────────┘ └───────────┘ └──────┘ └────────┘│
 │      │                                                        │
 │      ▼                                                        │
 │  ┌──────────────────────┐                                    │
