@@ -1,0 +1,80 @@
+export interface ChangelogEntry {
+  version: string;
+  date: string;
+  title: string;
+  changes: {
+    type: 'feature' | 'improvement' | 'fix';
+    text: string;
+  }[];
+}
+
+export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: '1.4.0',
+    date: '2026-01-31',
+    title: 'Transparente Verarbeitung',
+    changes: [
+      { type: 'feature', text: 'Live-Status während Chat-Verarbeitung: Sieh genau, was passiert!' },
+      { type: 'feature', text: 'Status-Icons für Web-Suche, Rufzeichen-Lookup, Verfügbarkeitsprüfung' },
+      { type: 'improvement', text: 'Abgeschlossene Aktionen werden mit ✓ angezeigt' },
+    ],
+  },
+  {
+    version: '1.3.0',
+    date: '2026-01-31',
+    title: 'Web-Suche & Externe Links',
+    changes: [
+      { type: 'feature', text: 'EU-konforme Web-Suche via Tavily für aktuelle Contest- und Propagation-Infos' },
+      { type: 'feature', text: 'Klickbare Links im Chat mit DSGVO-konformer Warnung bei externen Seiten' },
+      { type: 'improvement', text: 'Tavily und QRZ Status in Einstellungen sichtbar' },
+    ],
+  },
+  {
+    version: '1.2.0',
+    date: '2026-01-30',
+    title: 'Rufzeichen-Finder',
+    changes: [
+      { type: 'feature', text: 'Neuer Tab "Rufzeichen" mit Suche, Verfügbarkeit und Vorschlägen' },
+      { type: 'feature', text: 'Schwarzfunker-Erkennung: Warnung bei nicht-offiziellen OE-Rufzeichen' },
+      { type: 'feature', text: 'Suffix-Verfügbarkeit in allen 9 Bundesländern prüfen' },
+      { type: 'feature', text: 'Rufzeichen-Vorschläge basierend auf Namen generieren' },
+      { type: 'improvement', text: 'Chat-Integration: "Wer ist OE3NSC?", "Ist ABC frei?"' },
+    ],
+  },
+  {
+    version: '1.1.0',
+    date: '2026-01-28',
+    title: 'OERadio Tools & Chat-Verlauf',
+    changes: [
+      { type: 'feature', text: 'OERadio.at Tools im Chat verfügbar (Rechner, Lerntools, Utilities)' },
+      { type: 'feature', text: 'Chat-Verlauf mit mehreren Konversationen' },
+      { type: 'feature', text: 'Automatische Titel-Generierung für Chats' },
+      { type: 'improvement', text: 'Ham Radio Tools (MCP): Bandplan, EIRP, Kabelverlust, etc.' },
+    ],
+  },
+  {
+    version: '1.0.0',
+    date: '2026-01-25',
+    title: 'Erste Version',
+    changes: [
+      { type: 'feature', text: 'Voice CQ Generator mit Edge TTS Neural Voices' },
+      { type: 'feature', text: 'QSO-Chat-Assistent für Amateurfunk-Fragen' },
+      { type: 'feature', text: 'Contest-Log-Analyse mit ADIF-Import' },
+      { type: 'feature', text: 'Propagation-Berater mit Echtzeit Solar-Daten' },
+      { type: 'feature', text: 'Dunkel- und Hell-Modus' },
+    ],
+  },
+];
+
+// Get the latest version for "new" badge
+export const LATEST_VERSION = CHANGELOG[0]?.version || '1.0.0';
+
+// Check if user has seen the latest changelog
+export function hasSeenChangelog(version: string): boolean {
+  const seen = localStorage.getItem('funkpilot_changelog_seen');
+  return seen === version;
+}
+
+export function markChangelogSeen(version: string): void {
+  localStorage.setItem('funkpilot_changelog_seen', version);
+}

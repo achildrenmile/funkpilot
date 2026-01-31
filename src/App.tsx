@@ -8,7 +8,9 @@ import CallsignFinder from './components/CallsignFinder';
 import SettingsPanel from './components/Settings';
 import { LegalModal } from './components/LegalModal';
 import { HelpModal } from './components/HelpModal';
+import { ChangelogModal } from './components/ChangelogModal';
 import { ParentSiteLogo } from './components/ParentSiteLogo';
+import { hasSeenChangelog, LATEST_VERSION } from './data/changelog';
 import { useConfig } from './hooks/useConfig';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import { getUserSettings, saveUserSettings } from './utils/storage';
@@ -31,6 +33,8 @@ function App() {
   const [isLoadingSolar, setIsLoadingSolar] = useState(true);
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
+  const [hasNewChanges, setHasNewChanges] = useState(!hasSeenChangelog(LATEST_VERSION));
   const { config } = useConfig();
 
   // Auto-reload on new version deployment
@@ -253,6 +257,20 @@ function App() {
             </button>
             <span>|</span>
             <button
+              onClick={() => {
+                setShowChangelog(true);
+                setHasNewChanges(false);
+              }}
+              className="text-sky-400 hover:underline flex items-center gap-1 relative"
+            >
+              <span className="hidden sm:inline">Was ist neu?</span>
+              <span className="sm:hidden">Neu</span>
+              {hasNewChanges && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              )}
+            </button>
+            <span>|</span>
+            <button
               onClick={() => setShowHelp(true)}
               className="text-sky-400 hover:underline flex items-center gap-1"
             >
@@ -282,6 +300,11 @@ function App() {
       {/* Help Modal */}
       {showHelp && (
         <HelpModal onClose={() => setShowHelp(false)} />
+      )}
+
+      {/* Changelog Modal */}
+      {showChangelog && (
+        <ChangelogModal onClose={() => setShowChangelog(false)} />
       )}
     </div>
   );
