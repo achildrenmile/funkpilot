@@ -209,6 +209,17 @@ void updateDisplay() {
   codeLanguage: 'cpp',
   codeFileName: 'swr_meter.ino',
 
+  wiring: [
+    { from: 'Arduino A4 (SDA)', to: 'OLED SDA', color: 'Blau', notes: 'I2C Daten' },
+    { from: 'Arduino A5 (SCL)', to: 'OLED SCL', color: 'Gelb', notes: 'I2C Clock' },
+    { from: 'Arduino A0', to: 'Richtkoppler FWD', color: 'Rot', notes: 'über Spannungsteiler' },
+    { from: 'Arduino A1', to: 'Richtkoppler REF', color: 'Orange', notes: 'über Spannungsteiler' },
+    { from: 'Arduino 5V', to: 'OLED VCC', color: 'Rot' },
+    { from: 'Arduino GND', to: 'OLED GND', color: 'Schwarz' },
+    { from: 'BNC Input', to: 'Richtkoppler IN', notes: 'vom Transceiver' },
+    { from: 'Richtkoppler OUT', to: 'BNC Output', notes: 'zur Antenne' },
+  ],
+
   customizationSuggestions: [
     'Peak-Hold Funktion für maximalen SWR',
     'Akustische Warnung bei hohem SWR',

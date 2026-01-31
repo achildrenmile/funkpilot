@@ -4,6 +4,7 @@ import type { HamProject } from '../../types/projects';
 import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS } from '../../types/projects';
 import { CodeViewer } from './CodeViewer';
 import { ComponentList } from './ComponentList';
+import { WiringTable } from './WiringTable';
 import { ProjectChat } from './ProjectChat';
 
 interface ProjectDetailProps {
@@ -70,6 +71,14 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
             estimatedCost={project.estimatedCost}
             projectName={project.name}
           />
+
+          {/* Wiring Table */}
+          {project.wiring && project.wiring.length > 0 && (
+            <WiringTable
+              wiring={project.wiring}
+              wokwiUrl={project.wokwiUrl}
+            />
+          )}
 
           {/* Customization Suggestions */}
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">

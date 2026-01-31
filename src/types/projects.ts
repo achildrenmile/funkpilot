@@ -17,8 +17,12 @@ export interface HamProject {
   codeLanguage: 'cpp' | 'python' | 'micropython';
   codeFileName: string;
 
+  // Verdrahtung
+  wiring?: WiringConnection[];
+
   // Optional
   schematicUrl?: string;
+  wokwiUrl?: string;  // Wokwi Simulator Link
   externalLinks?: { title: string; url: string }[];
 
   // KI-Anpassungs-Vorschläge
@@ -45,6 +49,13 @@ export interface Component {
   name: string;
   quantity: number;
   notes?: string;
+}
+
+export interface WiringConnection {
+  from: string;        // z.B. "Arduino Pin 9"
+  to: string;          // z.B. "Taster Pin 1"
+  color?: string;      // Kabelfarbe (optional)
+  notes?: string;      // z.B. "über 10k Widerstand"
 }
 
 export const CATEGORY_INFO: Record<ProjectCategory, { name: string; icon: string }> = {

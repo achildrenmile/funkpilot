@@ -86,9 +86,9 @@ export function ProjectChat({ code, projectName, hardware, language, onCodeUpdat
   };
 
   const quickPrompts = [
-    'Erkläre den Code',
+    'Schritt-für-Schritt Bauanleitung',
+    'Erkläre den Code für Anfänger',
     'Füge Kommentare hinzu',
-    'Optimiere für weniger Speicher',
   ];
 
   return (

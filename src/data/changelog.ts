@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.6.1',
+    date: '2026-01-31',
+    title: 'Verdrahtungstabelle & Bauanleitung',
+    changes: [
+      { type: 'feature', text: 'Verdrahtungstabelle mit Pin-Belegung für jedes Projekt' },
+      { type: 'feature', text: 'Farbcodierte Kabelempfehlungen' },
+      { type: 'feature', text: 'Link zum Wokwi Online-Simulator (wo verfügbar)' },
+      { type: 'feature', text: 'KI-generierte Schritt-für-Schritt Bauanleitung' },
+    ],
+  },
+  {
     version: '1.6.0',
     date: '2026-01-31',
     title: 'KI Code-Anpassung',

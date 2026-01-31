@@ -212,6 +212,24 @@ void startupSequence() {
   codeLanguage: 'cpp',
   codeFileName: 'antenna_switch.ino',
 
+  wiring: [
+    { from: 'Arduino D2', to: 'Taster ANT1', color: 'Gelb', notes: 'nach GND schalten' },
+    { from: 'Arduino D3', to: 'Taster ANT2', color: 'Gelb' },
+    { from: 'Arduino D4', to: 'Taster ANT3', color: 'Gelb' },
+    { from: 'Arduino D5', to: 'Taster ANT4', color: 'Gelb' },
+    { from: 'Arduino D6', to: 'Relais-Modul IN1', color: 'Blau' },
+    { from: 'Arduino D7', to: 'Relais-Modul IN2', color: 'Blau' },
+    { from: 'Arduino D8', to: 'Relais-Modul IN3', color: 'Blau' },
+    { from: 'Arduino D9', to: 'Relais-Modul IN4', color: 'Blau' },
+    { from: 'Arduino D10', to: 'LED1 Anode', color: 'Grün', notes: 'über 220Ω' },
+    { from: 'Arduino D11', to: 'LED2 Anode', color: 'Grün', notes: 'über 220Ω' },
+    { from: 'Arduino D12', to: 'LED3 Anode', color: 'Grün', notes: 'über 220Ω' },
+    { from: 'Arduino D13', to: 'LED4 Anode', color: 'Grün', notes: 'über 220Ω' },
+    { from: 'Arduino 5V', to: 'Relais-Modul VCC', color: 'Rot' },
+    { from: 'Arduino GND', to: 'Relais-Modul GND + LEDs + Taster', color: 'Schwarz' },
+    { from: 'Relais COM', to: 'Koax-Relais', notes: 'HF-Pfad umschalten' },
+  ],
+
   customizationSuggestions: [
     'Band-Decoder für automatische Umschaltung',
     'CAT/CI-V Steuerung vom Transceiver',

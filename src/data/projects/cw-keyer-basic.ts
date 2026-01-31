@@ -157,6 +157,22 @@ void playStartupTone() {
   codeLanguage: 'cpp',
   codeFileName: 'cw_keyer_basic.ino',
 
+  wiring: [
+    { from: 'Arduino D2', to: 'Paddle DIT', color: 'Gelb', notes: 'über 1k Widerstand' },
+    { from: 'Arduino D3', to: 'Paddle DAH', color: 'Orange', notes: 'über 1k Widerstand' },
+    { from: 'Arduino D4', to: 'KEY-Out Buchse', color: 'Rot', notes: 'zum TRX' },
+    { from: 'Arduino D5', to: 'Piezo Buzzer +', color: 'Blau' },
+    { from: 'Arduino D6', to: 'LED Anode', color: 'Grün', notes: 'über Vorwiderstand' },
+    { from: 'Arduino A0', to: 'Poti Schleifer', color: 'Weiß' },
+    { from: 'Poti Außen 1', to: 'Arduino 5V', color: 'Rot' },
+    { from: 'Poti Außen 2', to: 'Arduino GND', color: 'Schwarz' },
+    { from: 'Piezo Buzzer -', to: 'Arduino GND', color: 'Schwarz' },
+    { from: 'LED Kathode', to: 'Arduino GND', color: 'Schwarz' },
+    { from: 'Paddle Common', to: 'Arduino GND', color: 'Schwarz' },
+  ],
+
+  wokwiUrl: 'https://wokwi.com/projects/new/arduino-nano',
+
   customizationSuggestions: [
     'OLED-Display für WPM-Anzeige hinzufügen',
     'Memory-Funktion für CQ-Ruf speichern',

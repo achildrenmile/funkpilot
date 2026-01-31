@@ -284,6 +284,20 @@ void printStatus() {
   codeLanguage: 'cpp',
   codeFileName: 'aprs_tracker.ino',
 
+  wiring: [
+    { from: 'ESP32 GPIO16 (RX2)', to: 'GPS TX', color: 'Grün', notes: 'GPS Daten empfangen' },
+    { from: 'ESP32 GPIO17 (TX2)', to: 'GPS RX', color: 'Gelb', notes: 'GPS Kommandos' },
+    { from: 'ESP32 GPIO4', to: 'SA818 PTT', color: 'Orange', notes: 'Push-To-Talk' },
+    { from: 'ESP32 GPIO25 (DAC)', to: 'SA818 MIC', color: 'Blau', notes: 'Audio-Ausgang' },
+    { from: 'ESP32 GPIO21 (SDA)', to: 'OLED SDA', color: 'Weiß', notes: 'optional' },
+    { from: 'ESP32 GPIO22 (SCL)', to: 'OLED SCL', color: 'Grau', notes: 'optional' },
+    { from: 'ESP32 GPIO0', to: 'Taster Beacon', color: 'Gelb', notes: 'manueller Beacon' },
+    { from: 'ESP32 3.3V', to: 'GPS VCC + OLED VCC', color: 'Rot' },
+    { from: 'SA818 VCC', to: 'LiPo + (über Schalter)', color: 'Rot', notes: '3.3-5V' },
+    { from: 'Alle GND', to: 'Gemeinsame Masse', color: 'Schwarz' },
+    { from: 'LiPo', to: 'TP4056 BAT+/BAT-', notes: 'Lademodul' },
+  ],
+
   customizationSuggestions: [
     'SmartBeaconing Algorithmus implementieren',
     'WiFi-Webinterface für Konfiguration',
