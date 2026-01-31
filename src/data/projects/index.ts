@@ -39,6 +39,11 @@ import { loraAntenna868 } from './lora-antenna-868';
 import { loraRangeTester } from './lora-range-tester';
 import { meshtasticRepeaterGuide } from './meshtastic-repeater-guide';
 import { meshFirmwareComparison } from './mesh-firmware-comparison';
+import { mqttBridgeGuide } from './mqtt-bridge-guide';
+import { aprsGatewayGuide } from './aprs-gateway-guide';
+import { meshNetworkPlanning } from './mesh-network-planning';
+import { meshtasticSensors } from './meshtastic-sensors';
+import { meshtasticHamMode } from './meshtastic-ham-mode';
 
 import type { HamProject } from '../../types/projects';
 
@@ -53,6 +58,11 @@ export const ALL_PROJECTS: HamProject[] = [
   loraRangeTester,
   meshtasticRepeaterGuide,
   meshFirmwareComparison,
+  mqttBridgeGuide,
+  aprsGatewayGuide,
+  meshNetworkPlanning,
+  meshtasticSensors,
+  meshtasticHamMode,
 
   // CW/Morse
   cwKeyerBasic,
@@ -105,6 +115,11 @@ export {
   loraRangeTester,
   meshtasticRepeaterGuide,
   meshFirmwareComparison,
+  mqttBridgeGuide,
+  aprsGatewayGuide,
+  meshNetworkPlanning,
+  meshtasticSensors,
+  meshtasticHamMode,
   // Existing
   cwKeyerBasic,
   swrMeter,

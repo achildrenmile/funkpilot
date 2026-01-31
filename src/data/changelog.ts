@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.12.0',
+    date: '2026-01-31',
+    title: 'Mesh/LoRa Komplett-Paket',
+    changes: [
+      { type: 'feature', text: 'MQTT-Bridge Guide: Internet-Anbindung für Mesh' },
+      { type: 'feature', text: 'APRS-Gateway Guide: Meshtastic ↔ APRS Brücke' },
+      { type: 'feature', text: 'Mesh-Netzwerk planen: Standorte, Reichweiten, Redundanz' },
+      { type: 'feature', text: 'Sensoren integrieren: BME280, INA219 und mehr' },
+      { type: 'feature', text: 'HAM-Modus: Mehr Leistung für Funkamateure' },
+      { type: 'improvement', text: 'Jetzt 14 Mesh/LoRa Projekte verfügbar!' },
+    ],
+  },
+  {
     version: '1.11.0',
     date: '2026-01-31',
     title: 'Mesh/LoRa Projekte',
