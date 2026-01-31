@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.13.1',
+    date: '2026-01-31',
+    title: 'Custom Firmware Guide',
+    changes: [
+      { type: 'feature', text: 'Eigene Firmware kompilieren: PlatformIO Setup Guide' },
+      { type: 'feature', text: 'Schritt-für-Schritt vom Clone bis zum Upload' },
+      { type: 'feature', text: 'Eigene Anpassungen & Feature-Flags erklärt' },
+      { type: 'improvement', text: 'Jetzt 16 Mesh/LoRa Projekte verfügbar!' },
+    ],
+  },
+  {
     version: '1.13.0',
     date: '2026-01-31',
     title: 'LoRa Interaktive Tools',

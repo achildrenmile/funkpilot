@@ -45,6 +45,7 @@ import { meshNetworkPlanning } from './mesh-network-planning';
 import { meshtasticSensors } from './meshtastic-sensors';
 import { meshtasticHamMode } from './meshtastic-ham-mode';
 import { loraTools } from './lora-tools';
+import { meshtasticCustomFirmware } from './meshtastic-custom-firmware';
 
 import type { HamProject } from '../../types/projects';
 
@@ -65,6 +66,7 @@ export const ALL_PROJECTS: HamProject[] = [
   meshtasticSensors,
   meshtasticHamMode,
   loraTools,
+  meshtasticCustomFirmware,
 
   // CW/Morse
   cwKeyerBasic,
@@ -123,6 +125,7 @@ export {
   meshtasticSensors,
   meshtasticHamMode,
   loraTools,
+  meshtasticCustomFirmware,
   // Existing
   cwKeyerBasic,
   swrMeter,
