@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.5.0',
+    date: '2026-01-31',
+    title: 'HAM Bastelprojekte',
+    changes: [
+      { type: 'feature', text: 'Neuer Tab "Projekte" mit Arduino & ESP32 Bastelprojekten' },
+      { type: 'feature', text: 'Code-Viewer mit Syntax-Highlighting, Copy & Download' },
+      { type: 'feature', text: 'Stücklisten und Kostenabschätzung für jedes Projekt' },
+      { type: 'feature', text: 'Erste Projekte: CW-Keyer, SWR-Meter, APRS-Tracker, Antennenumschalter' },
+    ],
+  },
+  {
     version: '1.4.0',
     date: '2026-01-31',
     title: 'Transparente Verarbeitung',

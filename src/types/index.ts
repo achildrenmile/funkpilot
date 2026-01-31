@@ -140,7 +140,7 @@ export interface UserSettings {
 
 // ===== Tab Navigation =====
 
-export type TabId = 'voice' | 'chat' | 'log' | 'propagation' | 'rufzeichen' | 'settings';
+export type TabId = 'voice' | 'chat' | 'log' | 'propagation' | 'rufzeichen' | 'projects' | 'settings';
 
 export interface Tab {
   id: TabId;
