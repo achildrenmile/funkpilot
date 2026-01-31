@@ -262,6 +262,27 @@ function PrivacyContent() {
 
       <section>
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          Wokwi Simulator (extern)
+        </h3>
+        <p className="mb-2">
+          Bei den Bastelprojekten können Sie optional den externen Arduino/ESP32-Simulator
+          <strong> Wokwi.com</strong> nutzen. Wenn Sie auf "Im Simulator öffnen" klicken,
+          werden Sie auf die externe Website wokwi.com weitergeleitet.
+        </p>
+        <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+          <li>FunkPilot überträgt dabei <strong>keine Daten</strong> an Wokwi</li>
+          <li>Sie kopieren den Code manuell in den Simulator</li>
+          <li>Wokwi unterliegt eigenen Datenschutzbestimmungen</li>
+          <li>Die Nutzung von Wokwi ist freiwillig und nicht erforderlich</li>
+        </ul>
+        <p className="mt-2 text-sm">
+          Betreiber: Wokwi Ltd. (Israel). Datenschutzerklärung:
+          <a href="https://wokwi.com/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline ml-1">wokwi.com/privacy</a>
+        </p>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">
           Ihre Rechte nach DSGVO
         </h3>
         <p className="mb-2">

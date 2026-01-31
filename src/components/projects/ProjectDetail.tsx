@@ -77,6 +77,8 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
             <WiringTable
               wiring={project.wiring}
               wokwiUrl={project.wokwiUrl}
+              code={currentCode}
+              hardware={hardware.name}
             />
           )}
 
