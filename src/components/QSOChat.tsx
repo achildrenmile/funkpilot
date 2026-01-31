@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu, ExternalLink, X } from 'lucide-react';
+import ReactMarkdown, { Components } from 'react-markdown';
 import { sendChatMessage, sendChatMessageStream, ChatProvider } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { useChatHistory } from '../hooks/useChatHistory';
@@ -43,7 +43,44 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   const [provider, setProvider] = useState<ChatProvider>('auto');
   const [showProviderMenu, setShowProviderMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingExternalLink, setPendingExternalLink] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check if URL is external (not our domain)
+  const isExternalLink = useCallback((url: string): boolean => {
+    try {
+      const linkUrl = new URL(url, window.location.origin);
+      return linkUrl.origin !== window.location.origin;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Custom link renderer for ReactMarkdown
+  const markdownComponents: Components = {
+    a: ({ href, children }) => {
+      const url = href || '';
+      const external = isExternalLink(url);
+
+      if (external) {
+        return (
+          <button
+            onClick={() => setPendingExternalLink(url)}
+            className="text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
+          >
+            {children}
+            <ExternalLink className="w-3 h-3" />
+          </button>
+        );
+      }
+
+      return (
+        <a href={url} className="text-sky-400 hover:text-sky-300 underline">
+          {children}
+        </a>
+      );
+    },
+  };
 
   // Get messages from active conversation
   const messages: ExtendedChatMessage[] = activeConversation?.messages || [];
@@ -325,7 +362,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 >
                   {message.role === 'assistant' ? (
                     <div className="prose prose-invert prose-sm max-w-none">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown>
                     </div>
                   ) : (
                     <p>{message.content}</p>
@@ -361,7 +398,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               </div>
               <div className="max-w-[80%] rounded-xl px-4 py-3 bg-slate-700 text-slate-100">
                 <div className="prose prose-invert prose-sm max-w-none">
-                  <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                  <ReactMarkdown components={markdownComponents}>{streamingContent}</ReactMarkdown>
                 </div>
                 <div className="flex items-center gap-2 mt-2 text-xs opacity-50">
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -429,6 +466,66 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           </div>
         </form>
       </div>
+
+      {/* External Link Warning Modal */}
+      {pendingExternalLink && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setPendingExternalLink(null)}
+        >
+          <div
+            className="bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-600/20 flex items-center justify-center">
+                  <ExternalLink className="w-5 h-5 text-amber-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white">Externe Webseite</h3>
+              </div>
+              <button
+                onClick={() => setPendingExternalLink(null)}
+                className="p-1 rounded hover:bg-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+
+            <p className="text-slate-300 mb-3">
+              Du verlässt jetzt FunkPilot und wirst zu einer externen Webseite weitergeleitet:
+            </p>
+
+            <div className="bg-slate-900 rounded-lg px-3 py-2 mb-4 break-all">
+              <code className="text-sky-400 text-sm">{pendingExternalLink}</code>
+            </div>
+
+            <p className="text-slate-400 text-sm mb-6">
+              Gemäß DSGVO/ECG weisen wir darauf hin, dass für externe Webseiten deren eigene
+              Datenschutzbestimmungen gelten. FunkPilot übernimmt keine Haftung für externe Inhalte.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingExternalLink(null)}
+                className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={() => {
+                  window.open(pendingExternalLink, '_blank', 'noopener,noreferrer');
+                  setPendingExternalLink(null);
+                }}
+                className="flex-1 px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Öffnen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
