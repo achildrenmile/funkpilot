@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.5.1',
+    date: '2026-01-31',
+    title: 'Code-Viewer Verbesserungen',
+    changes: [
+      { type: 'improvement', text: 'Erweitertes Syntax-Highlighting: Keywords, Types, Functions, Constants' },
+      { type: 'feature', text: 'Vollbild-Modus für Code-Viewer' },
+      { type: 'feature', text: 'Stücklisten-Export als CSV und TXT' },
+      { type: 'improvement', text: 'Traffic-Light Dekoration im macOS-Style' },
+    ],
+  },
+  {
     version: '1.5.0',
     date: '2026-01-31',
     title: 'HAM Bastelprojekte',

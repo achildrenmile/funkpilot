@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { ArrowLeft, Copy, Download, Check, ExternalLink, Cpu, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Cpu, Lightbulb } from 'lucide-react';
 import type { HamProject } from '../../types/projects';
 import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS } from '../../types/projects';
+import { CodeViewer } from './CodeViewer';
+import { ComponentList } from './ComponentList';
 
 interface ProjectDetailProps {
   project: HamProject;
@@ -9,27 +10,8 @@ interface ProjectDetailProps {
 }
 
 export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
-  const [copied, setCopied] = useState(false);
   const category = CATEGORY_INFO[project.category];
   const hardware = HARDWARE_INFO[project.hardware];
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(project.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleDownload = () => {
-    const blob = new Blob([project.code], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = project.codeFileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="space-y-6">
@@ -69,26 +51,11 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
           </div>
 
           {/* Components */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold text-slate-100 mb-3">Stückliste</h3>
-            <div className="space-y-2">
-              {project.components.map((comp, idx) => (
-                <div key={idx} className="flex items-start justify-between text-sm">
-                  <div className="flex-1">
-                    <span className="text-slate-200">{comp.name}</span>
-                    {comp.notes && (
-                      <span className="text-slate-500 text-xs ml-2">({comp.notes})</span>
-                    )}
-                  </div>
-                  <span className="text-slate-400 ml-2">{comp.quantity}x</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-700 flex justify-between text-sm">
-              <span className="text-slate-400">Geschätzte Kosten:</span>
-              <span className="text-green-400 font-medium">{project.estimatedCost}</span>
-            </div>
-          </div>
+          <ComponentList
+            components={project.components}
+            estimatedCost={project.estimatedCost}
+            projectName={project.name}
+          />
 
           {/* Customization Suggestions */}
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
@@ -130,58 +97,11 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
 
         {/* Right Column: Code */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
-            {/* Code Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-mono text-slate-300">{project.codeFileName}</span>
-                <span className="text-xs text-slate-500 bg-slate-700 px-2 py-0.5 rounded">
-                  {project.codeLanguage === 'cpp' ? 'C++' : project.codeLanguage}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400">Kopiert!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>Kopieren</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={handleDownload}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Code Content */}
-            <div className="p-4 overflow-x-auto max-h-[600px] overflow-y-auto">
-              <pre className="text-sm font-mono text-slate-300 leading-relaxed">
-                <code>
-                  {project.code.split('\n').map((line, idx) => (
-                    <div key={idx} className="flex">
-                      <span className="text-slate-600 select-none w-12 text-right pr-4 flex-shrink-0">
-                        {idx + 1}
-                      </span>
-                      <span className="flex-1">{highlightSyntax(line)}</span>
-                    </div>
-                  ))}
-                </code>
-              </pre>
-            </div>
-          </div>
+          <CodeViewer
+            code={project.code}
+            fileName={project.codeFileName}
+            language={project.codeLanguage}
+          />
 
           {/* Tip */}
           <div className="mt-4 bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
@@ -194,20 +114,4 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
       </div>
     </div>
   );
-}
-
-// Simple syntax highlighting for C++
-function highlightSyntax(line: string): JSX.Element {
-  // Comments
-  if (line.trim().startsWith('//')) {
-    return <span className="text-slate-500">{line}</span>;
-  }
-
-  // Preprocessor
-  if (line.trim().startsWith('#')) {
-    return <span className="text-purple-400">{line}</span>;
-  }
-
-  // This is a simplified highlighter - for production use a proper library
-  return <span>{line}</span>;
 }
