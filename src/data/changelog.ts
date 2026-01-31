@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.8.0',
+    date: '2026-01-31',
+    title: 'Mehrsprachigkeit / Multilingual',
+    changes: [
+      { type: 'feature', text: 'Drei Sprachen: Deutsch, English, Slovenščina' },
+      { type: 'feature', text: 'Sprachauswahl im Header und in Einstellungen' },
+      { type: 'feature', text: 'Automatische Spracherkennung (Browser-Sprache)' },
+      { type: 'improvement', text: 'Alle UI-Texte übersetzt' },
+    ],
+  },
+  {
     version: '1.7.1',
     date: '2026-01-31',
     title: 'Mobile Projekte-Tab',

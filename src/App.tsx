@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Mic, MessageCircle, BarChart3, Globe, Radio, Settings, HelpCircle, Github, Wrench } from 'lucide-react';
 import VoiceCQ from './components/VoiceCQ';
 import QSOChat from './components/QSOChat';
@@ -11,6 +12,7 @@ import { LegalModal } from './components/LegalModal';
 import { HelpModal } from './components/HelpModal';
 import { ChangelogModal } from './components/ChangelogModal';
 import { ParentSiteLogo } from './components/ParentSiteLogo';
+import { LanguageSelector } from './components/LanguageSelector';
 import { hasSeenChangelog, LATEST_VERSION } from './data/changelog';
 import { useConfig } from './hooks/useConfig';
 import { useVersionCheck } from './hooks/useVersionCheck';
@@ -18,17 +20,8 @@ import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
 import type { TabId, UserSettings, SolarData } from './types';
 
-const TABS = [
-  { id: 'voice' as TabId, name: 'Voice CQ', icon: Mic },
-  { id: 'chat' as TabId, name: 'QSO-Chat', icon: MessageCircle },
-  { id: 'log' as TabId, name: 'Log-Analyse', icon: BarChart3 },
-  { id: 'propagation' as TabId, name: 'Propagation', icon: Globe },
-  { id: 'rufzeichen' as TabId, name: 'Rufzeichen', icon: Radio },
-  { id: 'projects' as TabId, name: 'Projekte', icon: Wrench },
-  { id: 'settings' as TabId, name: 'Einstellungen', icon: Settings },
-];
-
 function App() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('voice');
   const [settings, setSettings] = useState<UserSettings>(getUserSettings());
   const [solarData, setSolarData] = useState<SolarData | null>(null);
@@ -38,6 +31,16 @@ function App() {
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasNewChanges, setHasNewChanges] = useState(!hasSeenChangelog(LATEST_VERSION));
   const { config } = useConfig();
+
+  const TABS = [
+    { id: 'voice' as TabId, nameKey: 'nav.voiceCQ', icon: Mic },
+    { id: 'chat' as TabId, nameKey: 'nav.qsoChat', icon: MessageCircle },
+    { id: 'log' as TabId, nameKey: 'nav.logAnalysis', icon: BarChart3 },
+    { id: 'propagation' as TabId, nameKey: 'nav.propagation', icon: Globe },
+    { id: 'rufzeichen' as TabId, nameKey: 'nav.callsign', icon: Radio },
+    { id: 'projects' as TabId, nameKey: 'nav.projects', icon: Wrench },
+    { id: 'settings' as TabId, nameKey: 'nav.settings', icon: Settings },
+  ];
 
   // Auto-reload on new version deployment
   useVersionCheck();
@@ -143,23 +146,26 @@ function App() {
                   </svg>
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-lg sm:text-xl font-bold text-white truncate">FunkPilot</h1>
-                  <p className="text-xs text-slate-400 hidden sm:block">KI-Assistent für Funkamateure</p>
+                  <h1 className="text-lg sm:text-xl font-bold text-white truncate">{t('common.appName')}</h1>
+                  <p className="text-xs text-slate-400 hidden sm:block">{t('common.appTagline')}</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+              {/* Language Selector */}
+              <LanguageSelector />
+
               {/* AI Badge - EU AI Act Art. 50 compliance */}
               <div
                 className="hidden md:flex items-center gap-1.5 bg-amber-600/20 text-amber-400 px-2.5 py-1 rounded-md text-xs cursor-pointer hover:bg-amber-600/30 transition-colors"
                 onClick={() => setLegalModal('privacy')}
-                title="Dieses System verwendet Künstliche Intelligenz"
+                title={t('common.aiSystemTitle')}
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
-                <span>KI-System</span>
+                <span>{t('common.aiSystem')}</span>
               </div>
 
               {/* Solar Conditions Badge - Compact on mobile */}
@@ -207,10 +213,10 @@ function App() {
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/20'
                     }
                   `}
-                  title={tab.name}
+                  title={t(tab.nameKey)}
                 >
                   <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{tab.name}</span>
+                  <span className="hidden sm:inline">{t(tab.nameKey)}</span>
                 </button>
               );
             })}
@@ -249,15 +255,15 @@ function App() {
               onClick={() => setLegalModal('imprint')}
               className="text-sky-400 hover:underline"
             >
-              Impressum
+              {t('footer.imprint')}
             </button>
             <span>|</span>
             <button
               onClick={() => setLegalModal('privacy')}
               className="text-sky-400 hover:underline"
             >
-              <span className="hidden sm:inline">Datenschutz & KI</span>
-              <span className="sm:hidden">Datenschutz</span>
+              <span className="hidden sm:inline">{t('footer.privacyAI')}</span>
+              <span className="sm:hidden">{t('footer.privacy')}</span>
             </button>
             <span>|</span>
             <button
@@ -267,8 +273,8 @@ function App() {
               }}
               className="text-sky-400 hover:underline flex items-center gap-1 relative"
             >
-              <span className="hidden sm:inline">Was ist neu?</span>
-              <span className="sm:hidden">Neu</span>
+              <span className="hidden sm:inline">{t('footer.whatsNew')}</span>
+              <span className="sm:hidden">{t('footer.new')}</span>
               {hasNewChanges && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               )}
@@ -279,7 +285,7 @@ function App() {
               className="text-sky-400 hover:underline flex items-center gap-1"
             >
               <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Hilfe</span>
+              <span className="hidden sm:inline">{t('footer.help')}</span>
             </button>
             <span>|</span>
             <a

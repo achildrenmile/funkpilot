@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Globe, RefreshCw, Loader2, AlertCircle, Minus, MapPin } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getSolarData, getConditionQuality } from '../services/solar';
@@ -15,6 +16,7 @@ interface PropagationProps {
 }
 
 export default function Propagation({ settings, solarData, isLoading }: PropagationProps) {
+  const { t: _t } = useTranslation(); // Will be used for translations
   const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
   const [customLocator, setCustomLocator] = useState('');
   const [advice, setAdvice] = useState<string | null>(null);

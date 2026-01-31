@@ -1,4 +1,5 @@
 import { Plus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ChatConversation } from '../types';
 import ChatListItem from './ChatListItem';
 
@@ -21,6 +22,8 @@ export default function ChatSidebar({
   isOpen,
   onClose,
 }: ChatSidebarProps) {
+  const { t } = useTranslation();
+
   const handleSelectConversation = (id: string) => {
     onSelectConversation(id);
     onClose(); // Close sidebar on mobile after selection
@@ -31,7 +34,7 @@ export default function ChatSidebar({
       {/* Header */}
       <div className="p-3 border-b border-slate-700">
         <div className="flex items-center justify-between mb-3 md:hidden">
-          <h3 className="font-medium text-slate-200">Chat-Verlauf</h3>
+          <h3 className="font-medium text-slate-200">{t('chat.chatHistory')}</h3>
           <button
             onClick={onClose}
             className="p-1.5 rounded hover:bg-slate-700 text-slate-400"
@@ -47,7 +50,7 @@ export default function ChatSidebar({
           className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white py-2.5 px-4 rounded-lg transition-colors font-medium"
         >
           <Plus className="w-5 h-5" />
-          <span>Neuer Chat</span>
+          <span>{t('chat.newChat')}</span>
         </button>
       </div>
 
@@ -56,10 +59,10 @@ export default function ChatSidebar({
         {conversations.length === 0 ? (
           <div className="text-center py-8 px-4">
             <p className="text-slate-500 text-sm">
-              Noch keine Chats vorhanden.
+              {t('chat.chatHistory')} - 0
             </p>
             <p className="text-slate-600 text-xs mt-1">
-              Starte einen neuen Chat!
+              {t('chat.newChat')}!
             </p>
           </div>
         ) : (

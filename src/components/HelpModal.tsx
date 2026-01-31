@@ -1,11 +1,14 @@
 import { X, Mic, MessageSquare, FileText, Radio, Search, Settings, HelpCircle, Wrench } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface HelpModalProps {
   onClose: () => void;
 }
 
 export function HelpModal({ onClose }: HelpModalProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -28,12 +31,12 @@ export function HelpModal({ onClose }: HelpModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
           <h2 className="text-xl font-semibold text-slate-100 flex items-center gap-2">
             <HelpCircle className="w-6 h-6 text-sky-400" />
-            Hilfe
+            {t('help.title')}
           </h2>
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-slate-700 transition-colors"
-            aria-label="Schließen"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5 text-slate-400" />
           </button>

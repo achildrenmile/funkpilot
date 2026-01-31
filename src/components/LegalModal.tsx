@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LegalModalProps {
   type: 'imprint' | 'privacy';
@@ -7,6 +8,8 @@ interface LegalModalProps {
 }
 
 export function LegalModal({ type, onClose }: LegalModalProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -28,12 +31,12 @@ export function LegalModal({ type, onClose }: LegalModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
           <h2 className="text-xl font-semibold text-slate-100">
-            {type === 'imprint' ? 'Impressum' : 'Datenschutzerklärung'}
+            {type === 'imprint' ? t('imprint.title') : t('privacy.title')}
           </h2>
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-slate-700 transition-colors"
-            aria-label="Schließen"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5 text-slate-400" />
           </button>

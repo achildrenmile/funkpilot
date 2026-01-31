@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu, ExternalLink, X, Search, Radio, Sparkles, Globe, User } from 'lucide-react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { sendChatMessageStream, sendChatMessageWithStatus, ChatProvider } from '../services/claude';
@@ -18,13 +19,15 @@ interface QSOChatProps {
   solarData: SolarData | null;
 }
 
-const PROVIDER_OPTIONS: { id: ChatProvider; name: string; description: string }[] = [
-  { id: 'auto', name: 'Auto (Empfohlen)', description: 'Groq + Ham Radio Tools mit Fallback' },
-  { id: 'groq-mcp', name: 'Groq + Ham Radio Tools', description: 'Mit Berechnungs-Tools' },
-  { id: 'standard', name: 'Standard Chat', description: 'Ohne spezielle Tools' },
-];
-
 export default function QSOChat({ settings, solarData }: QSOChatProps) {
+  const { t } = useTranslation();
+
+  const PROVIDER_OPTIONS: { id: ChatProvider; nameKey: string; descKey: string }[] = [
+    { id: 'auto', nameKey: 'chat.providerAuto', descKey: 'chat.providerAutoDesc' },
+    { id: 'groq-mcp', nameKey: 'chat.providerMCP', descKey: 'chat.providerMCPDesc' },
+    { id: 'standard', nameKey: 'chat.providerStandard', descKey: 'chat.providerStandardDesc' },
+  ];
+
   const {
     conversations,
     activeConversation,
@@ -170,7 +173,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             };
             addMessage(assistantMessage);
           } else if (update.type === 'error') {
-            throw new Error(update.error || 'Unbekannter Fehler');
+            throw new Error(update.error || t('common.error'));
           }
         }
       } else {
@@ -214,7 +217,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
       }
     } catch (err) {
       console.error('Chat error:', err);
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.');
+      setError(err instanceof Error ? err.message : t('common.error'));
       setIsStreaming(false);
       setStreamingContent('');
     } finally {
@@ -228,7 +231,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   };
 
   const handleClearHistory = () => {
-    if (confirm('Aktuellen Chat-Verlauf wirklich löschen?')) {
+    if (confirm(t('chat.clearConfirm'))) {
       clearActiveConversation();
     }
   };
@@ -261,12 +264,12 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="md:hidden p-2.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                title="Chat-Verlauf"
+                title={t('chat.chatHistory')}
               >
                 <Menu className="w-5 h-5" />
               </button>
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
-                {activeConversation?.title || 'QSO-Assistent'}
+                {activeConversation?.title || t('chat.title')}
               </h2>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -275,13 +278,13 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               <button
                 onClick={() => setShowProviderMenu(!showProviderMenu)}
                 className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm transition-colors"
-                title="KI-Provider wählen"
+                title={t('chat.provider')}
               >
                 {provider === 'groq-mcp' || (provider === 'auto' && hasGroqKey) ? (
                   <Wrench className="w-4 h-4 text-amber-400" />
                 ) : null}
                 <span className="hidden sm:inline">
-                  {PROVIDER_OPTIONS.find(p => p.id === provider)?.name || 'Auto'}
+                  {t(PROVIDER_OPTIONS.find(p => p.id === provider)?.nameKey || 'chat.providerAuto')}
                 </span>
                 <ChevronDown className="w-4 h-4" />
               </button>
@@ -302,11 +305,11 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                     >
                       <div className="flex items-center gap-2">
                         {opt.id === 'groq-mcp' && <Wrench className="w-4 h-4 text-amber-400" />}
-                        <span className="font-medium">{opt.name}</span>
+                        <span className="font-medium">{t(opt.nameKey)}</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">{opt.description}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{t(opt.descKey)}</p>
                       {opt.id !== 'standard' && !hasGroqKey && (
-                        <p className="text-xs text-red-400 mt-0.5">GROQ_API_KEY erforderlich</p>
+                        <p className="text-xs text-red-400 mt-0.5">{t('chat.groqRequired')}</p>
                       )}
                     </button>
                   ))}
@@ -318,7 +321,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               <button
                 onClick={handleClearHistory}
                 className="p-2.5 sm:p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                title="Verlauf löschen"
+                title={t('chat.clearHistory')}
               >
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -327,7 +330,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           </div>
           {/* Subtitle - separate row */}
           <p className="text-slate-400 text-xs sm:text-sm mt-1">
-            Frag mich zu Amateurfunk, Rufzeichen in OE, Propagation und mehr
+            {t('chat.subtitle')}
           </p>
         </div>
 
@@ -336,9 +339,9 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 mb-4 flex items-start gap-3 mx-1">
             <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-amber-200 font-medium">KI-Backend nicht verfügbar</p>
+              <p className="text-amber-200 font-medium">{t('chat.noApiKey')}</p>
               <p className="text-amber-300/80 text-sm">
-                Bitte GROQ_API_KEY konfigurieren.
+                {t('chat.configureKey')}
               </p>
             </div>
           </div>
@@ -353,10 +356,9 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                   <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium mb-2">Hallo, hier ist FunkPilot!</h3>
+              <h3 className="text-lg font-medium mb-2">{t('chat.welcome')}</h3>
               <p className="text-slate-400 text-sm max-w-md">
-                Ich bin dein OM für alle Amateurfunk-Fragen. Propagation, Antennen, Contests,
-                Digimodes – frag mich einfach! 73 de FunkPilot
+                {t('chat.welcomeText')}
               </p>
             </div>
           ) : (
@@ -419,7 +421,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 </div>
                 <div className="flex items-center gap-2 mt-2 text-xs opacity-50">
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  <span>Schreibt...</span>
+                  <span>{t('chat.writing')}</span>
                 </div>
               </div>
             </div>
@@ -469,7 +471,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                     <Loader2 className="w-4 h-4 animate-spin text-sky-400" />
                   )}
                   <span className="text-sm text-slate-300">
-                    {currentStatus?.detail || currentStatus?.status || 'Verarbeite...'}
+                    {currentStatus?.detail || currentStatus?.status || t('chat.processing')}
                   </span>
                 </div>
               </div>
@@ -508,7 +510,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Stelle eine Frage..."
+              placeholder={t('chat.placeholder')}
               disabled={isLoading || apiAvailable === false}
               className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 disabled:opacity-50"
             />
@@ -538,7 +540,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 <div className="w-10 h-10 rounded-full bg-amber-600/20 flex items-center justify-center">
                   <ExternalLink className="w-5 h-5 text-amber-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-white">Externe Webseite</h3>
+                <h3 className="text-lg font-semibold text-white">{t('chat.externalLink')}</h3>
               </div>
               <button
                 onClick={() => setPendingExternalLink(null)}
@@ -549,7 +551,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             </div>
 
             <p className="text-slate-300 mb-3">
-              Du verlässt jetzt FunkPilot und wirst zu einer externen Webseite weitergeleitet:
+              {t('chat.externalLinkWarning')}
             </p>
 
             <div className="bg-slate-900 rounded-lg px-3 py-2 mb-4 break-all">
@@ -557,8 +559,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             </div>
 
             <p className="text-slate-400 text-sm mb-6">
-              Gemäß DSGVO/ECG weisen wir darauf hin, dass für externe Webseiten deren eigene
-              Datenschutzbestimmungen gelten. FunkPilot übernimmt keine Haftung für externe Inhalte.
+              {t('chat.externalLinkDisclaimer')}
             </p>
 
             <div className="flex gap-3">
@@ -566,7 +567,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 onClick={() => setPendingExternalLink(null)}
                 className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
               >
-                Abbrechen
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => {
@@ -576,7 +577,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                 className="flex-1 px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
-                Öffnen
+                {t('common.open')}
               </button>
             </div>
           </div>

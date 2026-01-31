@@ -1,5 +1,6 @@
 import { X, Sparkles, Zap, Wrench } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CHANGELOG, markChangelogSeen, LATEST_VERSION } from '../data/changelog';
 
 interface ChangelogModalProps {
@@ -7,6 +8,8 @@ interface ChangelogModalProps {
 }
 
 export function ChangelogModal({ onClose }: ChangelogModalProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     // Mark as seen when modal opens
     markChangelogSeen(LATEST_VERSION);
@@ -36,11 +39,11 @@ export function ChangelogModal({ onClose }: ChangelogModalProps) {
   const getChangeLabel = (type: 'feature' | 'improvement' | 'fix') => {
     switch (type) {
       case 'feature':
-        return 'Neu';
+        return t('changelog.typeFeature');
       case 'improvement':
-        return 'Verbessert';
+        return t('changelog.typeImprovement');
       case 'fix':
-        return 'Behoben';
+        return t('changelog.typeFix');
     }
   };
 
@@ -57,14 +60,14 @@ export function ChangelogModal({ onClose }: ChangelogModalProps) {
               <Sparkles className="w-5 h-5 text-sky-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-100">Was ist neu?</h2>
-              <p className="text-sm text-slate-400">Aktuelle Updates und neue Features</p>
+              <h2 className="text-xl font-semibold text-slate-100">{t('changelog.title')}</h2>
+              <p className="text-sm text-slate-400">{t('changelog.subtitle')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-slate-700 transition-colors"
-            aria-label="Schließen"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5 text-slate-400" />
           </button>
@@ -90,7 +93,7 @@ export function ChangelogModal({ onClose }: ChangelogModalProps) {
                   <span className="text-sm text-slate-500">{entry.date}</span>
                   {idx === 0 && (
                     <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400">
-                      Aktuell
+                      {t('changelog.current')}
                     </span>
                   )}
                 </div>

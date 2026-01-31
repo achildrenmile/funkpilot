@@ -1,17 +1,19 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, Grid3X3, Sparkles } from 'lucide-react';
 import CallsignLookup from './callsign/CallsignLookup';
 import CallsignAvailability from './callsign/CallsignAvailability';
 import CallsignSuggest from './callsign/CallsignSuggest';
 import type { CallsignSubTab } from '../types/callsign';
 
-const SUB_TABS: Array<{ id: CallsignSubTab; name: string; icon: typeof Search; description: string }> = [
-  { id: 'lookup', name: 'Suche', icon: Search, description: 'Rufzeichen nachschlagen' },
-  { id: 'available', name: 'Verfügbarkeit', icon: Grid3X3, description: 'Suffix in allen Bundesländern prüfen' },
-  { id: 'suggest', name: 'Vorschläge', icon: Sparkles, description: 'Rufzeichen basierend auf Namen generieren' },
+const SUB_TABS: Array<{ id: CallsignSubTab; nameKey: string; icon: typeof Search; descKey: string }> = [
+  { id: 'lookup', nameKey: 'callsignFinder.tabLookup', icon: Search, descKey: 'callsignFinder.lookupTitle' },
+  { id: 'available', nameKey: 'callsignFinder.tabAvailability', icon: Grid3X3, descKey: 'callsignFinder.availabilityTitle' },
+  { id: 'suggest', nameKey: 'callsignFinder.tabSuggest', icon: Sparkles, descKey: 'callsignFinder.suggestTitle' },
 ];
 
 export default function CallsignFinder() {
+  const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState<CallsignSubTab>('lookup');
 
   const renderContent = () => {
@@ -31,9 +33,9 @@ export default function CallsignFinder() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white">Rufzeichen-Finder</h2>
+        <h2 className="text-2xl font-bold text-white">{t('callsignFinder.title')}</h2>
         <p className="text-slate-400 mt-1">
-          Österreichische Rufzeichen suchen, Verfügbarkeit prüfen und Vorschläge generieren
+          {t('callsignFinder.subtitle')}
         </p>
       </div>
 
@@ -53,10 +55,10 @@ export default function CallsignFinder() {
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
                 }
               `}
-              title={tab.description}
+              title={t(tab.descKey)}
             >
               <Icon className="w-4 h-4" />
-              <span>{tab.name}</span>
+              <span>{t(tab.nameKey)}</span>
             </button>
           );
         })}

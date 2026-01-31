@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileText, BarChart3, Loader2, AlertCircle, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { parseADIF, calculateStats } from '../utils/adifParser';
@@ -12,6 +13,7 @@ interface LogAnalysisProps {
 }
 
 export default function LogAnalysis({ settings: _settings }: LogAnalysisProps) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [stats, setStats] = useState<LogStats | null>(null);
   const [analysis, setAnalysis] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export default function LogAnalysis({ settings: _settings }: LogAnalysisProps) {
       const parsedQsos = parseADIF(content);
 
       if (parsedQsos.length === 0) {
-        setError('Keine QSOs in der Datei gefunden. Ist das eine gültige ADIF-Datei?');
+        setError(t('log.noQSOs'));
         return;
       }
 
@@ -49,7 +51,7 @@ export default function LogAnalysis({ settings: _settings }: LogAnalysisProps) {
       setFileName(file.name);
     } catch (err) {
       console.error('Parse error:', err);
-      setError('Fehler beim Lesen der Datei. Bitte stelle sicher, dass es eine gültige ADIF-Datei ist.');
+      setError(t('log.parseError'));
     }
   };
 
@@ -61,7 +63,7 @@ export default function LogAnalysis({ settings: _settings }: LogAnalysisProps) {
     if (file && (file.name.endsWith('.adi') || file.name.endsWith('.adif'))) {
       processFile(file);
     } else {
-      setError('Bitte eine ADIF-Datei (.adi oder .adif) hochladen.');
+      setError(t('log.invalidFile'));
     }
   }, []);
 
@@ -149,10 +151,10 @@ ${analysis}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
           <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400" />
-          Log-Analyse
+          {t('log.title')}
         </h2>
         <p className="text-slate-400 mt-1 text-sm sm:text-base">
-          ADIF-Log hochladen für KI-Analyse
+          {t('log.subtitle')}
         </p>
       </div>
 
@@ -174,10 +176,10 @@ ${analysis}
           `}
         >
           <Upload className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 ${isDragging ? 'text-sky-400' : 'text-slate-500'}`} />
-          <p className="text-base sm:text-lg font-medium mb-2">ADIF-Datei hochladen</p>
+          <p className="text-base sm:text-lg font-medium mb-2">{t('log.uploadTitle')}</p>
           <p className="text-slate-400 text-xs sm:text-sm mb-4">
-            <span className="hidden sm:inline">Ziehe eine .adi oder .adif Datei hierher oder klicke zum Auswählen</span>
-            <span className="sm:hidden">.adi oder .adif Datei wählen</span>
+            <span className="hidden sm:inline">{t('log.uploadHint')}</span>
+            <span className="sm:hidden">{t('log.uploadHintMobile')}</span>
           </p>
           <label className="inline-block">
             <input
@@ -187,7 +189,7 @@ ${analysis}
               className="hidden"
             />
             <span className="bg-sky-600 hover:bg-sky-700 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer transition-colors text-sm sm:text-base">
-              Datei auswählen
+              {t('log.selectFile')}
             </span>
           </label>
         </div>
@@ -221,13 +223,13 @@ ${analysis}
               onClick={resetAnalysis}
               className="text-slate-400 hover:text-white text-xs sm:text-sm self-end sm:self-auto"
             >
-              Andere Datei
+              {t('log.otherFile')}
             </button>
           </div>
 
           {/* Contest Selection */}
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <label className="block text-sm text-slate-400 mb-2">Contest (für Analyse-Kontext)</label>
+            <label className="block text-sm text-slate-400 mb-2">{t('log.contestSelect')}</label>
             <select
               value={contestName}
               onChange={(e) => setContestName(e.target.value)}
@@ -236,26 +238,26 @@ ${analysis}
               {CONTESTS.map(c => (
                 <option key={c.id} value={c.name}>{c.name}</option>
               ))}
-              <option value="General QSOs">Allgemeine QSOs</option>
+              <option value="General QSOs">{t('log.generalQSOs')}</option>
             </select>
           </div>
 
           {/* Statistics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
-              <p className="text-slate-400 text-xs sm:text-sm">QSOs</p>
+              <p className="text-slate-400 text-xs sm:text-sm">{t('log.stats.qsos')}</p>
               <p className="text-xl sm:text-2xl font-bold text-sky-400">{stats.totalQsos}</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
-              <p className="text-slate-400 text-xs sm:text-sm">Unique</p>
+              <p className="text-slate-400 text-xs sm:text-sm">{t('log.stats.unique')}</p>
               <p className="text-xl sm:text-2xl font-bold text-green-400">{stats.uniqueCallsigns}</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
-              <p className="text-slate-400 text-xs sm:text-sm">Zeit</p>
+              <p className="text-slate-400 text-xs sm:text-sm">{t('log.stats.time')}</p>
               <p className="text-xl sm:text-2xl font-bold text-amber-400">{(stats.operatingTime / 60).toFixed(1)}h</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
-              <p className="text-slate-400 text-xs sm:text-sm">Rate</p>
+              <p className="text-slate-400 text-xs sm:text-sm">{t('log.stats.rate')}</p>
               <p className="text-xl sm:text-2xl font-bold text-purple-400">
                 {stats.operatingTime > 0 ? (stats.totalQsos / (stats.operatingTime / 60)).toFixed(1) : 0}/h
               </p>
@@ -264,7 +266,7 @@ ${analysis}
 
           {/* Band Distribution */}
           <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <h3 className="text-lg font-semibold mb-4">Band-Verteilung</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('log.bandDistribution')}</h3>
             <div className="space-y-3">
               {Object.entries(stats.qsosByBand)
                 .sort(([a], [b]) => {
@@ -294,7 +296,7 @@ ${analysis}
           {/* Rate Chart */}
           {stats.ratePerHour.length > 0 && (
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-              <h3 className="text-lg font-semibold mb-4">QSO-Rate über Zeit</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('log.rateOverTime')}</h3>
               <div className="h-32 sm:h-40 flex items-end gap-1">
                 {stats.ratePerHour.map((rate, i) => {
                   const maxRate = Math.max(...stats.ratePerHour);
@@ -306,7 +308,7 @@ ${analysis}
                       style={{ height: `${height}%`, minHeight: rate > 0 ? '4px' : '0' }}
                     >
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-slate-900 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        Stunde {i + 1}: {rate} QSO
+                        {t('log.hour')} {i + 1}: {rate} QSO
                       </div>
                     </div>
                   );
@@ -323,7 +325,7 @@ ${analysis}
           <div className="grid md:grid-cols-2 gap-4">
             {stats.cqZones.length > 0 && (
               <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-                <h3 className="text-lg font-semibold mb-3">CQ-Zonen ({stats.cqZones.length})</h3>
+                <h3 className="text-lg font-semibold mb-3">{t('log.stats.cqZones')} ({stats.cqZones.length})</h3>
                 <div className="flex flex-wrap gap-2">
                   {stats.cqZones.map(zone => (
                     <span key={zone} className="bg-slate-700 px-2 py-1 rounded text-sm">
@@ -335,7 +337,7 @@ ${analysis}
             )}
             {stats.countries.length > 0 && (
               <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-                <h3 className="text-lg font-semibold mb-3">Länder ({stats.countries.length})</h3>
+                <h3 className="text-lg font-semibold mb-3">{t('log.stats.countries')} ({stats.countries.length})</h3>
                 <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                   {stats.countries.slice(0, 20).map(country => (
                     <span key={country} className="bg-slate-700 px-2 py-1 rounded text-sm">
@@ -356,15 +358,15 @@ ${analysis}
               {apiAvailable === false ? (
                 <div className="space-y-2">
                   <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
-                  <p className="text-amber-200">KI-Backend nicht verfügbar</p>
+                  <p className="text-amber-200">{t('chat.noApiKey')}</p>
                   <p className="text-slate-400 text-sm">
-                    Bitte GROQ_API_KEY konfigurieren.
+                    {t('chat.configureKey')}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <p className="text-slate-400">
-                    Klicke auf "Analysieren" für eine detaillierte KI-Auswertung mit Verbesserungsvorschlägen.
+                    {t('log.analyzeHint')}
                   </p>
                   <button
                     onClick={runAnalysis}
@@ -374,12 +376,12 @@ ${analysis}
                     {isAnalyzing ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        Analysiere...
+                        {t('log.analyzing')}
                       </>
                     ) : (
                       <>
                         <BarChart3 className="w-5 h-5" />
-                        Mit KI analysieren
+                        {t('log.analyze')}
                       </>
                     )}
                   </button>
@@ -389,21 +391,21 @@ ${analysis}
           ) : (
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">KI-Analyse</h3>
+                <h3 className="text-lg font-semibold">{t('log.aiAnalysis')}</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={downloadReport}
                     className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    Report speichern
+                    {t('log.saveReport')}
                   </button>
                   <button
                     onClick={runAnalysis}
                     disabled={isAnalyzing}
                     className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 px-3 py-1.5 rounded-lg text-sm transition-colors"
                   >
-                    Neu analysieren
+                    {t('log.reanalyze')}
                   </button>
                 </div>
               </div>

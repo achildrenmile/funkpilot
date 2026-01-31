@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Square, Volume2, Settings2 } from 'lucide-react';
 import { PHRASE_TEMPLATES } from '../data/phrases';
 import { processTemplate } from '../utils/phonetic';
@@ -12,6 +13,7 @@ interface VoiceCQProps {
 }
 
 export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
+  const { t: _t } = useTranslation(); // Will be used for translations
   const [voiceSettings, setVoiceSettings] = useState<VoiceCQSettings>(getVoiceSettings());
   const [voices, setVoices] = useState<VoiceInfo[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);

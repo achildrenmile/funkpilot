@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Settings as SettingsIcon, User, MapPin, Save, Check, Server, Sun, Moon } from 'lucide-react';
 import { checkHealth } from '../services/api';
 import { LATEST_VERSION } from '../data/changelog';
+import { SUPPORTED_LANGUAGES, changeLanguage, getCurrentLanguage, type SupportedLanguage } from '../i18n';
 import type { UserSettings } from '../types';
 
 interface SettingsProps {
@@ -10,7 +12,9 @@ interface SettingsProps {
 }
 
 export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
+  const { t } = useTranslation();
   const [saved, setSaved] = useState(false);
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage());
   const [serverStatus, setServerStatus] = useState<{
     connected: boolean;
     hasGroqKey: boolean;
@@ -46,16 +50,21 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
     onUpdate({ [field]: value });
   };
 
+  const handleLanguageChange = (lang: SupportedLanguage) => {
+    changeLanguage(lang);
+    setCurrentLang(lang);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <SettingsIcon className="w-6 h-6 text-sky-400" />
-          Einstellungen
+          {t('settings.title')}
         </h2>
         <p className="text-slate-400 mt-1">
-          Konfiguriere FunkPilot für dein Rufzeichen und deine Präferenzen
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -63,54 +72,54 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Server className="w-5 h-5 text-sky-400" />
-          Server-Status
+          {t('settings.serverStatus')}
         </h3>
 
         {serverStatus === null ? (
-          <p className="text-slate-400">Prüfe Verbindung...</p>
+          <p className="text-slate-400">{t('settings.checkingConnection')}</p>
         ) : (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${serverStatus.connected ? 'bg-green-400' : 'bg-red-400'}`} />
-              <span>Backend-Server: {serverStatus.connected ? 'Verbunden' : 'Nicht erreichbar'}</span>
+              <span>{t('settings.backendServer')}: {serverStatus.connected ? t('settings.connected') : t('settings.notReachable')}</span>
             </div>
 
             {serverStatus.connected && (
               <>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasGroqKey ? 'bg-green-400' : 'bg-slate-500'}`} />
-                  <span>Groq API: {serverStatus.hasGroqKey ? 'Konfiguriert (Empfohlen)' : 'Nicht konfiguriert'}</span>
+                  <span>{t('settings.groqApi')}: {serverStatus.hasGroqKey ? `${t('settings.configured')} (${t('settings.recommended')})` : t('settings.notConfigured')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasAnthropicKey ? 'bg-green-400' : 'bg-slate-500'}`} />
-                  <span>Anthropic API: {serverStatus.hasAnthropicKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
+                  <span>{t('settings.anthropicApi')}: {serverStatus.hasAnthropicKey ? t('settings.configured') : t('settings.notConfigured')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasOpenRouterKey ? 'bg-green-400' : 'bg-slate-500'}`} />
-                  <span>OpenRouter API: {serverStatus.hasOpenRouterKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
+                  <span>{t('settings.openRouterApi')}: {serverStatus.hasOpenRouterKey ? t('settings.configured') : t('settings.notConfigured')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasTavilyKey ? 'bg-green-400' : 'bg-slate-500'}`} />
-                  <span>Tavily Web-Suche: {serverStatus.hasTavilyKey ? 'Aktiviert' : 'Nicht konfiguriert'}</span>
+                  <span>{t('settings.tavilySearch')}: {serverStatus.hasTavilyKey ? t('settings.activated') : t('settings.notConfigured')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasQrzKey ? 'bg-green-400' : 'bg-slate-500'}`} />
-                  <span>QRZ.com Lookup: {serverStatus.hasQrzKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
+                  <span>{t('settings.qrzLookup')}: {serverStatus.hasQrzKey ? t('settings.configured') : t('settings.notConfigured')}</span>
                 </div>
               </>
             )}
 
             {!serverStatus.connected && (
               <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-3 text-sm text-amber-200">
-                <p className="font-medium">Server nicht erreichbar</p>
-                <p className="mt-1">Starte den Server mit: <code className="bg-slate-700 px-1 rounded">npm run dev:full</code></p>
+                <p className="font-medium">{t('settings.serverNotReachable')}</p>
+                <p className="mt-1">{t('settings.serverNotReachableHint')} <code className="bg-slate-700 px-1 rounded">npm run dev:full</code></p>
               </div>
             )}
 
             {serverStatus.connected && !serverStatus.hasGroqKey && !serverStatus.hasAnthropicKey && !serverStatus.hasOpenRouterKey && (
               <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-3 text-sm text-amber-200">
-                <p className="font-medium">Kein KI-API-Key konfiguriert</p>
-                <p className="mt-1">Setze GROQ_API_KEY (empfohlen, kostenlos) als Umgebungsvariable.</p>
+                <p className="font-medium">{t('settings.noApiKeyConfigured')}</p>
+                <p className="mt-1">{t('settings.noApiKeyHint')}</p>
               </div>
             )}
           </div>
@@ -121,26 +130,26 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <User className="w-5 h-5 text-sky-400" />
-          Station
+          {t('settings.station')}
         </h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Rufzeichen</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.callsign')}</label>
             <input
               type="text"
               value={settings.callsign}
               onChange={(e) => updateField('callsign', e.target.value.toUpperCase())}
-              placeholder="OE8YML"
+              placeholder={t('settings.callsignPlaceholder')}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 font-mono uppercase"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Name</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.name')}</label>
             <input
               type="text"
               value={settings.name}
               onChange={(e) => updateField('name', e.target.value)}
-              placeholder="Max"
+              placeholder={t('settings.namePlaceholder')}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
             />
           </div>
@@ -148,20 +157,20 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
             <label className="block text-sm text-slate-400 mb-1">
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
-                Locator (Maidenhead)
+                {t('settings.locator')}
               </span>
             </label>
             <input
               type="text"
               value={settings.locator}
               onChange={(e) => updateField('locator', e.target.value.toUpperCase())}
-              placeholder="JN66TO"
+              placeholder={t('settings.locatorPlaceholder')}
               maxLength={6}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 font-mono uppercase"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Contest-Zone (CQ)</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.contestZone')}</label>
             <input
               type="text"
               value={settings.contestZone}
@@ -175,10 +184,10 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
 
       {/* Voice Settings */}
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-        <h3 className="text-lg font-semibold mb-4">Sprach-Einstellungen</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('settings.voiceSettings')}</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Standard-Sprache für TTS</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.defaultLanguageTTS')}</label>
             <select
               value={settings.voiceSettings.language}
               onChange={(e) => updateField('voiceSettings', {
@@ -187,13 +196,13 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
               })}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
             >
-              <option value="en">Englisch (für Contest)</option>
-              <option value="de">Deutsch</option>
+              <option value="en">{t('settings.englishForContest')}</option>
+              <option value="de">{t('languages.de')}</option>
             </select>
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">
-              Geschwindigkeit: {settings.voiceSettings.speed.toFixed(1)}x
+              {t('settings.speedLabel')}: {settings.voiceSettings.speed.toFixed(1)}x
             </label>
             <input
               type="range"
@@ -213,21 +222,24 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
 
       {/* App Settings */}
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-        <h3 className="text-lg font-semibold mb-4">App-Einstellungen</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('settings.appSettings')}</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">UI-Sprache</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.uiLanguage')}</label>
             <select
-              value={settings.language}
-              onChange={(e) => updateField('language', e.target.value as 'de' | 'en')}
+              value={currentLang}
+              onChange={(e) => handleLanguageChange(e.target.value as SupportedLanguage)}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2"
             >
-              <option value="de">Deutsch</option>
-              <option value="en">English</option>
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Theme</label>
+            <label className="block text-sm text-slate-400 mb-1">{t('settings.theme')}</label>
             <div className="flex gap-2">
               <button
                 onClick={() => updateField('theme', 'dark')}
@@ -238,7 +250,7 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
                 }`}
               >
                 <Moon className="w-4 h-4" />
-                Dunkel
+                {t('settings.themeDark')}
               </button>
               <button
                 onClick={() => updateField('theme', 'light')}
@@ -249,7 +261,7 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
                 }`}
               >
                 <Sun className="w-4 h-4" />
-                Hell
+                {t('settings.themeLight')}
               </button>
             </div>
           </div>
@@ -269,12 +281,12 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
           {saved ? (
             <>
               <Check className="w-5 h-5" />
-              Gespeichert
+              {t('settings.saved')}
             </>
           ) : (
             <>
               <Save className="w-5 h-5" />
-              Einstellungen speichern
+              {t('settings.saveSettings')}
             </>
           )}
         </button>
@@ -282,10 +294,9 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
 
       {/* About */}
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-        <h3 className="text-lg font-semibold mb-2">Über FunkPilot</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('settings.aboutTitle')}</h3>
         <p className="text-slate-400 text-sm mb-4">
-          FunkPilot ist ein Open-Source KI-Assistent für Funkamateure. Entwickelt mit Leidenschaft
-          für die Amateurfunk-Community.
+          {t('settings.aboutText')}
         </p>
         <div className="flex flex-wrap gap-4 text-sm">
           <a
@@ -297,7 +308,7 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
             GitHub Repository
           </a>
           <span className="text-slate-600">|</span>
-          <span className="text-slate-400">Version {LATEST_VERSION}</span>
+          <span className="text-slate-400">{t('settings.version')} {LATEST_VERSION}</span>
           <span className="text-slate-600">|</span>
           <span className="text-slate-400">73 de OE8YML</span>
         </div>
