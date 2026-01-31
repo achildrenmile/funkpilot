@@ -10,6 +10,7 @@ import { LegalModal } from './components/LegalModal';
 import { HelpModal } from './components/HelpModal';
 import { ParentSiteLogo } from './components/ParentSiteLogo';
 import { useConfig } from './hooks/useConfig';
+import { useVersionCheck } from './hooks/useVersionCheck';
 import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
 import type { TabId, UserSettings, SolarData } from './types';
@@ -31,6 +32,9 @@ function App() {
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const { config } = useConfig();
+
+  // Auto-reload on new version deployment
+  useVersionCheck();
 
   // Keyboard shortcut for help
   useEffect(() => {
