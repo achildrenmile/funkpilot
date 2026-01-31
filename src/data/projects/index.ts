@@ -33,14 +33,26 @@ import { bandfilterSwitch } from './bandfilter-switch';
 import { meshtasticGettingStarted } from './meshtastic-getting-started';
 import { meshcomGettingStarted } from './meshcom-getting-started';
 import { meshcoreGettingStarted } from './meshcore-getting-started';
+import { solarNode } from './solar-node';
+import { loraOutdoorEnclosure } from './lora-outdoor-enclosure';
+import { loraAntenna868 } from './lora-antenna-868';
+import { loraRangeTester } from './lora-range-tester';
+import { meshtasticRepeaterGuide } from './meshtastic-repeater-guide';
+import { meshFirmwareComparison } from './mesh-firmware-comparison';
 
 import type { HamProject } from '../../types/projects';
 
 export const ALL_PROJECTS: HamProject[] = [
-  // Mesh/LoRa Guides (am Anfang für Sichtbarkeit)
+  // Mesh/LoRa Guides & Projects (am Anfang für Sichtbarkeit)
   meshtasticGettingStarted,
   meshcomGettingStarted,
   meshcoreGettingStarted,
+  solarNode,
+  loraOutdoorEnclosure,
+  loraAntenna868,
+  loraRangeTester,
+  meshtasticRepeaterGuide,
+  meshFirmwareComparison,
 
   // CW/Morse
   cwKeyerBasic,
@@ -83,10 +95,16 @@ export function getProjectsByCategory(category: string): HamProject[] {
 
 // Re-export all projects
 export {
-  // Mesh/LoRa Guides
+  // Mesh/LoRa Guides & Projects
   meshtasticGettingStarted,
   meshcomGettingStarted,
   meshcoreGettingStarted,
+  solarNode,
+  loraOutdoorEnclosure,
+  loraAntenna868,
+  loraRangeTester,
+  meshtasticRepeaterGuide,
+  meshFirmwareComparison,
   // Existing
   cwKeyerBasic,
   swrMeter,

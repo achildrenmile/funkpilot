@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.11.0',
+    date: '2026-01-31',
+    title: 'Mesh/LoRa Projekte',
+    changes: [
+      { type: 'feature', text: 'Solar Mesh-Node: Autarker Repeater mit Solarpanel' },
+      { type: 'feature', text: 'Wetterfestes Gehäuse: IP67 Outdoor-Box Anleitung' },
+      { type: 'feature', text: '868 MHz Antenne: DIY Groundplane Bauanleitung' },
+      { type: 'feature', text: 'LoRa Reichweiten-Tester: RSSI/SNR Messgerät' },
+      { type: 'feature', text: 'Repeater & Gateway Guide: Schritt-für-Schritt' },
+      { type: 'feature', text: 'Firmware-Vergleich: Meshtastic vs MeshCore vs MeshCom' },
+    ],
+  },
+  {
     version: '1.10.1',
     date: '2026-01-31',
     title: 'MeshCore Guide',
