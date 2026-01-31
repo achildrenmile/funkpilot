@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, User, MapPin, Save, Check, Server, Sun, Moon } from 'lucide-react';
 import { checkHealth } from '../services/api';
+import { LATEST_VERSION } from '../data/changelog';
 import type { UserSettings } from '../types';
 
 interface SettingsProps {
@@ -296,7 +297,7 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
             GitHub Repository
           </a>
           <span className="text-slate-600">|</span>
-          <span className="text-slate-400">Version 1.0.0</span>
+          <span className="text-slate-400">Version {LATEST_VERSION}</span>
           <span className="text-slate-600">|</span>
           <span className="text-slate-400">73 de OE8YML</span>
         </div>
