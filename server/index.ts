@@ -741,13 +741,67 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
       systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
     }
 
+    // Get official callsigns for all lookups
+    const officialCallsigns = await getOfficialCallsigns();
+
+    // Check for suffix availability queries (e.g., "Ist YML frei?", "Suffix ABC verfügbar?")
+    const suffixAvailabilityPattern = /(?:ist|ob|suffix|verfügbar|frei|noch frei)\s*[:\s]*([A-Z]{2,4})\b/gi;
+    const suffixMatches = message.match(suffixAvailabilityPattern);
+    if (suffixMatches) {
+      for (const match of suffixMatches.slice(0, 2)) {
+        const suffixMatch = match.match(/([A-Z]{2,4})\s*$/i);
+        if (suffixMatch) {
+          const suffix = suffixMatch[1].toUpperCase();
+          const availability = AUSTRIAN_DISTRICTS.map(district => {
+            const holder = isSuffixTaken(officialCallsigns, district.prefix, suffix);
+            return `${district.prefix}${suffix} (${district.name}): ${holder ? `vergeben an ${holder.name || 'unbekannt'}` : 'FREI'}`;
+          });
+          systemPrompt += `\n\nVerfügbarkeit Suffix "${suffix}" in Österreich:\n${availability.join('\n')}`;
+          console.log(`Suffix availability check in chat: ${suffix}`);
+        }
+      }
+    }
+
+    // Check for callsign suggestion queries (e.g., "Rufzeichen für Max Mustermann", "Vorschlag für Maria")
+    const suggestionPattern = /(?:rufzeichen|vorschlag|vorschläge|suffix)\s+(?:für|zu|von)\s+([A-ZÄÖÜa-zäöüß]+)\s+([A-ZÄÖÜa-zäöüß]+)/gi;
+    const suggestionMatches = [...message.matchAll(suggestionPattern)];
+    if (suggestionMatches.length > 0) {
+      for (const match of suggestionMatches.slice(0, 1)) {
+        const firstName = match[1];
+        const lastName = match[2];
+        const district = context?.userCall?.match(/OE(\d)/)?.[1] || '8';
+        const prefix = `OE${district}`;
+
+        // Generate suggestions
+        const fn = firstName.toUpperCase().replace(/[^A-Z]/g, '');
+        const ln = lastName.toUpperCase().replace(/[^A-Z]/g, '');
+
+        if (fn && ln) {
+          const candidates = [
+            { suffix: `${fn[0]}${ln[0]}`, reason: 'Initialen' },
+            { suffix: `${fn[0]}${ln.slice(0, 2)}`, reason: 'Initial + Nachname' },
+            { suffix: `X${fn[0]}${ln[0]}`, reason: 'X + Initialen' },
+            { suffix: `${fn.slice(0, 2)}${ln[0]}`, reason: 'Vorname + Initial' },
+            { suffix: ln.slice(0, 3), reason: 'Nachname verkürzt' },
+          ].filter(c => c.suffix.length >= 2 && c.suffix.length <= 4);
+
+          const suggestions = candidates.map(c => {
+            const holder = isSuffixTaken(officialCallsigns, prefix, c.suffix);
+            return `${prefix}${c.suffix} (${c.reason}): ${holder ? 'vergeben' : 'FREI'}`;
+          });
+
+          systemPrompt += `\n\nRufzeichen-Vorschläge für "${firstName} ${lastName}" in ${AUSTRIAN_DISTRICTS[parseInt(district) - 1]?.name || 'Österreich'}:\n${suggestions.join('\n')}`;
+          console.log(`Callsign suggestions in chat: ${firstName} ${lastName}`);
+        }
+      }
+    }
+
     // Check for callsigns in message and look up in official OE list and QRZ.com
     const callsignPattern = /\b([A-Z]{1,2}[0-9][A-Z]{1,4}|[0-9][A-Z][0-9][A-Z]{1,4})\b/gi;
     const callsignsInMessage = message.match(callsignPattern);
 
     if (callsignsInMessage) {
       const uniqueCallsigns: string[] = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))] as string[];
-      const officialCallsigns = await getOfficialCallsigns();
 
       for (const callsign of uniqueCallsigns.slice(0, 3)) { // Limit to 3 lookups
         // First check official OE list
