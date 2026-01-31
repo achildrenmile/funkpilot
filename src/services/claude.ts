@@ -1,5 +1,6 @@
 import type { ChatMessage, SolarData, LogStats } from '../types';
 import * as api from './api';
+import type { ChatStatusUpdate } from './api';
 
 export type ChatProvider = 'auto' | 'groq-mcp' | 'standard';
 
@@ -8,6 +9,8 @@ export interface ChatResponse {
   provider: string;
   toolsUsed?: string[];
 }
+
+export type { ChatStatusUpdate };
 
 const CHAT_SYSTEM_PROMPT = `Du bist FunkPilot – ein erfahrener Funkamateur und KI-Assistent.
 
@@ -134,6 +137,59 @@ export async function sendChatMessage(
 
   const content = await api.sendChat(messages, systemPrompt);
   return { content, provider: 'standard' };
+}
+
+// Streaming chat with status updates
+export async function* sendChatMessageWithStatus(
+  message: string,
+  history: ChatMessage[],
+  context: {
+    userCall?: string;
+    userLocator?: string;
+    solarData?: SolarData;
+  },
+  provider: ChatProvider = 'auto'
+): AsyncGenerator<ChatStatusUpdate> {
+  // Build context-aware system prompt
+  let systemPrompt = CHAT_SYSTEM_PROMPT;
+
+  systemPrompt += `\n\nAktuelles Datum: ${new Date().toLocaleDateString('de-AT')}`;
+
+  if (context.userCall) {
+    systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
+  }
+  if (context.userLocator) {
+    systemPrompt += `\nBenutzer-Locator: ${context.userLocator}`;
+  }
+  if (context.solarData) {
+    systemPrompt += `\n\nAktuelle Solar-Daten:
+- Solar Flux Index: ${context.solarData.sfi}
+- K-Index: ${context.solarData.kIndex}
+- A-Index: ${context.solarData.aIndex}
+- Sonnenflecken: ${context.solarData.sunspots}
+- X-Ray Flux: ${context.solarData.xrayFlux}`;
+  }
+
+  // Include history in the message for context
+  const historyContext = history.slice(-5).map(m =>
+    `${m.role === 'user' ? 'Benutzer' : 'Assistent'}: ${m.content}`
+  ).join('\n');
+
+  const fullMessage = historyContext
+    ? `Bisheriger Verlauf:\n${historyContext}\n\nNeue Frage: ${message}`
+    : message;
+
+  const mcpContext = {
+    userCall: context.userCall,
+    userLocator: context.userLocator,
+    solarData: context.solarData ? {
+      sfi: context.solarData.sfi,
+      kIndex: context.solarData.kIndex,
+      aIndex: context.solarData.aIndex,
+    } : undefined,
+  };
+
+  yield* api.sendChatGroqMCPStream(fullMessage, systemPrompt, mcpContext);
 }
 
 // Streaming chat function

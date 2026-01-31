@@ -1010,6 +1010,227 @@ Utilities:
   }
 });
 
+// Chat endpoint with Groq MCP - Streaming with status updates
+app.post('/api/chat-groq-mcp-stream', async (req, res) => {
+  // Set up SSE
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  const sendStatus = (status: string, detail?: string) => {
+    res.write(`data: ${JSON.stringify({ type: 'status', status, detail })}\n\n`);
+  };
+
+  const sendComplete = (content: string, toolsUsed: string[], provider: string) => {
+    res.write(`data: ${JSON.stringify({ type: 'complete', content, toolsUsed, provider })}\n\n`);
+    res.end();
+  };
+
+  const sendError = (error: string) => {
+    res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+    res.end();
+  };
+
+  try {
+    const { message, system, context } = req.body;
+
+    if (!GROQ_API_KEY) {
+      return sendError('GROQ_API_KEY nicht konfiguriert');
+    }
+
+    // Pre-filter: Check message for blocked content
+    if (message && containsBlockedContent(message)) {
+      console.log('Content moderation: Blocked message (MCP stream)');
+      return sendComplete(MODERATION_RESPONSE, [], 'moderation');
+    }
+
+    sendStatus('thinking', 'Analysiere Anfrage...');
+
+    // Build system prompt
+    let systemPrompt = getSystemPrompt(context?.userCall);
+    if (system) {
+      systemPrompt += `\n\n${system}`;
+    }
+    systemPrompt += `\n\nDir stehen folgende Amateur Radio Tools zur Verfügung (nutze sie bei relevanten Fragen):
+- get_band_plan: Bandplan für ein bestimmtes Band abrufen
+- calculate_wavelength: Wellenlänge aus Frequenz berechnen
+- calculate_eirp: EIRP aus Leistung und Antennengewinn berechnen
+- calculate_cable_loss: Kabelverlust berechnen
+- compare_cables: Kabeltypen vergleichen
+- calculate_battery_runtime: Akkulaufzeit berechnen
+- check_frequency: Prüfen ob Frequenz im Bandplan erlaubt ist
+- convert_power: Leistung zwischen Watt und dBm umrechnen
+- calculate_swr_loss: SWR-Verlust berechnen
+- get_antenna_gain: Antennengewinn nachschlagen
+- list_oeradio_tools: Liste aller OERadio.at Web-Tools
+
+OERadio.at Tools (IMMER mit URL antworten wenn nach Tools gefragt wird):
+Rechner: AkkuBlick, AntennenBlick, BandBlick, KabelBlick, StrahlBlick, RelaisBlick (alle unter *.oeradio.at)
+Lerntools: OE-CEPT, CQ...Nothing, FirstContact, PrefixPlay, QBlitz, QSOBuddy, MorseFleet
+Utilities: QSL Card Generator, FunkPilot, Dobratschrunde`;
+
+    if (context?.userCall) {
+      systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
+    }
+    if (context?.userLocator) {
+      systemPrompt += `\nBenutzer-Locator: ${context.userLocator}`;
+    }
+    if (context?.solarData) {
+      systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
+    }
+
+    const actionsPerformed: string[] = [];
+
+    // Web search for current events/news if needed
+    if (TAVILY_API_KEY && needsWebSearch(message)) {
+      sendStatus('web_search', 'Durchsuche Web nach aktuellen Informationen...');
+      const searchResults = await searchWeb(message);
+      if (searchResults && searchResults.results.length > 0) {
+        actionsPerformed.push('Web-Suche');
+        systemPrompt += `\n\n[Web-Recherche Ergebnisse]:`;
+        if (searchResults.answer) {
+          systemPrompt += `\nZusammenfassung: ${searchResults.answer}`;
+        }
+        for (const result of searchResults.results.slice(0, 3)) {
+          systemPrompt += `\n- ${result.title}: ${result.content.slice(0, 300)}... (Quelle: ${result.url})`;
+        }
+      }
+    }
+
+    // Get official callsigns
+    const officialCallsigns = await getOfficialCallsigns();
+
+    // Check for suffix availability queries
+    const suffixAvailabilityPattern = /\b(?:suffix\s+)?([A-Z]{2,4})(?:\s+(?:frei|verfügbar|noch\s+frei)|\s+in\s+österreich)/gi;
+    const directSuffixPattern = /\bist\s+(?:das\s+)?(?:suffix\s+)?([A-Z]{2,4})\s+(?:noch\s+)?(?:frei|verfügbar)/gi;
+    const suffixMatches = [...message.matchAll(suffixAvailabilityPattern)];
+    const directMatches = [...message.matchAll(directSuffixPattern)];
+    const allSuffixMatches = [...suffixMatches, ...directMatches];
+
+    if (allSuffixMatches.length > 0) {
+      sendStatus('checking_availability', 'Prüfe Suffix-Verfügbarkeit in allen Bundesländern...');
+      for (const match of allSuffixMatches.slice(0, 2)) {
+        const suffix = match[1].toUpperCase();
+        if (suffix.length >= 2 && suffix.length <= 4 && !['IST', 'DAS', 'FÜR', 'VON', 'UND', 'MIT'].includes(suffix)) {
+          actionsPerformed.push(`Suffix-Prüfung: ${suffix}`);
+          const availability = AUSTRIAN_DISTRICTS.map(district => {
+            const holder = isSuffixTaken(officialCallsigns, district.prefix, suffix);
+            return `${district.prefix}${suffix} (${district.name}): ${holder ? `vergeben an ${holder.name || 'unbekannt'}` : 'FREI'}`;
+          });
+          systemPrompt += `\n\nVerfügbarkeit Suffix "${suffix}" in Österreich:\n${availability.join('\n')}`;
+        }
+      }
+    }
+
+    // Check for callsign suggestion queries
+    const suggestionPattern = /(?:rufzeichen|vorschl[aä]g|call(?:sign)?)[e\-\s]*(?:für|zu|von|f[uü]r)\s+([A-ZÄÖÜa-zäöüß]+)\s+([A-ZÄÖÜa-zäöüß]+)/gi;
+    const suggestionMatches = [...message.matchAll(suggestionPattern)];
+    if (suggestionMatches.length > 0) {
+      sendStatus('generating_suggestions', 'Generiere Rufzeichen-Vorschläge...');
+      for (const match of suggestionMatches.slice(0, 1)) {
+        const firstName = match[1];
+        const lastName = match[2];
+        actionsPerformed.push(`Vorschläge für: ${firstName} ${lastName}`);
+        const district = context?.userCall?.match(/OE(\d)/)?.[1] || '8';
+        const prefix = `OE${district}`;
+        const fn = firstName.toUpperCase().replace(/[^A-Z]/g, '');
+        const ln = lastName.toUpperCase().replace(/[^A-Z]/g, '');
+
+        if (fn && ln) {
+          const candidates = [
+            { suffix: `${fn[0]}${ln[0]}`, reason: 'Initialen' },
+            { suffix: `${fn[0]}${ln.slice(0, 2)}`, reason: 'Initial + Nachname' },
+            { suffix: `X${fn[0]}${ln[0]}`, reason: 'X + Initialen' },
+            { suffix: `${fn.slice(0, 2)}${ln[0]}`, reason: 'Vorname + Initial' },
+            { suffix: ln.slice(0, 3), reason: 'Nachname verkürzt' },
+          ].filter(c => c.suffix.length >= 2 && c.suffix.length <= 4);
+
+          const suggestions = candidates.map(c => {
+            const holder = isSuffixTaken(officialCallsigns, prefix, c.suffix);
+            return `${prefix}${c.suffix} (${c.reason}): ${holder ? 'vergeben' : 'FREI'}`;
+          });
+          systemPrompt += `\n\nRufzeichen-Vorschläge für "${firstName} ${lastName}":\n${suggestions.join('\n')}`;
+        }
+      }
+    }
+
+    // Check for callsigns in message
+    const callsignPattern = /\b([A-Z]{1,2}[0-9][A-Z]{1,4}|[0-9][A-Z][0-9][A-Z]{1,4})\b/gi;
+    const callsignsInMessage = message.match(callsignPattern);
+    if (callsignsInMessage) {
+      const uniqueCallsigns: string[] = [...new Set(callsignsInMessage.map((c: string) => c.toUpperCase()))] as string[];
+      if (uniqueCallsigns.length > 0) {
+        sendStatus('callsign_lookup', `Suche Rufzeichen: ${uniqueCallsigns.slice(0, 3).join(', ')}...`);
+      }
+
+      for (const callsign of uniqueCallsigns.slice(0, 3)) {
+        const officialInfo = findOfficialCallsign(officialCallsigns, callsign);
+        if (officialInfo) {
+          actionsPerformed.push(`OE-Lookup: ${callsign}`);
+          const infoStr = [
+            officialInfo.name || 'Name nicht öffentlich',
+            officialInfo.qth,
+            officialInfo.licenseClass === 1 ? 'CEPT Klasse 1' : officialInfo.licenseClass === 3 ? 'Bewilligungsklasse' : null,
+          ].filter(Boolean).join(', ');
+          systemPrompt += `\n\nOffizielle OE-Daten für ${callsign}: ${infoStr}`;
+          continue;
+        }
+
+        // Fallback to QRZ/HamQTH
+        if (QRZ_USERNAME && QRZ_PASSWORD) {
+          const qrzInfo = await lookupQRZ(callsign);
+          if (qrzInfo && !qrzInfo.error) {
+            actionsPerformed.push(`QRZ-Lookup: ${callsign}`);
+            const infoStr = [
+              qrzInfo.fname && qrzInfo.name ? `${qrzInfo.fname} ${qrzInfo.name}` : qrzInfo.name,
+              qrzInfo.addr2,
+              qrzInfo.country,
+              qrzInfo.grid ? `Grid: ${qrzInfo.grid}` : null,
+            ].filter(Boolean).join(', ');
+            systemPrompt += `\n\nQRZ.com Info für ${callsign}: ${infoStr}`;
+            continue;
+          }
+        }
+
+        const hamqthInfo = await lookupHamQTH(callsign);
+        if (hamqthInfo && !hamqthInfo.error) {
+          actionsPerformed.push(`HamQTH-Lookup: ${callsign}`);
+          const infoStr = [hamqthInfo.nick, hamqthInfo.qth, hamqthInfo.country].filter(Boolean).join(', ');
+          if (infoStr) {
+            systemPrompt += `\n\nHamQTH Info für ${callsign}: ${infoStr}`;
+          }
+        }
+      }
+    }
+
+    // Now call the AI
+    sendStatus('ai_processing', 'KI generiert Antwort...');
+    console.log('Groq MCP Stream: Processing with actions:', actionsPerformed);
+
+    try {
+      const result = await callGroqWithMCP(message, systemPrompt);
+      const allTools = [...actionsPerformed, ...result.toolsUsed];
+      if (result.toolsUsed.length > 0) {
+        console.log(`Groq MCP Stream: Used tools: ${result.toolsUsed.join(', ')}`);
+      }
+      sendComplete(result.content, allTools, 'groq-mcp');
+    } catch (mcpError) {
+      console.error('Groq MCP failed, falling back:', mcpError);
+      sendStatus('fallback', 'Wechsle zu Standard-Modus...');
+      const fallbackContent = await callGroq(
+        [{ role: 'user', content: message }],
+        systemPrompt,
+        1024
+      );
+      sendComplete(fallbackContent, actionsPerformed, 'groq-fallback');
+    }
+  } catch (error) {
+    console.error('Groq MCP stream error:', error);
+    sendError(error instanceof Error ? error.message : 'Unknown error');
+  }
+});
+
 // ========== Callsign Finder API Endpoints ==========
 
 // Callsign lookup endpoint

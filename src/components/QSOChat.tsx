@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu, ExternalLink, X } from 'lucide-react';
+import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu, ExternalLink, X, Search, Radio, Sparkles, Globe, User } from 'lucide-react';
 import ReactMarkdown, { Components } from 'react-markdown';
-import { sendChatMessage, sendChatMessageStream, ChatProvider } from '../services/claude';
+import { sendChatMessage, sendChatMessageStream, sendChatMessageWithStatus, ChatProvider, ChatStatusUpdate } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { useChatHistory } from '../hooks/useChatHistory';
 import ChatSidebar from './ChatSidebar';
@@ -110,6 +110,10 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   const [streamingContent, setStreamingContent] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
 
+  // Status tracking for transparent processing
+  const [currentStatus, setCurrentStatus] = useState<{ status: string; detail?: string } | null>(null);
+  const [completedActions, setCompletedActions] = useState<string[]>([]);
+
   const sendMessageToChat = async (text: string) => {
     if (!text.trim()) return;
 
@@ -130,12 +134,13 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
     setIsLoading(true);
     setError(null);
     setStreamingContent('');
+    setCurrentStatus(null);
+    setCompletedActions([]);
 
     try {
-      // Use streaming for standard provider, non-streaming for MCP (tools need full response)
+      // Use streaming with status updates for MCP (tools need status feedback)
       if (provider === 'groq-mcp' || provider === 'auto') {
-        // Non-streaming for MCP (to support tool calls)
-        const response = await sendChatMessage(
+        const stream = sendChatMessageWithStatus(
           text.trim(),
           messages,
           {
@@ -146,16 +151,28 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           provider
         );
 
-        const assistantMessage: ExtendedChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: response.content,
-          timestamp: new Date(),
-          provider: response.provider,
-          toolsUsed: response.toolsUsed,
-        };
-
-        addMessage(assistantMessage);
+        for await (const update of stream) {
+          if (update.type === 'status') {
+            setCurrentStatus({ status: update.status || '', detail: update.detail });
+            // Track completed actions
+            if (update.status && !['thinking', 'ai_processing', 'fallback'].includes(update.status)) {
+              setCompletedActions(prev => [...prev, update.detail || update.status || '']);
+            }
+          } else if (update.type === 'complete') {
+            setCurrentStatus(null);
+            const assistantMessage: ExtendedChatMessage = {
+              id: (Date.now() + 1).toString(),
+              role: 'assistant',
+              content: update.content || '',
+              timestamp: new Date(),
+              provider: update.provider,
+              toolsUsed: update.toolsUsed,
+            };
+            addMessage(assistantMessage);
+          } else if (update.type === 'error') {
+            throw new Error(update.error || 'Unbekannter Fehler');
+          }
+        }
       } else {
         // Streaming for standard provider
         setIsStreaming(true);
@@ -408,14 +425,53 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             </div>
           )}
 
-          {/* Loading indicator (only when not streaming) */}
+          {/* Loading indicator with status updates */}
           {isLoading && !isStreaming && (
             <div className="flex gap-3">
               <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center flex-shrink-0">
                 <span className="text-sm">AI</span>
               </div>
-              <div className="bg-slate-700 rounded-xl px-4 py-3">
-                <Loader2 className="w-5 h-5 animate-spin text-sky-400" />
+              <div className="bg-slate-700 rounded-xl px-4 py-3 min-w-[200px]">
+                {/* Show completed actions */}
+                {completedActions.length > 0 && (
+                  <div className="space-y-1.5 mb-3 pb-3 border-b border-slate-600">
+                    {completedActions.map((action, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs text-slate-400">
+                        <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-green-400" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M2 6l3 3 5-6" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <span>{action}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Current status */}
+                <div className="flex items-center gap-2">
+                  {currentStatus?.status === 'web_search' && (
+                    <Globe className="w-4 h-4 text-sky-400 animate-pulse" />
+                  )}
+                  {currentStatus?.status === 'callsign_lookup' && (
+                    <Radio className="w-4 h-4 text-amber-400 animate-pulse" />
+                  )}
+                  {currentStatus?.status === 'checking_availability' && (
+                    <Search className="w-4 h-4 text-purple-400 animate-pulse" />
+                  )}
+                  {currentStatus?.status === 'generating_suggestions' && (
+                    <User className="w-4 h-4 text-green-400 animate-pulse" />
+                  )}
+                  {currentStatus?.status === 'ai_processing' && (
+                    <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
+                  )}
+                  {(!currentStatus || currentStatus?.status === 'thinking' || currentStatus?.status === 'fallback') && (
+                    <Loader2 className="w-4 h-4 animate-spin text-sky-400" />
+                  )}
+                  <span className="text-sm text-slate-300">
+                    {currentStatus?.detail || currentStatus?.status || 'Verarbeite...'}
+                  </span>
+                </div>
               </div>
             </div>
           )}
