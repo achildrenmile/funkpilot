@@ -6,7 +6,7 @@ export const meshcomGettingStarted: HamProject = {
   category: 'mesh-lora',
   difficulty: 2,
   description: 'MeshCom - Das LoRa-Mesh-Netzwerk für Funkamateure in Österreich und Deutschland. Entwickelt vom ÖVSV mit Fokus auf Ham Radio.',
-  hardware: 't-beam',
+  hardware: 'esp32-lora',
   projectType: 'guide',
 
   components: [

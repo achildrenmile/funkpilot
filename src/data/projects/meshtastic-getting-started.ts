@@ -6,7 +6,7 @@ export const meshtasticGettingStarted: HamProject = {
   category: 'mesh-lora',
   difficulty: 1,
   description: 'Einstieg in Meshtastic - Das Open-Source LoRa Mesh-Netzwerk für Off-Grid Kommunikation. Perfekt für Outdoor, Notfunk und Experimentieren.',
-  hardware: 't-beam',
+  hardware: 'esp32-lora',
   projectType: 'guide',
 
   components: [

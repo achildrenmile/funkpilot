@@ -6,7 +6,7 @@ export const meshcoreGettingStarted: HamProject = {
   category: 'mesh-lora',
   difficulty: 2,
   description: 'MeshCore - Der leistungsstarke Meshtastic-Fork mit erweiterten Funktionen für Repeater, Rooms und Client-Management.',
-  hardware: 't-beam',
+  hardware: 'esp32-lora',
   projectType: 'guide',
 
   components: [
