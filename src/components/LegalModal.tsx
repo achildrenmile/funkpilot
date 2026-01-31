@@ -229,6 +229,17 @@ function PrivacyContent() {
               <a href="https://openrouter.ai/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">openrouter.ai/privacy</a>
             </p>
           </div>
+
+          <div className="bg-slate-700/50 rounded-lg p-3">
+            <p className="font-medium text-slate-200">Tavily Inc. (USA) - Web-Suche</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Für aktuelle Informationen (z.B. Contests, Propagation) kann eine Web-Suche
+              durchgeführt werden. Dabei werden nur die Suchbegriffe übermittelt, keine
+              personenbezogenen Daten. Tavily ist GDPR-konform und speichert keine Suchanfragen.
+              <br />
+              <a href="https://tavily.com/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">tavily.com/privacy</a>
+            </p>
+          </div>
         </div>
 
         <p className="mt-3 text-sm text-slate-400">

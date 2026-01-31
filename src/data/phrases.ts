@@ -152,6 +152,6 @@ export const QUICK_QUESTIONS = [
   { id: 'suffix_check', text: 'Ist Suffix ABC noch frei?', textEN: 'Is suffix ABC available?' },
   { id: 'callsign_suggest', text: 'Rufzeichen für Anna Berger', textEN: 'Callsign for Anna Berger' },
   { id: 'oeradio_tools', text: 'Welche OERadio Tools gibt es?', textEN: 'What OERadio tools are available?' },
-  { id: 'propagation', text: 'Wie sind die Bedingungen?', textEN: 'Current propagation?' },
+  { id: 'current_contest', text: 'Welcher Contest ist aktuell?', textEN: 'What contest is currently on?' },
   { id: 'antenna', text: 'Antennentipps für Balkon?', textEN: 'Antenna tips for balcony?' },
 ];

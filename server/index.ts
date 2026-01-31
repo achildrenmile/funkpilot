@@ -17,6 +17,7 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const QRZ_USERNAME = process.env.QRZ_USERNAME || '';
 const QRZ_PASSWORD = process.env.QRZ_PASSWORD || '';
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY || '';
 
 // QRZ.com session management
 let qrzSessionKey: string | null = null;
@@ -122,6 +123,7 @@ app.get('/api/health', (_req, res) => {
     hasAnthropicKey: !!ANTHROPIC_API_KEY,
     hasOpenRouterKey: !!OPENROUTER_API_KEY,
     hasQrzKey: !!(QRZ_USERNAME && QRZ_PASSWORD),
+    hasTavilyKey: !!TAVILY_API_KEY,
   });
 });
 
@@ -501,6 +503,82 @@ async function lookupHamQTH(callsign: string): Promise<HamQTHInfo | null> {
   }
 }
 
+// Tavily Web Search for amateur radio topics (EU GDPR compliant)
+interface TavilySearchResult {
+  title: string;
+  url: string;
+  content: string;
+  score: number;
+}
+
+interface TavilyResponse {
+  results: TavilySearchResult[];
+  answer?: string;
+}
+
+async function searchWeb(query: string): Promise<TavilyResponse | null> {
+  if (!TAVILY_API_KEY) {
+    return null;
+  }
+
+  try {
+    // Add amateur radio context to improve relevance
+    const enhancedQuery = `${query} amateur radio ham radio`;
+
+    const response = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        api_key: TAVILY_API_KEY,
+        query: enhancedQuery,
+        search_depth: 'basic',
+        include_answer: true,
+        include_domains: [
+          'arrl.org', 'iaru.org', 'darc.de', 'oevsv.at', 'uska.ch',
+          'qrz.com', 'eham.net', 'dxwatch.com', 'pskreporter.info',
+          'hamqsl.com', 'spaceweather.com', 'solarham.com',
+          'contestcalendar.com', 'cqww.com', 'cqwpx.com',
+          'sota.org.uk', 'pota.app', 'wwff.co',
+          'wikipedia.org', 'github.com'
+        ],
+        max_results: 5,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Tavily search error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log(`Web search: "${query}" -> ${data.results?.length || 0} results`);
+    return data;
+  } catch (error) {
+    console.error('Tavily search error:', error);
+    return null;
+  }
+}
+
+// Check if a message likely needs web search (current events, recent info)
+function needsWebSearch(message: string): boolean {
+  const searchTriggers = [
+    /\b(aktuell|heute|jetzt|gerade|momentan|derzeit)\b/i,
+    /\b(contest|wettbewerb)\s+(diese|nächste|am)\b/i,
+    /\b(wann|wo)\s+(ist|findet|beginnt)\b/i,
+    /\b(neueste|letzte|aktuelle)\s+(news|nachrichten|infos?)\b/i,
+    /\b(propagation|ausbreitung|bedingungen)\s+(heute|aktuell|jetzt)\b/i,
+    /\b(suche|finde|such)\s+(nach|mir|information)\b/i,
+    /\bweb\s*such/i,
+    /\brecherchier/i,
+    /\b(DX-?pedition|expedition)\b/i,
+    /\b(fieldday|field\s*day)\b/i,
+  ];
+
+  return searchTriggers.some(pattern => pattern.test(message));
+}
+
 // MCP Server URL for Ham Radio Tools
 const OERADIO_MCP_URL = 'https://oeradio-mcp.oeradio.at/mcp';
 
@@ -763,6 +841,20 @@ Utilities:
     }
     if (context?.solarData) {
       systemPrompt += `\nAktuelle Solar-Daten: SFI=${context.solarData.sfi}, K=${context.solarData.kIndex}, A=${context.solarData.aIndex}`;
+    }
+
+    // Web search for current events/news if needed (EU GDPR compliant via Tavily)
+    if (TAVILY_API_KEY && needsWebSearch(message)) {
+      const searchResults = await searchWeb(message);
+      if (searchResults && searchResults.results.length > 0) {
+        systemPrompt += `\n\n[Web-Recherche Ergebnisse - nutze diese aktuellen Informationen in deiner Antwort, IMMER mit Quellenangabe/URL]:`;
+        if (searchResults.answer) {
+          systemPrompt += `\nZusammenfassung: ${searchResults.answer}`;
+        }
+        for (const result of searchResults.results.slice(0, 3)) {
+          systemPrompt += `\n- ${result.title}: ${result.content.slice(0, 300)}... (Quelle: ${result.url})`;
+        }
+      }
     }
 
     // Get official callsigns for all lookups
@@ -1310,4 +1402,5 @@ app.listen(PORT, () => {
   console.log(`   Groq API: ${GROQ_API_KEY ? '✓ configured' : '✗ not set'}`);
   console.log(`   Anthropic API: ${ANTHROPIC_API_KEY ? '✓ configured' : '✗ not set'}`);
   console.log(`   OpenRouter API: ${OPENROUTER_API_KEY ? '✓ configured' : '✗ not set'}`);
+  console.log(`   Tavily Search: ${TAVILY_API_KEY ? '✓ configured' : '✗ not set'}`);
 });
