@@ -119,7 +119,7 @@ export function ProjectChat({ code, projectName, hardware, language, onCodeUpdat
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[85%] rounded-lg px-4 py-2 ${
+                className={`max-w-[95%] sm:max-w-[85%] rounded-lg px-3 sm:px-4 py-2 ${
                   msg.role === 'user'
                     ? 'bg-sky-600 text-white'
                     : 'bg-slate-700 text-slate-200'
@@ -166,16 +166,18 @@ export function ProjectChat({ code, projectName, hardware, language, onCodeUpdat
 
       {/* Quick prompts - only show when no messages */}
       {messages.length === 0 && (
-        <div className="px-4 py-3 flex flex-wrap gap-2">
-          {quickPrompts.map((prompt, idx) => (
-            <button
-              key={idx}
-              onClick={() => setInput(prompt)}
-              className="text-xs px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-full text-slate-300 transition-colors"
-            >
-              {prompt}
-            </button>
-          ))}
+        <div className="px-4 py-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 pb-1">
+            {quickPrompts.map((prompt, idx) => (
+              <button
+                key={idx}
+                onClick={() => setInput(prompt)}
+                className="text-xs px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-full text-slate-300 transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

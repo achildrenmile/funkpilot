@@ -42,12 +42,12 @@ export default function ProjectsTab() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Wrench className="w-6 h-6 text-sky-400" />
+        <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400" />
           Bastelprojekte
         </h2>
-        <p className="text-slate-400 mt-1">
-          Arduino & ESP32 Projekte für Funkamateure - mit Code zum Download
+        <p className="text-slate-400 mt-1 text-sm sm:text-base">
+          Arduino & ESP32 Projekte für Funkamateure
         </p>
       </div>
 
@@ -65,37 +65,39 @@ export default function ProjectsTab() {
           />
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              selectedCategory === 'all'
-                ? 'bg-sky-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
-          >
-            Alle ({ALL_PROJECTS.length})
-          </button>
-          {(Object.keys(CATEGORY_INFO) as ProjectCategory[]).map((cat) => {
-            const count = getProjectsByCategory(cat).length;
-            if (count === 0) return null;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-1.5 ${
-                  selectedCategory === cat
-                    ? 'bg-sky-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                <span>{CATEGORY_INFO[cat].icon}</span>
-                <span className="hidden sm:inline">{CATEGORY_INFO[cat].name}</span>
-                <span className="text-xs opacity-70">({count})</span>
-              </button>
-            );
-          })}
+        {/* Category Filter - Horizontal scroll on mobile */}
+        <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
+          <div className="flex gap-2 pb-2 sm:pb-0 sm:flex-wrap">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
+                selectedCategory === 'all'
+                  ? 'bg-sky-600 text-white'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              Alle ({ALL_PROJECTS.length})
+            </button>
+            {(Object.keys(CATEGORY_INFO) as ProjectCategory[]).map((cat) => {
+              const count = getProjectsByCategory(cat).length;
+              if (count === 0) return null;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
+                    selectedCategory === cat
+                      ? 'bg-sky-600 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  <span>{CATEGORY_INFO[cat].icon}</span>
+                  <span className="hidden sm:inline">{CATEGORY_INFO[cat].name}</span>
+                  <span className="text-xs opacity-70">({count})</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

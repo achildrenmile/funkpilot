@@ -31,27 +31,27 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <button
           onClick={onBack}
-          className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors"
+          className="p-2.5 sm:p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">{category.icon}</span>
-            <h2 className="text-2xl font-bold">{project.name}</h2>
+            <span className="text-xl sm:text-2xl">{category.icon}</span>
+            <h2 className="text-lg sm:text-2xl font-bold truncate">{project.name}</h2>
           </div>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="flex flex-wrap items-center gap-2 mt-1">
             <span className={`${hardware.color} text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1`}>
               <Cpu className="w-3 h-3" />
               {hardware.name}
             </span>
-            <span className="text-sm text-slate-400">
+            <span className="text-xs sm:text-sm text-slate-400">
               {'⭐'.repeat(project.difficulty)} {DIFFICULTY_LABELS[project.difficulty]}
             </span>
-            <span className="text-sm text-green-400">{project.estimatedCost}</span>
+            <span className="text-xs sm:text-sm text-green-400">{project.estimatedCost}</span>
           </div>
         </div>
       </div>

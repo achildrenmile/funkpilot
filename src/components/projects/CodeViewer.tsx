@@ -35,63 +35,60 @@ export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
   return (
     <div className={`bg-slate-900 rounded-xl border border-slate-700 overflow-hidden ${expanded ? 'fixed inset-0 sm:inset-4 z-50' : ''}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
-        <div className="flex items-center gap-3">
-          {/* Traffic lights decoration */}
-          <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-slate-800 border-b border-slate-700 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Traffic lights decoration - hide on mobile */}
+          <div className="hidden sm:flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500/80" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
             <div className="w-3 h-3 rounded-full bg-green-500/80" />
           </div>
-          <span className="text-sm font-mono text-slate-300">{fileName}</span>
-          <span className="text-xs text-slate-500 bg-slate-700 px-2 py-0.5 rounded">
+          <span className="text-xs sm:text-sm font-mono text-slate-300 truncate">{fileName}</span>
+          <span className="hidden sm:inline text-xs text-slate-500 bg-slate-700 px-2 py-0.5 rounded flex-shrink-0">
             {langLabel}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
+            className="p-2 sm:p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
             title={expanded ? 'Verkleinern' : 'Vollbild'}
           >
             {expanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+            title="Kopieren"
           >
             {copied ? (
-              <>
-                <Check className="w-4 h-4 text-green-400" />
-                <span className="text-green-400">Kopiert!</span>
-              </>
+              <Check className="w-4 h-4 text-green-400" />
             ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span>Kopieren</span>
-              </>
+              <Copy className="w-4 h-4" />
             )}
+            <span className="hidden sm:inline">{copied ? 'Kopiert!' : 'Kopieren'}</span>
           </button>
           <button
             onClick={handleDownload}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-sm bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors"
+            title="Download"
           >
             <Download className="w-4 h-4" />
-            <span>Download</span>
+            <span className="hidden sm:inline">Download</span>
           </button>
         </div>
       </div>
 
       {/* Code Content */}
-      <div className={`p-4 overflow-auto ${expanded ? 'h-[calc(100%-60px)]' : 'max-h-[500px]'}`}>
-        <pre className="text-sm font-mono leading-relaxed">
+      <div className={`p-2 sm:p-4 overflow-auto ${expanded ? 'h-[calc(100%-60px)]' : 'max-h-[400px] sm:max-h-[500px]'}`}>
+        <pre className="text-xs sm:text-sm font-mono leading-relaxed">
           <code>
             {lines.map((line, idx) => (
-              <div key={idx} className="flex hover:bg-slate-800/50 -mx-4 px-4">
-                <span className="text-slate-600 select-none w-12 text-right pr-4 flex-shrink-0 border-r border-slate-800 mr-4">
+              <div key={idx} className="flex hover:bg-slate-800/50 -mx-2 sm:-mx-4 px-2 sm:px-4">
+                <span className="text-slate-600 select-none w-8 sm:w-12 text-right pr-2 sm:pr-4 flex-shrink-0 border-r border-slate-800 mr-2 sm:mr-4">
                   {idx + 1}
                 </span>
-                <span className="flex-1 whitespace-pre">
+                <span className="flex-1 whitespace-pre overflow-x-auto">
                   {highlightLine(line, language)}
                 </span>
               </div>

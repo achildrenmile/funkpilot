@@ -82,8 +82,8 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
           )}
         </div>
 
-        {/* Wiring Table */}
-        <div className="p-4">
+        {/* Wiring Table - Desktop */}
+        <div className="p-4 hidden sm:block">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -123,6 +123,28 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Wiring Cards - Mobile */}
+        <div className="p-3 sm:hidden space-y-2">
+          {wiring.map((conn, idx) => (
+            <div key={idx} className="bg-slate-700/50 rounded-lg p-3">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-mono text-xs text-sky-400">{conn.from}</span>
+                <span className="text-slate-500">→</span>
+                <span className="font-mono text-xs text-green-400">{conn.to}</span>
+                {conn.color && (
+                  <span
+                    className={`w-4 h-2 rounded-full ml-auto ${WIRE_COLORS[conn.color.toLowerCase()] || 'bg-slate-500'}`}
+                    title={conn.color}
+                  />
+                )}
+              </div>
+              {conn.notes && (
+                <p className="text-xs text-slate-400 mt-1">{conn.notes}</p>
+              )}
+            </div>
+          ))}
 
           {/* Legend */}
           <div className="mt-4 pt-3 border-t border-slate-700">
@@ -139,7 +161,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={(e) => e.target === e.currentTarget && setShowWokwiModal(false)}
         >
-          <div className="bg-slate-800 rounded-xl max-w-lg w-full shadow-xl border border-slate-700">
+          <div className="bg-slate-800 rounded-xl max-w-[95vw] sm:max-w-lg w-full shadow-xl border border-slate-700">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
               <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
