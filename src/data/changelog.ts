@@ -10,6 +10,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.13.2',
+    date: '2026-01-31',
+    title: 'Markdown Rendering Fix',
+    changes: [
+      { type: 'fix', text: 'Markdown wird jetzt korrekt formatiert angezeigt' },
+      { type: 'improvement', text: 'Tailwind Typography Plugin für bessere Dokumentation' },
+    ],
+  },
+  {
     version: '1.13.1',
     date: '2026-01-31',
     title: 'Custom Firmware Guide',
