@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, Check, X, Loader2, ChevronDown } from 'lucide-react';
 import { suggestCallsigns } from '../../services/callsignService';
 import type { CallsignSuggestion } from '../../types/callsign';
 import { AUSTRIAN_DISTRICTS } from '../../types/callsign';
 
 export default function CallsignSuggest() {
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [district, setDistrict] = useState(8); // Default to Kärnten
@@ -24,7 +26,7 @@ export default function CallsignSuggest() {
       const data = await suggestCallsigns(firstName.trim(), lastName.trim(), district);
       setSuggestions(data.suggestions);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler bei der Generierung');
+      setError(err instanceof Error ? err.message : t('callsignFinder.generateError'));
     } finally {
       setIsLoading(false);
     }
@@ -40,13 +42,13 @@ export default function CallsignSuggest() {
           {/* First Name */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">
-              Vorname
+              {t('callsignFinder.firstName')}
             </label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              placeholder="z.B. Max"
+              placeholder={t('callsignFinder.firstNamePlaceholder')}
               className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none"
             />
           </div>
@@ -54,13 +56,13 @@ export default function CallsignSuggest() {
           {/* Last Name */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">
-              Nachname
+              {t('callsignFinder.lastName')}
             </label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              placeholder="z.B. Mustermann"
+              placeholder={t('callsignFinder.lastNamePlaceholder')}
               className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none"
             />
           </div>
@@ -69,7 +71,7 @@ export default function CallsignSuggest() {
         {/* District Selection */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Bundesland (Präfix)
+            {t('callsignFinder.districtPrefix')}
           </label>
           <div className="relative">
             <select
@@ -98,7 +100,7 @@ export default function CallsignSuggest() {
           ) : (
             <Sparkles className="w-5 h-5" />
           )}
-          Vorschläge generieren
+          {t('callsignFinder.suggestButton')}
         </button>
       </form>
 
@@ -116,10 +118,10 @@ export default function CallsignSuggest() {
           {/* Summary */}
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium text-white">
-              Vorschläge für {firstName} {lastName}
+              {t('callsignFinder.suggestionsFor')} {firstName} {lastName}
             </h3>
             <span className={`text-sm ${availableCount > 0 ? 'text-green-400' : 'text-slate-400'}`}>
-              {availableCount} von {suggestions.length} verfügbar
+              {availableCount} {t('callsignFinder.availableOf', { total: suggestions.length })}
             </span>
           </div>
 
@@ -153,12 +155,12 @@ export default function CallsignSuggest() {
                 {suggestion.available ? (
                   <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600/30 text-green-400 rounded-full text-sm font-medium">
                     <Check className="w-4 h-4" />
-                    Verfügbar
+                    {t('callsignFinder.availabilityAvailable')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 text-slate-400 rounded-full text-sm">
                     <X className="w-4 h-4" />
-                    Vergeben
+                    {t('callsignFinder.availabilityTaken')}
                   </span>
                 )}
               </div>
@@ -167,11 +169,11 @@ export default function CallsignSuggest() {
 
           {/* Tips */}
           <div className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-slate-400">
-            <p className="font-medium text-slate-300 mb-2">Tipps zur Rufzeichenwahl:</p>
+            <p className="font-medium text-slate-300 mb-2">{t('callsignFinder.tipsTitle')}:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>Kurze Suffixe (2 Buchstaben) sind im Contest-Betrieb vorteilhaft</li>
-              <li>Suffix mit X am Anfang sind traditionell für Klubstationen reserviert</li>
-              <li>Ein gut merkbares Suffix basierend auf deinen Initialen ist empfehlenswert</li>
+              <li>{t('callsignFinder.tip1')}</li>
+              <li>{t('callsignFinder.tip2')}</li>
+              <li>{t('callsignFinder.tip3')}</li>
             </ul>
           </div>
         </div>

@@ -13,7 +13,7 @@ interface VoiceCQProps {
 }
 
 export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
-  const { t: _t } = useTranslation(); // Will be used for translations
+  const { t } = useTranslation();
   const [voiceSettings, setVoiceSettings] = useState<VoiceCQSettings>(getVoiceSettings());
   const [voices, setVoices] = useState<VoiceInfo[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -114,10 +114,10 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Volume2 className="w-6 h-6 text-sky-400 flex-shrink-0" />
-            <span className="truncate">Voice CQ Generator</span>
+            <span className="truncate">{t('voiceCQ.title')}</span>
           </h2>
           <p className="text-slate-400 mt-1 text-sm sm:text-base">
-            Generiere CQ-Rufe und Contest-Phrasen
+            {t('voiceCQ.subtitle')}
           </p>
         </div>
         <button
@@ -133,11 +133,11 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
       {/* Settings Panel */}
       {showSettings && (
         <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
-          <h3 className="text-lg font-semibold mb-4">Einstellungen</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('voiceCQ.settingsTitle')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Callsign */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Mein Rufzeichen</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.myCallsign')}</label>
               <input
                 type="text"
                 value={voiceSettings.callsign}
@@ -149,7 +149,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
             {/* Contest */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Contest</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.contest')}</label>
               <select
                 value={voiceSettings.contest}
                 onChange={(e) => updateVoiceSettings({ contest: e.target.value })}
@@ -163,7 +163,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
             {/* Zone */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Contest-Zone</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.contestZone')}</label>
               <input
                 type="text"
                 value={voiceSettings.zone}
@@ -175,7 +175,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
             {/* Serial Number */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Seriennummer</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.serialNumber')}</label>
               <input
                 type="number"
                 value={voiceSettings.serialNr}
@@ -187,13 +187,13 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
             {/* Voice Selection */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Stimme</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.voice')}</label>
               <select
                 value={voiceSettings.tts.voice}
                 onChange={(e) => updateVoiceSettings({ tts: { ...voiceSettings.tts, voice: e.target.value } })}
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2"
               >
-                <option value="">Standard</option>
+                <option value="">{t('voiceCQ.voiceDefault')}</option>
                 {voices.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}
@@ -203,7 +203,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
             {/* Speed */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">
-                Geschwindigkeit: {voiceSettings.tts.speed.toFixed(1)}x
+                {t('voiceCQ.speed')}: {voiceSettings.tts.speed.toFixed(1)}x
               </label>
               <input
                 type="range"
@@ -219,7 +219,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
             {/* Pitch */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">
-                Tonhöhe: {voiceSettings.tts.pitch.toFixed(1)}
+                {t('voiceCQ.pitch')}: {voiceSettings.tts.pitch.toFixed(1)}
               </label>
               <input
                 type="range"
@@ -234,15 +234,15 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
             {/* Phonetic Mode */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Phonetik</label>
+              <label className="block text-sm text-slate-400 mb-1">{t('voiceCQ.phonetic')}</label>
               <select
                 value={voiceSettings.phonetikMode}
                 onChange={(e) => updateVoiceSettings({ phonetikMode: e.target.value as 'auto' | 'callonly' | 'none' })}
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2"
               >
-                <option value="auto">Automatisch</option>
-                <option value="callonly">Nur Rufzeichen</option>
-                <option value="none">Keine</option>
+                <option value="auto">{t('voiceCQ.phonetikAuto')}</option>
+                <option value="callonly">{t('voiceCQ.phonetikCallOnly')}</option>
+                <option value="none">{t('voiceCQ.phonetikNone')}</option>
               </select>
             </div>
           </div>
@@ -252,20 +252,20 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
       {/* Quick Info */}
       {voiceSettings.callsign && (
         <div className="bg-slate-800/50 rounded-lg px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm overflow-hidden">
-          <span className="text-slate-400">Aktiv:</span>
+          <span className="text-slate-400">{t('voiceCQ.active')}:</span>
           <span className="font-mono text-sky-400">{voiceSettings.callsign}</span>
           <span className="text-slate-600 hidden sm:inline">|</span>
-          <span className="text-slate-400">Contest:</span>
+          <span className="text-slate-400">{t('voiceCQ.contest')}:</span>
           <span>{CONTESTS.find(c => c.id === voiceSettings.contest)?.name}</span>
           <span className="text-slate-600 hidden sm:inline">|</span>
-          <span className="text-slate-400">Zone:</span>
+          <span className="text-slate-400">{t('voiceCQ.contestZone')}:</span>
           <span>{voiceSettings.zone}</span>
         </div>
       )}
 
       {/* Standard Phrases */}
       <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
-        <h3 className="text-lg font-semibold mb-4">Standard-Phrasen</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('voiceCQ.standardPhrases')}</h3>
         <div className="space-y-3">
           {filteredPhrases.map((phrase) => {
             const variables = getVariables();
@@ -309,11 +309,11 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
       {/* Custom Phrase */}
       <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 min-w-0">
-        <h3 className="text-lg font-semibold mb-4">Eigene Phrase</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('voiceCQ.customPhrase')}</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-xs sm:text-sm text-slate-400 mb-2">
-              Verwende {'{CALL}'} oder {'{CALL_PHONETIC}'}
+              {t('voiceCQ.customPhraseHint')}
             </label>
             <input
               type="text"
@@ -326,7 +326,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
 
           {customPhrase && (
             <div className="bg-slate-700/50 rounded-lg p-3 min-w-0">
-              <span className="text-xs text-slate-400">Vorschau: </span>
+              <span className="text-xs text-slate-400">{t('voiceCQ.preview')}: </span>
               <p className="text-xs sm:text-sm font-mono text-slate-300 truncate">
                 {processTemplate(customPhrase, getVariables(), voiceSettings.phonetikMode !== 'none')}
               </p>
@@ -339,7 +339,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
             className="w-full bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
           >
             <Play className="w-5 h-5" />
-            Generieren & Abspielen
+            {t('voiceCQ.generateAndPlay')}
           </button>
         </div>
       </div>
@@ -358,7 +358,7 @@ export default function VoiceCQ({ settings: userSettings }: VoiceCQProps) {
               ))}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-sky-400 font-medium">Wird gesprochen...</p>
+              <p className="text-sm text-sky-400 font-medium">{t('voiceCQ.nowSpeaking')}</p>
               <p className="text-xs text-slate-400 truncate font-mono">{currentPhrase}</p>
             </div>
             <button

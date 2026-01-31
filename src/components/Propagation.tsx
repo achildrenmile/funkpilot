@@ -16,7 +16,7 @@ interface PropagationProps {
 }
 
 export default function Propagation({ settings, solarData, isLoading }: PropagationProps) {
-  const { t: _t } = useTranslation(); // Will be used for translations
+  const { t } = useTranslation();
   const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
   const [customLocator, setCustomLocator] = useState('');
   const [advice, setAdvice] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       setAdvice(result);
     } catch (err) {
       console.error('Advice error:', err);
-      setError(err instanceof Error ? err.message : 'Fehler bei der Empfehlung.');
+      setError(err instanceof Error ? err.message : t('propagation.errorRecommendation'));
     } finally {
       setIsLoadingAdvice(false);
     }
@@ -91,7 +91,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       setAdvice(result);
     } catch (err) {
       console.error('Advice error:', err);
-      setError(err instanceof Error ? err.message : 'Fehler bei der Empfehlung.');
+      setError(err instanceof Error ? err.message : t('propagation.errorRecommendation'));
     } finally {
       setIsLoadingAdvice(false);
     }
@@ -119,11 +119,11 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
 
   const getQualityLabel = (q: string) => {
     switch (q) {
-      case 'excellent': return 'Ausgezeichnet';
-      case 'good': return 'Gut';
-      case 'moderate': return 'Moderat';
-      case 'poor': return 'Schlecht';
-      default: return 'Unbekannt';
+      case 'excellent': return t('propagation.excellent');
+      case 'good': return t('propagation.good');
+      case 'moderate': return t('propagation.moderate');
+      case 'poor': return t('propagation.poor');
+      default: return t('propagation.closed');
     }
   };
 
@@ -134,10 +134,10 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
         <div className="min-w-0">
           <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400 flex-shrink-0" />
-            <span className="truncate">Propagation</span>
+            <span className="truncate">{t('propagation.title')}</span>
           </h2>
           <p className="text-slate-400 mt-1 text-sm sm:text-base">
-            Solar-Daten und KI-Empfehlungen für DX
+            {t('propagation.subtitle')}
           </p>
         </div>
         <button
@@ -152,10 +152,10 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       {/* Solar Conditions */}
       <div className={`rounded-xl p-4 sm:p-6 border ${quality ? getQualityBg(quality.hf) : 'bg-slate-800 border-slate-700'}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
-          <h3 className="text-base sm:text-lg font-semibold">Aktuelle Bedingungen</h3>
+          <h3 className="text-base sm:text-lg font-semibold">{t('propagation.currentConditions')}</h3>
           {solarData && (
             <span className="text-xs sm:text-sm text-slate-400">
-              Stand: {solarData.updatedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })} UTC
+              {t('propagation.asOf')}: {solarData.updatedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })} UTC
             </span>
           )}
         </div>
@@ -172,7 +172,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
                 {solarData.sfi}
               </p>
               <p className="text-xs text-slate-500 hidden sm:block">
-                {solarData.sfi > 150 ? 'Sehr gut' : solarData.sfi > 120 ? 'Gut' : solarData.sfi > 80 ? 'Moderat' : 'Niedrig'}
+                {solarData.sfi > 150 ? t('propagation.veryGood') : solarData.sfi > 120 ? t('propagation.good') : solarData.sfi > 80 ? t('propagation.moderate') : t('propagation.low')}
               </p>
             </div>
             <div className="text-center">
@@ -181,7 +181,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
                 {solarData.kIndex}
               </p>
               <p className="text-xs text-slate-500 hidden sm:block">
-                {solarData.kIndex <= 2 ? 'Ruhig' : solarData.kIndex <= 4 ? 'Unruhig' : 'Gestört'}
+                {solarData.kIndex <= 2 ? t('propagation.quiet') : solarData.kIndex <= 4 ? t('propagation.unsettled') : t('propagation.disturbed')}
               </p>
             </div>
             <div className="text-center">
@@ -190,24 +190,24 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
                 {solarData.aIndex}
               </p>
               <p className="text-xs text-slate-500 hidden sm:block">
-                {solarData.aIndex <= 10 ? 'Normal' : solarData.aIndex <= 20 ? 'Erhöht' : 'Hoch'}
+                {solarData.aIndex <= 10 ? t('propagation.normal') : solarData.aIndex <= 20 ? t('propagation.elevated') : t('propagation.high')}
               </p>
             </div>
             <div className="text-center hidden sm:block">
               <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">SSN</p>
               <p className="text-xl sm:text-2xl font-bold text-slate-200">{solarData.sunspots}</p>
-              <p className="text-xs text-slate-500">Flecken</p>
+              <p className="text-xs text-slate-500">{t('propagation.spots')}</p>
             </div>
             <div className="text-center hidden sm:block">
               <p className="text-slate-400 text-xs sm:text-sm mb-0.5 sm:mb-1">X-Ray</p>
               <p className="text-xl sm:text-2xl font-bold text-slate-200">{solarData.xrayFlux}</p>
               <p className="text-xs text-slate-500">
-                {solarData.xrayFlux.startsWith('A') || solarData.xrayFlux.startsWith('B') ? 'Niedrig' : 'Erhöht'}
+                {solarData.xrayFlux.startsWith('A') || solarData.xrayFlux.startsWith('B') ? t('propagation.low') : t('propagation.elevated')}
               </p>
             </div>
           </div>
         ) : (
-          <p className="text-slate-400 text-center py-4">Keine Solar-Daten verfügbar</p>
+          <p className="text-slate-400 text-center py-4">{t('propagation.noSolarData')}</p>
         )}
 
         {/* Quality Summary */}
@@ -229,9 +229,9 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <span>Trend:</span>
+                <span>{t('propagation.trend')}:</span>
                 <Minus className="w-4 h-4" />
-                <span>Stabil</span>
+                <span>{t('propagation.stable')}</span>
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
 
       {/* Target Selection */}
       <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700">
-        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Ziel auswählen</h3>
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{t('propagation.selectTarget')}</h3>
 
         {/* Popular Targets */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 mb-4">
@@ -266,7 +266,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             type="text"
             value={customLocator}
             onChange={(e) => setCustomLocator(e.target.value.toUpperCase())}
-            placeholder="Locator (z.B. PM95)"
+            placeholder={t('propagation.locatorPlaceholder')}
             maxLength={6}
             className="flex-1 min-w-0 bg-slate-700 border border-slate-600 rounded-lg px-3 sm:px-4 py-2 font-mono uppercase text-sm sm:text-base"
           />
@@ -275,8 +275,8 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             disabled={!customLocator || customLocator.length < 4 || isLoadingAdvice || !solarData || apiAvailable === false}
             className="bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap"
           >
-            <span className="hidden sm:inline">Analysieren</span>
-            <span className="sm:hidden">Go</span>
+            <span className="hidden sm:inline">{t('propagation.analyze')}</span>
+            <span className="sm:hidden">{t('propagation.go')}</span>
           </button>
         </div>
 
@@ -285,7 +285,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
           <div className="mt-4 bg-amber-900/30 border border-amber-700 rounded-lg p-3 flex items-center gap-2 text-sm">
             <AlertCircle className="w-4 h-4 text-amber-500" />
             <span className="text-amber-200">
-              KI-Backend nicht verfügbar. Bitte GROQ_API_KEY konfigurieren.
+              {t('propagation.backendNotAvailable')}
             </span>
           </div>
         )}
@@ -303,7 +303,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       {isLoadingAdvice && (
         <div className="bg-slate-800 rounded-xl p-8 border border-slate-700 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-sky-400 mx-auto mb-4" />
-          <p className="text-slate-400">Analysiere Propagation-Bedingungen...</p>
+          <p className="text-slate-400">{t('propagation.analyzing')}</p>
         </div>
       )}
 
@@ -312,14 +312,14 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <span>KI-Empfehlung</span>
+              <span>{t('propagation.aiRecommendation')}</span>
               {selectedTarget && selectedTarget !== 'custom' && (
                 <span className="text-sky-400">
-                  für {PROPAGATION_TARGETS.find(t => t.id === selectedTarget)?.name}
+                  {t('propagation.for')} {PROPAGATION_TARGETS.find(tgt => tgt.id === selectedTarget)?.name}
                 </span>
               )}
               {selectedTarget === 'custom' && (
-                <span className="text-sky-400">für {customLocator}</span>
+                <span className="text-sky-400">{t('propagation.for')} {customLocator}</span>
               )}
             </h3>
           </div>
@@ -358,17 +358,17 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
           localTimeStr = `${localHour.toString().padStart(2, '0')}:${localMin.toString().padStart(2, '0')} LOC`;
 
           // Solar status based on elevation
-          if (solar.solarElevation > 6) solarStatus = 'Tag';
-          else if (solar.solarElevation > 0) solarStatus = 'Greyline';
-          else if (solar.solarElevation > -6) solarStatus = 'Dämmerung';
-          else solarStatus = 'Nacht';
+          if (solar.solarElevation > 6) solarStatus = t('propagation.statusDay');
+          else if (solar.solarElevation > 0) solarStatus = t('propagation.statusGreyline');
+          else if (solar.solarElevation > -6) solarStatus = t('propagation.statusTwilight');
+          else solarStatus = t('propagation.statusNight');
         } else {
           // Fallback to UTC-based estimation
           isDay = utcHour >= 6 && utcHour <= 18;
           isNight = !isDay;
           isTwilight = (utcHour >= 5 && utcHour <= 7) || (utcHour >= 17 && utcHour <= 19);
           localTimeStr = `${utcHour.toString().padStart(2, '0')}:${utcMin.toString().padStart(2, '0')} UTC`;
-          solarStatus = isDay ? 'Tag' : isTwilight ? 'Greyline' : 'Nacht';
+          solarStatus = isDay ? t('propagation.statusDay') : isTwilight ? t('propagation.statusGreyline') : t('propagation.statusNight');
         }
 
         // Band definitions with real propagation characteristics
@@ -521,12 +521,12 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
               <div className="min-w-0">
                 <h3 className="text-base sm:text-lg font-semibold">
-                  <span className="hidden sm:inline">Band-Status (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})</span>
-                  <span className="sm:hidden">Band-Status</span>
+                  <span className="hidden sm:inline">{t('propagation.bandStatusTitle')} (Live: SFI={solarData.sfi}, K={solarData.kIndex}, A={solarData.aIndex})</span>
+                  <span className="sm:hidden">{t('propagation.bandStatusTitle')}</span>
                 </h3>
                 <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
                   <MapPin className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate">QTH: {userLocator}</span>
+                  <span className="truncate">{t('propagation.qth')}: {userLocator}</span>
                   {coords && <span className="text-slate-500 hidden md:inline">({coords.lat.toFixed(1)}°N, {coords.lng.toFixed(1)}°E)</span>}
                 </p>
               </div>
@@ -544,7 +544,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             </div>
 
             {/* 6m Magic Band */}
-            <p className="text-sm text-slate-400 mb-2">Magic Band</p>
+            <p className="text-sm text-slate-400 mb-2">{t('propagation.magicBand')}</p>
             <div className="grid grid-cols-1 gap-2 mb-4">
               {allBands.filter(b => b.category === 'vhf').map((bandInfo) => {
                 const result = bandInfo.getStatus();
@@ -566,7 +566,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             </div>
 
             {/* Upper HF Bands (10m - 17m) */}
-            <p className="text-sm text-slate-400 mb-2">Obere Kurzwelle (SFI-abhängig, Tagbänder)</p>
+            <p className="text-sm text-slate-400 mb-2">{t('propagation.upperHF')} ({t('propagation.sfiDependentDayBands')})</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
               {allBands.filter(b => b.category === 'upper').map((bandInfo) => {
                 const result = bandInfo.getStatus();
@@ -586,7 +586,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             </div>
 
             {/* Middle HF Bands (20m - 30m) */}
-            <p className="text-sm text-slate-400 mb-2">Mittlere Kurzwelle (Allrounder)</p>
+            <p className="text-sm text-slate-400 mb-2">{t('propagation.middleHF')} ({t('propagation.allrounder')})</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {allBands.filter(b => b.category === 'middle').map((bandInfo) => {
                 const result = bandInfo.getStatus();
@@ -606,7 +606,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             </div>
 
             {/* Lower HF Bands (40m - 160m) */}
-            <p className="text-sm text-slate-400 mb-2">Untere Kurzwelle (K-sensitiv, Nacht/Greyline)</p>
+            <p className="text-sm text-slate-400 mb-2">{t('propagation.lowerHF')} ({t('propagation.kSensitiveNightGreyline')})</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
               {allBands.filter(b => b.category === 'lower').map((bandInfo) => {
                 const result = bandInfo.getStatus();
@@ -628,13 +628,13 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
             {/* Legend */}
             <div className="border-t border-slate-700 pt-3 mt-3">
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                <span><span className="text-green-400">●</span> Offen/Gut</span>
-                <span><span className="text-yellow-400">●</span> Marginal/K-Warnung</span>
-                <span><span className="text-red-400">●</span> Gestört</span>
-                <span><span className="text-slate-400">●</span> Geschlossen</span>
+                <span><span className="text-green-400">●</span> {t('propagation.legendOpenGood')}</span>
+                <span><span className="text-yellow-400">●</span> {t('propagation.legendMarginalK')}</span>
+                <span><span className="text-red-400">●</span> {t('propagation.legendDisturbed')}</span>
+                <span><span className="text-slate-400">●</span> {t('propagation.legendClosed')}</span>
               </div>
               <p className="text-xs text-slate-500 mt-2">
-                K! = hoher K-Index, LP = Long Path, ES = Sporadic-E, D-Abs = D-Layer Absorption, QRN = Atmospheric Noise
+                {t('propagation.legendNote')}
               </p>
             </div>
           </div>

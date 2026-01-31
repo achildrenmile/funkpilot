@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, AlertTriangle, CheckCircle, XCircle, User, MapPin, Grid3X3, Loader2 } from 'lucide-react';
 import { lookupCallsign } from '../../services/callsignService';
 import type { CallsignLookupResult } from '../../types/callsign';
 
 export default function CallsignLookup() {
+  const { t } = useTranslation();
   const [callsign, setCallsign] = useState('');
   const [result, setResult] = useState<CallsignLookupResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function CallsignLookup() {
       const data = await lookupCallsign(callsign.trim());
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler bei der Abfrage');
+      setError(err instanceof Error ? err.message : t('callsignFinder.searchError'));
     } finally {
       setIsLoading(false);
     }
@@ -37,7 +39,7 @@ export default function CallsignLookup() {
             type="text"
             value={callsign}
             onChange={(e) => setCallsign(e.target.value.toUpperCase())}
-            placeholder="Rufzeichen eingeben (z.B. OE8YML)"
+            placeholder={t('callsignFinder.lookupPlaceholderFull')}
             className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none font-mono text-lg"
             maxLength={10}
           />
@@ -52,7 +54,7 @@ export default function CallsignLookup() {
           ) : (
             <Search className="w-5 h-5" />
           )}
-          Suchen
+          {t('callsignFinder.lookupButton')}
         </button>
       </form>
 
@@ -73,10 +75,9 @@ export default function CallsignLookup() {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-amber-300 text-lg">Achtung: Möglicher Schwarzfunker!</h3>
+                  <h3 className="font-bold text-amber-300 text-lg">{t('callsignFinder.possibleBlackOperator')}</h3>
                   <p className="text-amber-200/80 mt-1">
-                    <span className="font-mono font-bold">{result.callsign}</span> wurde in {result.source === 'qrz' ? 'QRZ.com' : 'HamQTH'} gefunden,
-                    ist aber <strong>NICHT</strong> in der offiziellen österreichischen Rufzeichenliste registriert.
+                    <span className="font-mono font-bold">{result.callsign}</span> {t('callsignFinder.blackOperatorDetailText', { source: result.source === 'qrz' ? 'QRZ.com' : 'HamQTH' })}
                   </p>
                 </div>
               </div>
@@ -98,16 +99,16 @@ export default function CallsignLookup() {
                 {result.isOfficial ? (
                   <span className="px-3 py-1 bg-green-600/30 text-green-400 rounded-full text-sm flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4" />
-                    Offiziell registriert
+                    {t('callsignFinder.officiallyRegistered')}
                   </span>
                 ) : result.found ? (
                   <span className="px-3 py-1 bg-slate-600/50 text-slate-300 rounded-full text-sm">
-                    Nur in {result.source === 'qrz' ? 'QRZ.com' : 'HamQTH'}
+                    {t('callsignFinder.onlyIn')} {result.source === 'qrz' ? 'QRZ.com' : 'HamQTH'}
                   </span>
                 ) : (
                   <span className="px-3 py-1 bg-slate-600/50 text-slate-400 rounded-full text-sm flex items-center gap-1.5">
                     <XCircle className="w-4 h-4" />
-                    Nicht gefunden
+                    {t('callsignFinder.notFoundAny')}
                   </span>
                 )}
               </div>
@@ -116,20 +117,20 @@ export default function CallsignLookup() {
             {/* Not Found Message */}
             {!result.found && (
               <p className="text-slate-400">
-                Dieses Rufzeichen wurde weder in der offiziellen Liste noch in QRZ.com oder HamQTH gefunden.
+                {t('callsignFinder.notFoundText')}
               </p>
             )}
 
             {/* Official Info */}
             {result.official && (
               <div className="space-y-3 mb-4">
-                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Offizielle Daten</h3>
+                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">{t('callsignFinder.officialData')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
                     <User className="w-5 h-5 text-slate-400" />
                     <div>
                       <p className="text-white font-medium">{result.official.name}</p>
-                      <p className="text-slate-400 text-sm">Name</p>
+                      <p className="text-slate-400 text-sm">{t('callsignFinder.name')}</p>
                     </div>
                   </div>
                   {result.official.qth && (
@@ -137,7 +138,7 @@ export default function CallsignLookup() {
                       <MapPin className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{result.official.qth}</p>
-                        <p className="text-slate-400 text-sm">QTH</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.qth')}</p>
                       </div>
                     </div>
                   )}
@@ -146,9 +147,9 @@ export default function CallsignLookup() {
                       <CheckCircle className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">
-                          {result.official.licenseClass === 1 ? 'CEPT (Klasse 1)' : `Klasse ${result.official.licenseClass}`}
+                          {result.official.licenseClass === 1 ? t('callsignFinder.cept') : `Klasse ${result.official.licenseClass}`}
                         </p>
-                        <p className="text-slate-400 text-sm">Lizenzklasse</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.licenseClass')}</p>
                       </div>
                     </div>
                   )}
@@ -159,14 +160,14 @@ export default function CallsignLookup() {
             {/* QRZ Info */}
             {result.qrz && !result.isOfficial && (
               <div className="space-y-3 mb-4 pt-4 border-t border-slate-700">
-                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">QRZ.com Daten</h3>
+                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">{t('callsignFinder.qrzData')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(result.qrz.fname || result.qrz.name) && (
                     <div className="flex items-center gap-3">
                       <User className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{[result.qrz.fname, result.qrz.name].filter(Boolean).join(' ')}</p>
-                        <p className="text-slate-400 text-sm">Name</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.name')}</p>
                       </div>
                     </div>
                   )}
@@ -175,7 +176,7 @@ export default function CallsignLookup() {
                       <MapPin className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{result.qrz.addr2}</p>
-                        <p className="text-slate-400 text-sm">QTH</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.qth')}</p>
                       </div>
                     </div>
                   )}
@@ -184,7 +185,7 @@ export default function CallsignLookup() {
                       <Grid3X3 className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white font-mono">{result.qrz.grid}</p>
-                        <p className="text-slate-400 text-sm">Locator</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.locator')}</p>
                       </div>
                     </div>
                   )}
@@ -193,7 +194,7 @@ export default function CallsignLookup() {
                       <MapPin className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{result.qrz.country}</p>
-                        <p className="text-slate-400 text-sm">Land</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.country')}</p>
                       </div>
                     </div>
                   )}
@@ -204,14 +205,14 @@ export default function CallsignLookup() {
             {/* HamQTH Info */}
             {result.hamqth && !result.isOfficial && !result.qrz && (
               <div className="space-y-3 pt-4 border-t border-slate-700">
-                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">HamQTH Daten</h3>
+                <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">{t('callsignFinder.hamqthData')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {result.hamqth.nick && (
                     <div className="flex items-center gap-3">
                       <User className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{result.hamqth.nick}</p>
-                        <p className="text-slate-400 text-sm">Name</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.name')}</p>
                       </div>
                     </div>
                   )}
@@ -220,7 +221,7 @@ export default function CallsignLookup() {
                       <MapPin className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white">{result.hamqth.qth}</p>
-                        <p className="text-slate-400 text-sm">QTH</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.qth')}</p>
                       </div>
                     </div>
                   )}
@@ -229,7 +230,7 @@ export default function CallsignLookup() {
                       <Grid3X3 className="w-5 h-5 text-slate-400" />
                       <div>
                         <p className="text-white font-mono">{result.hamqth.grid}</p>
-                        <p className="text-slate-400 text-sm">Locator</p>
+                        <p className="text-slate-400 text-sm">{t('callsignFinder.locator')}</p>
                       </div>
                     </div>
                   )}

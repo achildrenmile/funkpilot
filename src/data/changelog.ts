@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.8.1',
+    date: '2026-01-31',
+    title: 'Vollständige Übersetzung',
+    changes: [
+      { type: 'improvement', text: 'Voice CQ: Alle Texte übersetzt' },
+      { type: 'improvement', text: 'Propagation: Alle Texte übersetzt inkl. Band-Status' },
+      { type: 'improvement', text: 'Rufzeichen-Finder: Alle drei Tabs vollständig übersetzt' },
+      { type: 'improvement', text: 'Konsistente Übersetzungen in DE, EN, SL' },
+    ],
+  },
+  {
     version: '1.8.0',
     date: '2026-01-31',
     title: 'Mehrsprachigkeit / Multilingual',

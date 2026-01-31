@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, Check, X, Loader2, User } from 'lucide-react';
 import { checkSuffixAvailability } from '../../services/callsignService';
 import type { SuffixAvailabilityResult } from '../../types/callsign';
 
 export default function CallsignAvailability() {
+  const { t } = useTranslation();
   const [suffix, setSuffix] = useState('');
   const [result, setResult] = useState<SuffixAvailabilityResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +24,7 @@ export default function CallsignAvailability() {
       const data = await checkSuffixAvailability(cleanSuffix);
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler bei der Abfrage');
+      setError(err instanceof Error ? err.message : t('callsignFinder.searchError'));
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +42,7 @@ export default function CallsignAvailability() {
             type="text"
             value={suffix}
             onChange={(e) => setSuffix(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
-            placeholder="Suffix eingeben (z.B. YML)"
+            placeholder={t('callsignFinder.availabilityPlaceholder')}
             className="w-full pl-14 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none font-mono text-lg"
             maxLength={4}
           />
@@ -55,13 +57,13 @@ export default function CallsignAvailability() {
           ) : (
             <Search className="w-5 h-5" />
           )}
-          Prüfen
+          {t('callsignFinder.availabilityButton')}
         </button>
       </form>
 
       {/* Info */}
       <p className="text-slate-400 text-sm">
-        Prüfe, ob ein Suffix (2-4 Buchstaben) in den 9 österreichischen Bundesländern noch verfügbar ist.
+        {t('callsignFinder.suffixInfo')}
       </p>
 
       {/* Error Message */}
@@ -78,13 +80,13 @@ export default function CallsignAvailability() {
           {/* Summary */}
           <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg border border-slate-700">
             <div>
-              <p className="text-slate-400 text-sm">Suffix</p>
+              <p className="text-slate-400 text-sm">{t('callsignFinder.suffix')}</p>
               <p className="text-2xl font-mono font-bold text-white">{result.suffix}</p>
             </div>
             <div className="text-right">
-              <p className="text-slate-400 text-sm">Verfügbarkeit</p>
+              <p className="text-slate-400 text-sm">{t('callsignFinder.availabilityStatus')}</p>
               <p className={`text-2xl font-bold ${availableCount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {availableCount} / 9 frei
+                {availableCount} / 9 {t('callsignFinder.free')}
               </p>
             </div>
           </div>
@@ -121,12 +123,12 @@ export default function CallsignAvailability() {
 
                 {/* Holder or Available */}
                 {district.available ? (
-                  <p className="text-green-400 text-sm mt-2 font-medium">Verfügbar</p>
+                  <p className="text-green-400 text-sm mt-2 font-medium">{t('callsignFinder.availabilityAvailable')}</p>
                 ) : (
                   <div className="flex items-center gap-2 mt-2 text-slate-300 text-sm">
                     <User className="w-4 h-4 text-slate-500" />
                     <span className="truncate" title={district.holder}>
-                      {district.holder || 'Vergeben'}
+                      {district.holder || t('callsignFinder.availabilityTaken')}
                     </span>
                   </div>
                 )}
@@ -138,11 +140,11 @@ export default function CallsignAvailability() {
           <div className="flex items-center gap-6 text-sm text-slate-400 pt-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span>Verfügbar</span>
+              <span>{t('callsignFinder.availabilityAvailable')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-slate-500"></div>
-              <span>Vergeben</span>
+              <span>{t('callsignFinder.availabilityTaken')}</span>
             </div>
           </div>
         </div>
