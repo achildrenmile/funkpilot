@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Trash2, Loader2, AlertCircle, Wrench, ChevronDown, Menu, ExternalLink, X, Search, Radio, Sparkles, Globe, User } from 'lucide-react';
 import ReactMarkdown, { Components } from 'react-markdown';
-import { sendChatMessage, sendChatMessageStream, sendChatMessageWithStatus, ChatProvider, ChatStatusUpdate } from '../services/claude';
+import { sendChatMessageStream, sendChatMessageWithStatus, ChatProvider } from '../services/claude';
 import { checkHealth } from '../services/api';
 import { useChatHistory } from '../hooks/useChatHistory';
 import ChatSidebar from './ChatSidebar';

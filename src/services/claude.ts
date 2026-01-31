@@ -148,7 +148,7 @@ export async function* sendChatMessageWithStatus(
     userLocator?: string;
     solarData?: SolarData;
   },
-  provider: ChatProvider = 'auto'
+  _provider: ChatProvider = 'auto' // Reserved for future use
 ): AsyncGenerator<ChatStatusUpdate> {
   // Build context-aware system prompt
   let systemPrompt = CHAT_SYSTEM_PROMPT;
