@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.7.1',
+    date: '2026-01-31',
+    title: 'Mobile Projekte-Tab',
+    changes: [
+      { type: 'improvement', text: 'Verdrahtungstabelle: Card-Layout auf Mobile statt Tabelle' },
+      { type: 'improvement', text: 'Kategorie-Filter: Horizontales Scrollen' },
+      { type: 'improvement', text: 'Code-Viewer: Kompakte Buttons auf Mobile' },
+      { type: 'improvement', text: 'Projekt-Header: Besseres Layout auf kleinen Screens' },
+    ],
+  },
+  {
     version: '1.7.0',
     date: '2026-01-31',
     title: 'PWA & Mobile Optimierung',
