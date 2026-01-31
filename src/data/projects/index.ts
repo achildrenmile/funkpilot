@@ -32,6 +32,7 @@ import { bandfilterSwitch } from './bandfilter-switch';
 // Mesh/LoRa Guides
 import { meshtasticGettingStarted } from './meshtastic-getting-started';
 import { meshcomGettingStarted } from './meshcom-getting-started';
+import { meshcoreGettingStarted } from './meshcore-getting-started';
 
 import type { HamProject } from '../../types/projects';
 
@@ -39,6 +40,7 @@ export const ALL_PROJECTS: HamProject[] = [
   // Mesh/LoRa Guides (am Anfang für Sichtbarkeit)
   meshtasticGettingStarted,
   meshcomGettingStarted,
+  meshcoreGettingStarted,
 
   // CW/Morse
   cwKeyerBasic,
@@ -84,6 +86,7 @@ export {
   // Mesh/LoRa Guides
   meshtasticGettingStarted,
   meshcomGettingStarted,
+  meshcoreGettingStarted,
   // Existing
   cwKeyerBasic,
   swrMeter,

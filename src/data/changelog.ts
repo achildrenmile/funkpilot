@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.10.1',
+    date: '2026-01-31',
+    title: 'MeshCore Guide',
+    changes: [
+      { type: 'feature', text: 'MeshCore Getting Started Guide' },
+      { type: 'feature', text: 'MeshCore vs Meshtastic Vergleich' },
+      { type: 'feature', text: 'Rooms & Repeater-Modus erklärt' },
+      { type: 'improvement', text: 'Einheitliche Kostenangaben für Mesh-Hardware' },
+    ],
+  },
+  {
     version: '1.10.0',
     date: '2026-01-31',
     title: 'Mesh/LoRa Guides',

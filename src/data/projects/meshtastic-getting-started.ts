@@ -44,28 +44,80 @@ Es ermöglicht verschlüsselte Nachrichten über große Entfernungen ohne Intern
 
 ## Hardware-Übersicht
 
-### Empfohlene Geräte
+### Alle unterstützten Geräte
 
-| Gerät | Preis | Vorteile | Nachteile |
-|-------|-------|----------|-----------|
-| **LILYGO T-Beam** | ~35€ | GPS, 18650 Akku, bewährt | Größer |
-| **Heltec V3** | ~25€ | Günstig, kompakt, OLED | Kein GPS |
-| **RAK WisBlock** | ~40€ | Modular, professionell | Komplexer |
-| **T-Echo** | ~60€ | E-Paper, sehr sparsam | Teurer |
-| **Station G2** | ~50€ | Fertiggerät mit Gehäuse | Weniger flexibel |
+#### LILYGO (Empfohlen für Einsteiger)
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **T-Beam v1.2** | ~35€ | ✅ | ❌ | 18650 | Allrounder, sehr beliebt |
+| **T-Echo** | ~60€ | ✅ | E-Paper | LiPo | Sehr sparsam, Outdoor |
+| **T-Deck** | ~80€ | ✅ | TFT | LiPo | Mit Tastatur, Standalone |
+| **T-LoRa Pager** | ~50€ | ❌ | OLED | LiPo | Kompakt mit Buttons |
+| **LoRa32 V2.1** | ~25€ | ❌ | OLED | ❌ | Günstig, Bastelfreundlich |
+
+#### Heltec
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **LoRa V3** | ~25€ | ❌ | OLED | ❌ | Günstig, guter Einstieg |
+| **Wireless Tracker** | ~30€ | ✅ | OLED | LiPo | GPS + kompakt |
+| **Wireless Stick Lite** | ~20€ | ❌ | ❌ | ❌ | Minimal, günstig |
+| **Vision Master** | ~35€ | ❌ | E-Paper | LiPo | Sparsam |
+| **Mesh Node** | ~40€ | Optional | Optional | LiPo | Modular |
+
+#### RAKwireless
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **WisBlock Starter Kit** | ~45€ | Optional | Optional | LiPo | Modular, professionell |
+| **WisBlock Meshtastic Kit** | ~60€ | ✅ | OLED | LiPo | Komplett-Paket |
+| **WisMesh Repeater** | ~100€ | ✅ | ❌ | LiPo | IP67, Solar-ready |
+| **WisMesh Repeater Mini** | ~80€ | ✅ | ❌ | 3200mAh | Kompakter, Solar |
+
+#### B&Q Consulting
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **Station G2** | ~100€ | ❌ | ❌ | ❌ | High Power für Funkamateure |
+| **Nano G2 Ultra** | ~70€ | ✅ | OLED | LiPo | Kompakt, robust |
+
+#### Seeed Studio
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **SenseCAP T1000-E** | ~40€ | ✅ | ❌ | LiPo | Card Tracker, IP65 |
+| **SenseCAP Indicator** | ~80€ | ❌ | 4" Touch | ❌ | Touchscreen, Dashboard |
+
+#### Elecrow & Andere
+
+| Gerät | Preis | GPS | Display | Akku | Empfehlung |
+|-------|-------|-----|---------|------|------------|
+| **ThinkNode M1** | ~60€ | ✅ | OLED | LiPo | Robust, Outdoor |
+| **muzi R1 Neo** | ~50€ | ✅ | OLED | LiPo | Pager-Style |
+| **Raspberry Pi Pico** | ~15€ | ❌ | ❌ | ❌ | DIY-Projekte |
 
 ### Hardware-Kaufempfehlung
 
-**Für Einsteiger**: LILYGO T-Beam v1.2 (mit GPS und Akkuhalterung)
-- Alles dabei was man braucht
-- Große Community & Support
-- Viele Tutorials verfügbar
+**Für Einsteiger**: LILYGO T-Beam v1.2
+- GPS integriert, 18650 Akkuhalterung
+- Große Community & viele Tutorials
+- Bewährte, zuverlässige Plattform
+
+**Für mobilen Einsatz**: LILYGO T-Echo oder T-Deck
+- E-Paper/TFT Display, eingebauter Akku
+- Standalone-Betrieb ohne Smartphone
+
+**Für Repeater/Gateway**: RAK WisMesh Repeater
+- Wetterfest (IP67), Solar-ready
+- Professionelle Qualität
 
 **Bezugsquellen**:
 - AliExpress (günstigste Option, 2-3 Wochen Lieferzeit)
 - Amazon (schneller, teurer)
-- Banggood
-- Offizieller LILYGO Store
+- Offizieller LILYGO/RAK/Heltec Store
+- Seeed Studio (für SenseCAP)
+- Tindie (für B&Q Station G2)
 
 ---
 
@@ -242,8 +294,24 @@ Meshtastic hat einen voreingestellten "LongFast" Kanal.
       features: ['GPS integriert', '18650 Akkuhalterung', 'Große Community', 'Viele Tutorials'],
       recommended: true,
       buyLinks: [
-        { store: 'AliExpress', url: 'https://s.click.aliexpress.com/e/_DkQHGFR' },
-        { store: 'Amazon', url: 'https://www.amazon.de/s?k=lilygo+t-beam' },
+        { store: 'LILYGO Store', url: 'https://lilygo.cc/' },
+        { store: 'AliExpress', url: 'https://aliexpress.com/w/wholesale-lilygo-t-beam.html' },
+      ],
+    },
+    {
+      name: 'LILYGO T-Deck',
+      price: '~80€',
+      features: ['Tastatur integriert', 'TFT Display', 'GPS', 'Standalone-Betrieb'],
+      buyLinks: [
+        { store: 'LILYGO Store', url: 'https://lilygo.cc/' },
+      ],
+    },
+    {
+      name: 'LILYGO T-Echo',
+      price: '~60€',
+      features: ['E-Paper Display', 'Sehr sparsam', 'GPS', 'Outdoor-tauglich'],
+      buyLinks: [
+        { store: 'LILYGO Store', url: 'https://lilygo.cc/' },
       ],
     },
     {
@@ -251,21 +319,49 @@ Meshtastic hat einen voreingestellten "LongFast" Kanal.
       price: '~25€',
       features: ['Günstig', 'Kompakt', 'OLED Display', 'USB-C'],
       buyLinks: [
-        { store: 'AliExpress', url: 'https://s.click.aliexpress.com/e/_DmYqfxR' },
+        { store: 'Heltec Store', url: 'https://heltec.org/' },
+        { store: 'AliExpress', url: 'https://aliexpress.com/w/wholesale-heltec-lora-v3.html' },
       ],
     },
     {
-      name: 'RAK WisBlock',
-      price: '~40€',
-      features: ['Modular', 'Professionell', 'Viele Sensoren', 'Outdoor-tauglich'],
+      name: 'Heltec Wireless Tracker',
+      price: '~30€',
+      features: ['GPS integriert', 'OLED Display', 'Kompakt', 'LiPo Akku'],
+      buyLinks: [
+        { store: 'Heltec Store', url: 'https://heltec.org/' },
+      ],
+    },
+    {
+      name: 'RAK WisBlock Kit',
+      price: '~60€',
+      features: ['Modular', 'Professionell', 'GPS Option', 'Outdoor-tauglich'],
       buyLinks: [
         { store: 'RAK Store', url: 'https://store.rakwireless.com/' },
       ],
     },
     {
-      name: 'LILYGO T-Echo',
-      price: '~60€',
-      features: ['E-Paper Display', 'Sehr sparsam', 'GPS', 'Kompakt'],
+      name: 'RAK WisMesh Repeater',
+      price: '~100€',
+      features: ['IP67 Wetterfest', 'Solar-ready', 'GPS', 'Für Dauerbetrieb'],
+      buyLinks: [
+        { store: 'RAK Store', url: 'https://store.rakwireless.com/' },
+      ],
+    },
+    {
+      name: 'Station G2 (B&Q)',
+      price: '~100€',
+      features: ['High Power', 'Für Funkamateure', 'Robustes Gehäuse', 'Base Station'],
+      buyLinks: [
+        { store: 'Tindie', url: 'https://www.tindie.com/stores/neilhao/' },
+      ],
+    },
+    {
+      name: 'SenseCAP T1000-E',
+      price: '~40€',
+      features: ['Card Tracker', 'IP65', 'GPS', 'Vorkonfiguriert'],
+      buyLinks: [
+        { store: 'Seeed Studio', url: 'https://www.seeedstudio.com/' },
+      ],
     },
   ],
 };

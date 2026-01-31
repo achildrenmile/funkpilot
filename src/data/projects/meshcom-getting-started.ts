@@ -15,7 +15,7 @@ export const meshcomGettingStarted: HamProject = {
     { name: 'Antenne 433 MHz', quantity: 1, notes: '70cm Band für Funkamateure' },
     { name: '18650 LiPo Akku', quantity: 1, notes: 'Für portablen Betrieb' },
   ],
-  estimatedCost: '30-50 EUR',
+  estimatedCost: '25-60 EUR',
 
   code: `# MeshCom Getting Started Guide
 
@@ -270,15 +270,38 @@ Konfiguration am Gateway erforderlich.
 
   hardwareOptions: [
     {
-      name: 'LILYGO T-Beam v1.2',
+      name: 'LILYGO T-Beam v1.2 (433MHz)',
       price: '~35€',
-      features: ['GPS integriert', '18650 Akku', 'Bewährt für MeshCom'],
+      features: ['GPS integriert', '18650 Akku', 'Bewährt für MeshCom', '433 MHz Version!'],
       recommended: true,
+      buyLinks: [
+        { store: 'LILYGO Store', url: 'https://lilygo.cc/' },
+        { store: 'AliExpress', url: 'https://aliexpress.com/w/wholesale-lilygo-t-beam-433.html' },
+      ],
     },
     {
-      name: 'Heltec LoRa V3',
+      name: 'LILYGO T-Deck (433MHz)',
+      price: '~80€',
+      features: ['Tastatur', 'TFT Display', 'GPS', 'Standalone'],
+      buyLinks: [
+        { store: 'LILYGO Store', url: 'https://lilygo.cc/' },
+      ],
+    },
+    {
+      name: 'Heltec LoRa V3 (433MHz)',
       price: '~25€',
-      features: ['Günstig', 'Kompakt', 'OLED Display'],
+      features: ['Günstig', 'Kompakt', 'OLED Display', '433 MHz Version!'],
+      buyLinks: [
+        { store: 'Heltec Store', url: 'https://heltec.org/' },
+      ],
+    },
+    {
+      name: 'RAK WisBlock (433MHz)',
+      price: '~60€',
+      features: ['Modular', 'Outdoor-tauglich', 'Professionell'],
+      buyLinks: [
+        { store: 'RAK Store', url: 'https://store.rakwireless.com/' },
+      ],
     },
     {
       name: '433 MHz Antenne',
