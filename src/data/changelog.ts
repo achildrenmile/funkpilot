@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.6.2',
+    date: '2026-01-31',
+    title: '15 Neue Bastelprojekte',
+    changes: [
+      { type: 'feature', text: '19 Projekte jetzt verfügbar (15 neu!)' },
+      { type: 'feature', text: 'CW/Morse: Morse-Decoder, Morse-Trainer (Koch-Methode), Baken-Keyer' },
+      { type: 'feature', text: 'Messtechnik: Frequenzzähler, Dummy Load, Feldstärkemessgerät' },
+      { type: 'feature', text: 'Audio/NF: CW-Audiofilter, NF-Verstärker, VOX-Schaltung' },
+      { type: 'feature', text: 'Digital: Digimode-Interface, FT8-Sync, Simple TNC' },
+      { type: 'feature', text: 'Steuerung: Rotorsteuerung, PTT-Interface, Bandfilter-Umschalter' },
+    ],
+  },
+  {
     version: '1.6.1',
     date: '2026-01-31',
     title: 'Verdrahtungstabelle & Bauanleitung',
