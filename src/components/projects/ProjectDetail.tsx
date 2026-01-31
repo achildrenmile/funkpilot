@@ -208,10 +208,6 @@ function highlightSyntax(line: string): JSX.Element {
     return <span className="text-purple-400">{line}</span>;
   }
 
-  // Keywords
-  const keywords = ['const', 'int', 'void', 'bool', 'float', 'char', 'String', 'if', 'else', 'for', 'while', 'return', 'true', 'false', 'HIGH', 'LOW', 'INPUT', 'OUTPUT', 'INPUT_PULLUP'];
-  let result = line;
-
   // This is a simplified highlighter - for production use a proper library
-  return <span>{result}</span>;
+  return <span>{line}</span>;
 }
