@@ -29,9 +29,17 @@ import { rotorController } from './rotor-controller';
 import { pttInterface } from './ptt-interface';
 import { bandfilterSwitch } from './bandfilter-switch';
 
+// Mesh/LoRa Guides
+import { meshtasticGettingStarted } from './meshtastic-getting-started';
+import { meshcomGettingStarted } from './meshcom-getting-started';
+
 import type { HamProject } from '../../types/projects';
 
 export const ALL_PROJECTS: HamProject[] = [
+  // Mesh/LoRa Guides (am Anfang für Sichtbarkeit)
+  meshtasticGettingStarted,
+  meshcomGettingStarted,
+
   // CW/Morse
   cwKeyerBasic,
   morseDecoder,
@@ -73,6 +81,9 @@ export function getProjectsByCategory(category: string): HamProject[] {
 
 // Re-export all projects
 export {
+  // Mesh/LoRa Guides
+  meshtasticGettingStarted,
+  meshcomGettingStarted,
   // Existing
   cwKeyerBasic,
   swrMeter,

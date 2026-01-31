@@ -144,22 +144,26 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
             language={project.codeLanguage}
           />
 
-          {/* AI Chat for code customization */}
-          <ProjectChat
-            code={currentCode}
-            projectName={project.name}
-            hardware={hardware.name}
-            language={project.codeLanguage}
-            onCodeUpdate={handleCodeUpdate}
-          />
+          {/* AI Chat for code customization (not for guides) */}
+          {project.codeLanguage !== 'markdown' && (
+            <>
+              <ProjectChat
+                code={currentCode}
+                projectName={project.name}
+                hardware={hardware.name}
+                language={project.codeLanguage}
+                onCodeUpdate={handleCodeUpdate}
+              />
 
-          {/* Tip */}
-          <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
-            <p className="text-sm text-amber-200">
-              <strong>Tipp:</strong> Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO.
-              Installiere ggf. benötigte Libraries über den Library Manager.
-            </p>
-          </div>
+              {/* Tip */}
+              <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
+                <p className="text-sm text-amber-200">
+                  <strong>Tipp:</strong> Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO.
+                  Installiere ggf. benötigte Libraries über den Library Manager.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

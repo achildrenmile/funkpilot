@@ -11,7 +11,7 @@ interface ProjectChatProps {
   code: string;
   projectName: string;
   hardware: string;
-  language: 'cpp' | 'python' | 'micropython';
+  language: 'cpp' | 'python' | 'micropython' | 'markdown';
   onCodeUpdate: (newCode: string) => void;
 }
 

@@ -10,6 +10,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.10.0',
+    date: '2026-01-31',
+    title: 'Mesh/LoRa Guides',
+    changes: [
+      { type: 'feature', text: 'Neue Kategorie: Mesh / LoRa im Projekte-Tab' },
+      { type: 'feature', text: 'Meshtastic Getting Started Guide' },
+      { type: 'feature', text: 'MeshCom Getting Started Guide (ÖVSV)' },
+      { type: 'feature', text: 'Hardware-Vergleich: T-Beam, Heltec, RAK' },
+      { type: 'improvement', text: 'Markdown-Rendering für Dokumentation' },
+    ],
+  },
+  {
     version: '1.9.1',
     date: '2026-01-31',
     title: 'Chat-Bugfix',

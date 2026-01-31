@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { Copy, Download, Check, Maximize2, Minimize2 } from 'lucide-react';
+import { Copy, Download, Check, Maximize2, Minimize2, BookOpen, Code } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface CodeViewerProps {
   code: string;
   fileName: string;
-  language: 'cpp' | 'python' | 'micropython';
+  language: 'cpp' | 'python' | 'micropython' | 'markdown';
 }
 
 export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [showRaw, setShowRaw] = useState(false);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);
@@ -30,7 +32,8 @@ export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
   };
 
   const lines = code.split('\n');
-  const langLabel = language === 'cpp' ? 'C++ / Arduino' : language === 'python' ? 'Python' : 'MicroPython';
+  const langLabel = language === 'cpp' ? 'C++ / Arduino' : language === 'python' ? 'Python' : language === 'markdown' ? 'Dokumentation' : 'MicroPython';
+  const isMarkdown = language === 'markdown';
 
   return (
     <div className={`bg-slate-900 rounded-xl border border-slate-700 overflow-hidden ${expanded ? 'fixed inset-0 sm:inset-4 z-50' : ''}`}>
@@ -49,6 +52,16 @@ export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
           </span>
         </div>
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          {isMarkdown && (
+            <button
+              onClick={() => setShowRaw(!showRaw)}
+              className="p-2 sm:p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors flex items-center gap-1"
+              title={showRaw ? 'Formatiert anzeigen' : 'Quelltext anzeigen'}
+            >
+              {showRaw ? <BookOpen className="w-4 h-4" /> : <Code className="w-4 h-4" />}
+              <span className="hidden sm:inline text-xs">{showRaw ? 'Formatiert' : 'Quelltext'}</span>
+            </button>
+          )}
           <button
             onClick={() => setExpanded(!expanded)}
             className="p-2 sm:p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
@@ -80,21 +93,43 @@ export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
       </div>
 
       {/* Code Content */}
-      <div className={`p-2 sm:p-4 overflow-auto ${expanded ? 'h-[calc(100%-60px)]' : 'max-h-[400px] sm:max-h-[500px]'}`}>
-        <pre className="text-xs sm:text-sm font-mono leading-relaxed">
-          <code>
-            {lines.map((line, idx) => (
-              <div key={idx} className="flex hover:bg-slate-800/50 -mx-2 sm:-mx-4 px-2 sm:px-4">
-                <span className="text-slate-600 select-none w-8 sm:w-12 text-right pr-2 sm:pr-4 flex-shrink-0 border-r border-slate-800 mr-2 sm:mr-4">
-                  {idx + 1}
-                </span>
-                <span className="flex-1 whitespace-pre overflow-x-auto">
-                  {highlightLine(line, language)}
-                </span>
-              </div>
-            ))}
-          </code>
-        </pre>
+      <div className={`p-2 sm:p-4 overflow-auto ${expanded ? 'h-[calc(100%-60px)]' : 'max-h-[400px] sm:max-h-[600px]'}`}>
+        {isMarkdown && !showRaw ? (
+          // Rendered Markdown
+          <div className="prose prose-invert prose-sm max-w-none
+            prose-headings:text-slate-100 prose-headings:font-semibold prose-headings:border-b prose-headings:border-slate-700 prose-headings:pb-2
+            prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
+            prose-p:text-slate-300 prose-p:leading-relaxed
+            prose-a:text-sky-400 prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-slate-100
+            prose-code:text-amber-400 prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+            prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-700
+            prose-ul:text-slate-300 prose-ol:text-slate-300
+            prose-li:marker:text-slate-500
+            prose-table:text-sm
+            prose-th:bg-slate-800 prose-th:text-slate-200 prose-th:font-medium prose-th:px-3 prose-th:py-2
+            prose-td:px-3 prose-td:py-2 prose-td:border-t prose-td:border-slate-700
+            prose-hr:border-slate-700
+          ">
+            <ReactMarkdown>{code}</ReactMarkdown>
+          </div>
+        ) : (
+          // Raw Code/Markdown
+          <pre className="text-xs sm:text-sm font-mono leading-relaxed">
+            <code>
+              {lines.map((line, idx) => (
+                <div key={idx} className="flex hover:bg-slate-800/50 -mx-2 sm:-mx-4 px-2 sm:px-4">
+                  <span className="text-slate-600 select-none w-8 sm:w-12 text-right pr-2 sm:pr-4 flex-shrink-0 border-r border-slate-800 mr-2 sm:mr-4">
+                    {idx + 1}
+                  </span>
+                  <span className="flex-1 whitespace-pre overflow-x-auto">
+                    {highlightLine(line, language)}
+                  </span>
+                </div>
+              ))}
+            </code>
+          </pre>
+        )}
       </div>
 
       {/* Expanded overlay backdrop */}
