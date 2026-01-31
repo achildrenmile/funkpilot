@@ -729,7 +729,13 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
 - check_frequency: Prüfen ob Frequenz im Bandplan erlaubt ist
 - convert_power: Leistung zwischen Watt und dBm umrechnen
 - calculate_swr_loss: SWR-Verlust berechnen
-- get_antenna_gain: Antennengewinn nachschlagen`;
+- get_antenna_gain: Antennengewinn nachschlagen
+- list_oeradio_tools: Liste aller OERadio.at Web-Tools (Rechner, Lerntools, Utilities)
+
+OERadio.at Tools-Übersicht:
+- Rechner: AkkuBlick, AntennenBlick, BandBlick, KabelBlick, StrahlBlick, RelaisBlick
+- Lerntools: OE-CEPT, CQ...Nothing, FirstContact, PrefixPlay, QBlitz, QSOBuddy, MorseFleet
+- Utilities: QSL Card Generator, FunkPilot, Dobratschrunde`;
 
     if (context?.userCall) {
       systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
