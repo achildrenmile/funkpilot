@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.13.3',
+    date: '2026-01-31',
+    title: 'Chat kennt Projekte',
+    changes: [
+      { type: 'feature', text: 'QSO-Chat empfiehlt passende Bastelprojekte' },
+      { type: 'improvement', text: 'Alle 35 Projekte im Chat-Kontext verfügbar' },
+      { type: 'fix', text: 'Suchlupe im Projekte-Tab korrekt ausgerichtet' },
+    ],
+  },
+  {
     version: '1.13.2',
     date: '2026-01-31',
     title: 'Markdown Rendering Fix',
