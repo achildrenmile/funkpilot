@@ -15,6 +15,8 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
     hasGroqKey: boolean;
     hasAnthropicKey: boolean;
     hasOpenRouterKey: boolean;
+    hasQrzKey: boolean;
+    hasTavilyKey: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -25,10 +27,12 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
           hasGroqKey: health.hasGroqKey,
           hasAnthropicKey: health.hasAnthropicKey,
           hasOpenRouterKey: health.hasOpenRouterKey,
+          hasQrzKey: health.hasQrzKey,
+          hasTavilyKey: health.hasTavilyKey,
         });
       })
       .catch(() => {
-        setServerStatus({ connected: false, hasGroqKey: false, hasAnthropicKey: false, hasOpenRouterKey: false });
+        setServerStatus({ connected: false, hasGroqKey: false, hasAnthropicKey: false, hasOpenRouterKey: false, hasQrzKey: false, hasTavilyKey: false });
       });
   }, []);
 
@@ -83,6 +87,14 @@ export default function SettingsPanel({ settings, onUpdate }: SettingsProps) {
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${serverStatus.hasOpenRouterKey ? 'bg-green-400' : 'bg-slate-500'}`} />
                   <span>OpenRouter API: {serverStatus.hasOpenRouterKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${serverStatus.hasTavilyKey ? 'bg-green-400' : 'bg-slate-500'}`} />
+                  <span>Tavily Web-Suche: {serverStatus.hasTavilyKey ? 'Aktiviert' : 'Nicht konfiguriert'}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${serverStatus.hasQrzKey ? 'bg-green-400' : 'bg-slate-500'}`} />
+                  <span>QRZ.com Lookup: {serverStatus.hasQrzKey ? 'Konfiguriert' : 'Nicht konfiguriert'}</span>
                 </div>
               </>
             )}

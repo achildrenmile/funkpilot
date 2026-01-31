@@ -34,6 +34,8 @@ export async function checkHealth(): Promise<{
   hasGroqKey: boolean;
   hasAnthropicKey: boolean;
   hasOpenRouterKey: boolean;
+  hasQrzKey: boolean;
+  hasTavilyKey: boolean;
 }> {
   const response = await fetch(`${API_BASE}/api/health`);
   return response.json();

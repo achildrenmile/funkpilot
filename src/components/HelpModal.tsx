@@ -87,6 +87,16 @@ export function HelpModal({ onClose }: HelpModalProps) {
                   Kabelverlust-, SWR- und Akkulaufzeit-Berechnungen direkt im Chat.
                 </p>
               </div>
+              <div className="mt-3 p-2 bg-sky-900/30 border border-sky-700/50 rounded">
+                <h4 className="text-sm font-medium text-sky-200 flex items-center gap-1">
+                  <Search className="w-4 h-4" />
+                  Web-Suche (Tavily)
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  Aktuelle Informationen zu Contests, Propagation und Amateurfunk-News.
+                  Frage z.B. "Welcher Contest ist aktuell?" oder "Was ist heute auf den Bändern los?"
+                </p>
+              </div>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">

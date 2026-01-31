@@ -20,6 +20,7 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 ### 🤖 QSO-Chat-Assistent
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
 - **Rufzeichen-Abfrage**: Automatische Suche in offizieller OE-Liste, QRZ.com & HamQTH
+- **Web-Suche**: Aktuelle Infos zu Contests, Propagation & News (via Tavily)
 - Technik, Betriebsverfahren, Vorschriften
 - Propagation-Beratung mit aktuellen Solar-Daten
 - **Chat-Verlauf** mit mehreren Konversationen:
@@ -134,6 +135,15 @@ OPENROUTER_API_KEY=sk-or-...
 ```bash
 QRZ_USERNAME=DEIN_RUFZEICHEN
 QRZ_PASSWORD=DEIN_QRZ_PASSWORT
+```
+
+### Optional: Tavily (Web-Suche)
+- Aktuelle Informationen zu Contests, Propagation und Amateurfunk-News
+- EU GDPR-konform, keine Speicherung von Suchanfragen
+- Kostenloser API-Key: [tavily.com](https://tavily.com)
+
+```bash
+TAVILY_API_KEY=tvly-...
 ```
 
 ### Provider-Priorität
@@ -283,6 +293,11 @@ funkpilot/
 │  │ Groq   │ │Anthropic│ │OpenRouter│ │  HamQSL   │ │ Edge │ │  OE    ││
 │  │ + MCP  │ │ Claude  │ │(fallback)│ │Solar Data │ │ TTS  │ │Callsign││
 │  └───┬────┘ └─────────┘ └──────────┘ └───────────┘ └──────┘ └────────┘│
+│      │                                                        │
+│      │  ┌──────────┐                                         │
+│      │  │ Tavily   │  Web-Suche für aktuelle Infos           │
+│      │  │ Search   │  (Contests, Propagation, News)          │
+│      │  └──────────┘                                         │
 │      │                                                        │
 │      ▼                                                        │
 │  ┌──────────────────────┐                                    │
