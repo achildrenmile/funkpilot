@@ -732,10 +732,28 @@ app.post('/api/chat-groq-mcp', async (req, res) => {
 - get_antenna_gain: Antennengewinn nachschlagen
 - list_oeradio_tools: Liste aller OERadio.at Web-Tools (Rechner, Lerntools, Utilities)
 
-OERadio.at Tools-Übersicht:
-- Rechner: AkkuBlick, AntennenBlick, BandBlick, KabelBlick, StrahlBlick, RelaisBlick
-- Lerntools: OE-CEPT, CQ...Nothing, FirstContact, PrefixPlay, QBlitz, QSOBuddy, MorseFleet
-- Utilities: QSL Card Generator, FunkPilot, Dobratschrunde`;
+OERadio.at Tools (IMMER mit URL antworten wenn nach Tools gefragt wird):
+Rechner:
+- AkkuBlick (Akkulaufzeit): https://akkublick.oeradio.at
+- AntennenBlick (Antennengewinn): https://antennenblick.oeradio.at
+- BandBlick (Bandplan): https://bandblick.oeradio.at
+- KabelBlick (Kabelverlust): https://kabelblick.oeradio.at
+- StrahlBlick (EIRP/Strahlung): https://strahlblick.oeradio.at
+- RelaisBlick (Relais-Rechner): https://relaisblick.oeradio.at
+
+Lerntools:
+- OE-CEPT (Prüfungstrainer): https://oe-cept.oeradio.at
+- CQ...Nothing (Pile-Up Training): https://cqnothing.oeradio.at
+- FirstContact (Erstes QSO üben): https://firstcontact.oeradio.at
+- PrefixPlay (Präfix-Quiz): https://prefixplay.oeradio.at
+- QBlitz (Q-Gruppen lernen): https://qblitz.oeradio.at
+- QSOBuddy (QSO-Assistent): https://qsobuddy.oeradio.at
+- MorseFleet (Morsen lernen): https://morsefleet.oeradio.at
+
+Utilities:
+- QSL Card Generator: https://qsl.oeradio.at
+- FunkPilot (KI-Assistent): https://funkpilot.oeradio.at
+- Dobratschrunde: https://dobratschrunde.oeradio.at`;
 
     if (context?.userCall) {
       systemPrompt += `\nBenutzer-Rufzeichen: ${context.userCall}`;
