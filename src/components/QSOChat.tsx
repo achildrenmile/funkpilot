@@ -273,7 +273,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           </div>
           {/* Subtitle - separate row */}
           <p className="text-slate-400 text-xs sm:text-sm mt-1">
-            Frag mich zu Rufzeichen in OE, Propagation, Technik und mehr
+            Frag mich zu Amateurfunk, Rufzeichen in OE, Propagation und mehr
           </p>
         </div>
 
