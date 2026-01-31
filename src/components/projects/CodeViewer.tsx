@@ -134,7 +134,6 @@ function highlightLine(line: string, language: string): JSX.Element {
 
   // Tokenize and highlight
   const tokens: JSX.Element[] = [];
-  let remaining = line;
   let key = 0;
 
   // Keywords
