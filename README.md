@@ -19,6 +19,12 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 
 ### 🤖 QSO-Chat-Assistent
 - KI-gestützter Chat speziell für Amateurfunk-Fragen
+- **Transparente Verarbeitung**: Live-Status während der Verarbeitung
+  - 🌐 Web-Suche (Tavily) für aktuelle Infos
+  - 📻 Rufzeichen-Lookup (OE-Liste, QRZ, HamQTH)
+  - 🔍 Suffix-Verfügbarkeitsprüfung
+  - 👤 Rufzeichen-Vorschläge generieren
+  - ✨ KI-Verarbeitung
 - **Rufzeichen-Abfrage**: Automatische Suche in offizieller OE-Liste, QRZ.com & HamQTH
 - **Web-Suche**: Aktuelle Infos zu Contests, Propagation & News (via Tavily)
 - Technik, Betriebsverfahren, Vorschriften
