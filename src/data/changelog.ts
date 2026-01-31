@@ -10,6 +10,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9.1',
+    date: '2026-01-31',
+    title: 'Chat-Bugfix',
+    changes: [
+      { type: 'fix', text: 'Erste Chat-Nachricht wird jetzt korrekt angezeigt' },
+      { type: 'fix', text: 'Race-Condition bei Conversation-Erstellung behoben' },
+    ],
+  },
+  {
     version: '1.9.0',
     date: '2026-01-31',
     title: 'Test-Suite',

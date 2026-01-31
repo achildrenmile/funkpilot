@@ -120,9 +120,11 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
   const sendMessageToChat = async (text: string) => {
     if (!text.trim()) return;
 
-    // Create conversation if none exists
+    // Create conversation if none exists - use returned ID for immediate use
+    let conversationId = activeConversation?.id;
     if (!activeConversation) {
-      createConversation();
+      const newConv = createConversation();
+      conversationId = newConv.id;
     }
 
     const userMessage: ExtendedChatMessage = {
@@ -132,7 +134,8 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
       timestamp: new Date(),
     };
 
-    addMessage(userMessage);
+    // Use conversationId to ensure message is added even on first message
+    addMessage(userMessage, conversationId);
     setInput('');
     setIsLoading(true);
     setError(null);
@@ -171,7 +174,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               provider: update.provider,
               toolsUsed: update.toolsUsed,
             };
-            addMessage(assistantMessage);
+            addMessage(assistantMessage, conversationId);
           } else if (update.type === 'error') {
             throw new Error(update.error || t('common.error'));
           }
@@ -213,7 +216,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
           provider: 'groq-stream',
         };
 
-        addMessage(assistantMessage);
+        addMessage(assistantMessage, conversationId);
       }
     } catch (err) {
       console.error('Chat error:', err);

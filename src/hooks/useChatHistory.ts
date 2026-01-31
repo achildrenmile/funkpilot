@@ -15,7 +15,7 @@ export interface UseChatHistoryReturn {
   createConversation: () => ChatConversation;
   switchConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
-  addMessage: (message: ChatMessage) => void;
+  addMessage: (message: ChatMessage, conversationId?: string) => void;
   updateConversationTitle: (id: string, title: string) => void;
   clearActiveConversation: () => void;
 }
@@ -98,13 +98,14 @@ export function useChatHistory(): UseChatHistoryReturn {
     }
   }, [conversations, activeId]);
 
-  // Add a message to the active conversation
-  const addMessage = useCallback((message: ChatMessage) => {
-    if (!activeId) return;
+  // Add a message to the active conversation (or specified conversation)
+  const addMessage = useCallback((message: ChatMessage, conversationId?: string) => {
+    const targetId = conversationId || activeId;
+    if (!targetId) return;
 
     setConversations(prev => {
       const updated = prev.map(conv => {
-        if (conv.id !== activeId) return conv;
+        if (conv.id !== targetId) return conv;
 
         const updatedMessages = [...conv.messages, message];
 
