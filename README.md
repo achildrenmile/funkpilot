@@ -233,6 +233,28 @@ npm run build:all
 npm start
 ```
 
+### Testing
+
+FunkPilot verwendet Vitest für automatisierte Tests.
+
+```bash
+# Alle Tests ausführen
+npm test
+
+# Tests im Watch-Modus
+npm run test:watch
+
+# Mit Coverage-Report
+npm run test:coverage
+```
+
+**Getestete Bereiche:**
+- `phonetic.ts` - NATO-Alphabet Konvertierung
+- `locator.ts` - Maidenhead-Locator Berechnungen
+- `adifParser.ts` - ADIF Import/Export
+- `i18n` - Übersetzungs-Vollständigkeit (DE, EN, SL)
+- `API` - Endpunkt-Integration
+
 ## Docker
 
 ### Mit Docker Compose (Empfohlen)

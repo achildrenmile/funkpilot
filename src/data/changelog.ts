@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9.0',
+    date: '2026-01-31',
+    title: 'Test-Suite',
+    changes: [
+      { type: 'feature', text: 'Vitest Test-Framework eingerichtet' },
+      { type: 'feature', text: '123 automatisierte Tests für Kernfunktionen' },
+      { type: 'feature', text: 'Tests für: Phonetik, Locator, ADIF-Parser, i18n, API' },
+      { type: 'improvement', text: 'npm test startet alle Tests' },
+    ],
+  },
+  {
     version: '1.8.1',
     date: '2026-01-31',
     title: 'Vollständige Übersetzung',
