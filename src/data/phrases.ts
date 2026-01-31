@@ -148,10 +148,10 @@ export const PROPAGATION_TARGETS = [
 ];
 
 export const QUICK_QUESTIONS = [
-  { id: 'propagation', text: 'Wie sind die Bedingungen gerade?', textEN: 'Current propagation?' },
+  { id: 'callsign_lookup', text: 'Wer ist OE3NSC?', textEN: 'Who is OE3NSC?' },
+  { id: 'suffix_check', text: 'Ist Suffix ABC noch frei?', textEN: 'Is suffix ABC available?' },
+  { id: 'callsign_suggest', text: 'Rufzeichen für Anna Berger', textEN: 'Callsign for Anna Berger' },
+  { id: 'propagation', text: 'Wie sind die Bedingungen?', textEN: 'Current propagation?' },
   { id: 'bandplan20', text: 'Bandplan 20m', textEN: 'Bandplan 20m' },
-  { id: 'qsl', text: 'QSL via Büro oder direkt?', textEN: 'QSL via bureau or direct?' },
-  { id: 'contest', text: 'Welcher Contest ist gerade?', textEN: 'What contest is on?' },
-  { id: 'ft8', text: 'FT8 Frequenzen?', textEN: 'FT8 frequencies?' },
-  { id: 'antenna', text: 'Antennentipps für 20m?', textEN: 'Antenna tips for 20m?' },
+  { id: 'antenna', text: 'Antennentipps für Balkon?', textEN: 'Antenna tips for balcony?' },
 ];
