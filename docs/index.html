@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FunkPilot – KI-Assistent für Funkamateure</title>
+  <meta name="description" content="FunkPilot ist ein KI-gestützter Assistent für österreichische Funkamateure. Voice CQ, QSO-Chat, Contest-Log, Propagation, Rufzeichen-Finder und 19 Bastelprojekte.">
+  <meta name="keywords" content="Amateurfunk, KI, Funkamateur, OE8YML, oeradio, Ham Radio, Arduino, ESP32, Bastelprojekte">
+  <meta name="author" content="Michael Linder, OE8YML">
+  <meta property="og:title" content="FunkPilot – KI-Assistent für Funkamateure">
+  <meta property="og:description" content="Der österreichische Amateurfunk-Assistent mit KI-Unterstützung. 19 Bastelprojekte, Rufzeichen-Finder, Propagation und mehr.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://funkpilot.oeradio.at">
+  <!-- Actual logo from repo: sky-blue gradient circle with radio waves + mic -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%230ea5e9'/%3E%3Cstop offset='100%25' style='stop-color:%230369a1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='45' fill='url(%23bg)'/%3E%3Cpath d='M30 50 Q35 35, 50 35 Q65 35, 70 50' stroke='white' stroke-width='3' fill='none' opacity='0.9'/%3E%3Cpath d='M25 50 Q32 25, 50 25 Q68 25, 75 50' stroke='white' stroke-width='2.5' fill='none' opacity='0.7'/%3E%3Cpath d='M20 50 Q28 15, 50 15 Q72 15, 80 50' stroke='white' stroke-width='2' fill='none' opacity='0.5'/%3E%3Crect x='44' y='50' width='12' height='25' rx='2' fill='white'/%3E%3Crect x='42' y='75' width='16' height='4' rx='1' fill='white'/%3E%3Ccircle cx='75' cy='25' r='5' fill='%23fbbf24'/%3E%3Cpath d='M75 18 L75 32 M68 25 L82 25' stroke='%23fbbf24' stroke-width='2'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      /* Exact app palette from src/index.css */
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --border-color: #475569;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --accent: #0ea5e9;
+      --accent-hover: #0284c7;
+      --accent-dark: #0369a1;
+      --accent-glow: rgba(14,165,233,0.12);
+      --accent-glow-strong: rgba(14,165,233,0.25);
+      --amber: #fbbf24;
+      --amber-text: #f59e0b;
+      --amber-bg: rgba(217,119,6,0.2);
+
+      /* App font: monospace */
+      --font: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: #fff; }
+
+    /* ── Layout ─────────────────────────────── */
+    .wrap {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav — matches app header ───────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .nav-inner {
+      max-width: 960px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+      color: #fff; font-weight: 700; font-size: 1.05rem;
+    }
+    /* Logo box — exact match: bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg */
+    .logo-box {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-box svg { width: 22px; height: 22px; color: #fff; }
+    .nav-sub { font-size: .7rem; color: var(--text-muted); }
+    .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .nav-links a { color: var(--text-muted); font-size: .82rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--text-primary); }
+    .btn-live {
+      padding: 5px 14px; background: var(--accent); color: #fff !important;
+      border-radius: var(--radius-sm); font-size: .82rem; font-weight: 600;
+      transition: background .2s;
+    }
+    .btn-live:hover { background: var(--accent-hover); color: #fff !important; }
+    /* KI badge — amber like app */
+    .ki-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--amber-bg); color: #f59e0b;
+      padding: 4px 10px; border-radius: 6px; font-size: .7rem; font-weight: 600;
+    }
+    .nav-toggle { display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .nav-links.open {
+        display: flex; flex-direction: column; gap: 12px;
+        position: absolute; top: 56px; left: 0; right: 0;
+        background: var(--bg-secondary); padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    /* ── Hero ───────────────────────────────── */
+    .hero { padding: 120px 0 56px; text-align: center; }
+    .hero-version {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; margin-bottom: 24px;
+      background: var(--accent-glow); border: 1px solid var(--accent-glow-strong);
+      border-radius: 100px; font-size: .75rem; font-weight: 600; color: var(--accent);
+    }
+    .hero-version .dot {
+      width: 6px; height: 6px; background: var(--accent);
+      border-radius: 50%; animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; line-height: 1.15; letter-spacing: -.03em;
+      margin-bottom: 16px;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero-sub {
+      font-size: .95rem; color: var(--text-secondary);
+      max-width: 520px; margin: 0 auto 32px; line-height: 1.65;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; background: var(--accent); color: #fff;
+      border-radius: var(--radius-sm); font-weight: 600; font-size: .88rem;
+      border: none; cursor: pointer; transition: all .2s;
+    }
+    .btn-primary:hover { background: var(--accent-hover); color: #fff; box-shadow: 0 4px 20px var(--accent-glow-strong); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+      font-weight: 600; font-size: .88rem; cursor: pointer; transition: all .2s;
+    }
+    .btn-outline:hover { color: var(--text-primary); border-color: var(--text-muted); }
+    .btn-outline svg { width: 18px; height: 18px; }
+
+    /* ── Stats ──────────────────────────────── */
+    .stats {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 1px; background: var(--border-color);
+      border: 1px solid var(--border-color); border-radius: var(--radius);
+      margin-top: 48px; overflow: hidden;
+    }
+    .stat { background: var(--bg-secondary); padding: 20px; text-align: center; }
+    .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+    @media (max-width: 480px) { .stats { grid-template-columns: repeat(2,1fr); } }
+
+    /* ── Section ────────────────────────────── */
+    .section { padding: 72px 0; }
+    .section-tag {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--accent); margin-bottom: 8px;
+    }
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px;
+    }
+    .section-desc { color: var(--text-secondary); max-width: 520px; margin-bottom: 40px; font-size: .9rem; }
+
+    /* ── Feature cards ──────────────────────── */
+    .grid-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius); padding: 24px;
+      transition: background .2s, border-color .2s;
+    }
+    .card:hover { background: var(--bg-tertiary); border-color: var(--text-muted); }
+    .card-icon { font-size: 1.3rem; margin-bottom: 10px; }
+    .card h3 { font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: .8rem; color: var(--text-secondary); line-height: 1.55; }
+    .card-badge {
+      display: inline-block; margin-top: 10px;
+      padding: 2px 8px; font-size: .62rem; font-weight: 700;
+      border-radius: 4px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .badge-ki { background: var(--accent-glow-strong); color: var(--accent); }
+    .badge-tool { background: rgba(148,163,184,0.12); color: var(--text-muted); }
+    .badge-new { background: var(--amber-bg); color: var(--amber-text); }
+
+    /* ── Projects grid ──────────────────────── */
+    .grid-proj {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
+    }
+    .proj {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); font-size: .8rem; transition: background .2s;
+    }
+    .proj:hover { background: var(--bg-tertiary); }
+    .proj-icon { font-size: 1rem; flex-shrink: 0; }
+    .proj-text { color: var(--text-secondary); line-height: 1.35; }
+    .proj-text strong { color: var(--text-primary); font-weight: 600; display: block; }
+
+    /* ── Timeline ───────────────────────────── */
+    .tl { position: relative; padding-left: 24px; }
+    .tl::before {
+      content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--border-color);
+    }
+    .tl-item { position: relative; padding-bottom: 24px; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-dot {
+      position: absolute; left: -22px; top: 6px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--bg-primary); border: 2px solid var(--accent-dark);
+    }
+    .tl-item.now .tl-dot {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-glow-strong);
+    }
+    .tl-ver { font-size: .88rem; font-weight: 700; }
+    .tl-badge {
+      display: inline-block; margin-left: 6px; padding: 1px 7px;
+      font-size: .58rem; font-weight: 700; background: var(--accent);
+      color: #fff; border-radius: 3px; text-transform: uppercase; vertical-align: middle;
+    }
+    .tl-date { font-size: .72rem; color: var(--text-muted); margin-bottom: 4px; }
+    .tl-desc { font-size: .8rem; color: var(--text-secondary); line-height: 1.55; }
+
+    /* ── Code block ─────────────────────────── */
+    .codeblock {
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius); overflow: hidden; max-width: 600px;
+    }
+    .codeblock-bar {
+      display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+      background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);
+    }
+    .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .cb-r { background: #ef4444; } .cb-y { background: #fbbf24; } .cb-b { background: var(--accent); }
+    .codeblock-bar span { margin-left: 6px; font-size: .7rem; color: var(--text-muted); }
+    .codeblock pre {
+      padding: 18px; font-size: .78rem;
+      line-height: 1.8; overflow-x: auto; color: var(--text-secondary);
+    }
+    .codeblock .cm { color: var(--text-muted); }
+    .codeblock .kw { color: var(--accent); }
+    .codeblock .fl { color: var(--amber); }
+
+    /* ── Stack chips ────────────────────────── */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); font-size: .78rem; color: var(--text-secondary);
+    }
+    .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Footer — matches app footer ────────── */
+    footer {
+      border-top: 1px solid var(--border-color);
+      background: rgba(30,41,59,0.5);
+      padding: 16px 0;
+    }
+    .foot-inner {
+      display: flex; justify-content: center; align-items: center;
+      flex-wrap: wrap; gap: 8px; font-size: .8rem; color: var(--text-muted);
+    }
+    .foot-inner a { color: var(--accent); }
+    .foot-inner a:hover { text-decoration: underline; color: var(--accent); }
+    .foot-sep { color: var(--border-color); }
+
+    /* ── Scroll fade ────────────────────────── */
+    .fade { opacity: 0; transform: translateY(16px); transition: opacity .45s, transform .45s; }
+    .fade.vis { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV — matches app header structure -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <!-- Logo box: exact match from App.tsx -->
+        <div class="logo-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 18.5V22M8 22h8M6 10c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/>
+            <path d="M4 10c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke-linecap="round" opacity="0.6"/>
+            <rect x="9" y="10" width="6" height="8" rx="1"/>
+          </svg>
+        </div>
+        <div>
+          FunkPilot
+          <div class="nav-sub">KI-Assistent für Funkamateure</div>
+        </div>
+      </a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menü">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#projekte">Projekte</a></li>
+        <li><a href="#releases">Releases</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><span class="ki-badge">✓ KI-System</span></li>
+        <li><a href="https://funkpilot.oeradio.at" class="btn-live" target="_blank" rel="noopener">Live Demo</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-version"><span class="dot"></span> v1.6.2 — 19 Bastelprojekte</div>
+      <h1>KI-Assistent für<br><span class="accent">Amateurfunk</span></h1>
+      <p class="hero-sub">Voice CQ, QSO-Chat, Contest-Analyse, Propagation, Rufzeichen-Finder und 19 Arduino/ESP32 Bastelprojekte — alles in einer App.</p>
+      <div class="hero-btns">
+        <a href="https://funkpilot.oeradio.at" class="btn-primary" target="_blank" rel="noopener">Jetzt ausprobieren →</a>
+        <a href="https://github.com/achildrenmile/funkpilot" class="btn-outline" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-val">19</div><div class="stat-label">Projekte</div></div>
+        <div class="stat"><div class="stat-val">7</div><div class="stat-label">KI-Module</div></div>
+        <div class="stat"><div class="stat-val">9</div><div class="stat-label">Bundesländer</div></div>
+        <div class="stat"><div class="stat-val">v1.6</div><div class="stat-label">Release</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section fade">
+    <div class="wrap">
+      <div class="section-tag">Features</div>
+      <h2 class="section-title">Alles was ein Funkamateur braucht</h2>
+      <p class="section-desc">Vom CQ-Ruf bis zur Bauanleitung — FunkPilot deckt alle Bereiche ab.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon">🎙️</div>
+          <h3>Voice CQ Generator</h3>
+          <p>Neural-Voices für CQ-Rufe mit NATO-Phonetik und Contest-Templates.</p>
+          <span class="card-badge badge-ki">KI</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">💬</div>
+          <h3>QSO-Chat-Assistent</h3>
+          <p>KI-Chat für Amateurfunk-Fragen. Versteht Kontext und kennt OE-Regeln.</p>
+          <span class="card-badge badge-ki">KI</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h3>Contest-Log-Analyse</h3>
+          <p>ADIF importieren, per KI analysieren — Statistiken und Bandverteilung.</p>
+          <span class="card-badge badge-ki">KI</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <h3>Propagation-Berater</h3>
+          <p>Echtzeit-Solardaten, Bandprognosen und DX-Empfehlungen.</p>
+          <span class="card-badge badge-tool">Tool</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Rufzeichen-Finder</h3>
+          <p>Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.</p>
+          <span class="card-badge badge-new">Neu</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <h3>Web-Suche</h3>
+          <p>EU-konforme Suche via Tavily mit klickbaren Links und DSGVO-Warnung.</p>
+          <span class="card-badge badge-tool">Tool</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔧</div>
+          <h3>KI Code-Anpassung</h3>
+          <p>Bastelprojekt-Code per Chat individuell anpassen mit Quick-Prompts.</p>
+          <span class="card-badge badge-ki">KI</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Live-Verarbeitung</h3>
+          <p>Status-Icons für Web-Suche, Rufzeichen-Lookup und Tool-Ausführung.</p>
+          <span class="card-badge badge-tool">Tool</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛠️</div>
+          <h3>OERadio MCP Tools</h3>
+          <p>Ham Radio MCP-Tools im Chat. Verlauf mit Auto-Titel-Generierung.</p>
+          <span class="card-badge badge-ki">KI</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BASTELPROJEKTE -->
+  <section id="projekte" class="section fade">
+    <div class="wrap">
+      <div class="section-tag">Bastelprojekte</div>
+      <h2 class="section-title">19 Arduino & ESP32 Projekte</h2>
+      <p class="section-desc">Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.</p>
+
+      <div class="grid-proj">
+        <div class="proj"><span class="proj-icon">📟</span><div class="proj-text"><strong>Morse-Decoder</strong>OLED Display</div></div>
+        <div class="proj"><span class="proj-icon">🎓</span><div class="proj-text"><strong>Morse-Trainer</strong>Koch-Methode</div></div>
+        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong>Baken-Keyer</strong>Automatisch</div></div>
+        <div class="proj"><span class="proj-icon">🔢</span><div class="proj-text"><strong>Frequenzzähler</strong>bis 8 MHz</div></div>
+        <div class="proj"><span class="proj-icon">🔥</span><div class="proj-text"><strong>Dummy Load</strong>50Ω, Watt/Temp</div></div>
+        <div class="proj"><span class="proj-icon">📊</span><div class="proj-text"><strong>Feldstärkemesser</strong>S-Meter</div></div>
+        <div class="proj"><span class="proj-icon">🎧</span><div class="proj-text"><strong>CW-Audiofilter</strong>Digital einstellbar</div></div>
+        <div class="proj"><span class="proj-icon">🔊</span><div class="proj-text"><strong>NF-Verstärker</strong>LM386 + VU-Meter</div></div>
+        <div class="proj"><span class="proj-icon">🎤</span><div class="proj-text"><strong>VOX-Schaltung</strong>Anti-VOX</div></div>
+        <div class="proj"><span class="proj-icon">💻</span><div class="proj-text"><strong>Digimode</strong>PSK/RTTY Interface</div></div>
+        <div class="proj"><span class="proj-icon">⏱️</span><div class="proj-text"><strong>FT8-Sync</strong>NTP Display</div></div>
+        <div class="proj"><span class="proj-icon">📦</span><div class="proj-text"><strong>Packet TNC</strong>Simple</div></div>
+        <div class="proj"><span class="proj-icon">🔄</span><div class="proj-text"><strong>Rotorsteuerung</strong>Presets</div></div>
+        <div class="proj"><span class="proj-icon">🔘</span><div class="proj-text"><strong>USB-PTT</strong>Hamlib-kompatibel</div></div>
+        <div class="proj"><span class="proj-icon">🎚️</span><div class="proj-text"><strong>Bandfilter</strong>Auto-Umschalter</div></div>
+        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong>SWR-Meter</strong>Arduino</div></div>
+        <div class="proj"><span class="proj-icon">⚡</span><div class="proj-text"><strong>Antennen-Tuner</strong>Automatisch</div></div>
+        <div class="proj"><span class="proj-icon">🌡️</span><div class="proj-text"><strong>PA-Monitoring</strong>Temperatur</div></div>
+        <div class="proj"><span class="proj-icon">🔋</span><div class="proj-text"><strong>Akku-Monitor</strong>Portabel</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RELEASES -->
+  <section id="releases" class="section fade">
+    <div class="wrap">
+      <div class="section-tag">Releases</div>
+      <h2 class="section-title">Versionshistorie</h2>
+      <p class="section-desc">Vom ersten Release bis heute.</p>
+
+      <div class="tl">
+        <div class="tl-item now">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.6.2 <span class="tl-badge">Latest</span></div>
+          <div class="tl-date">31. Jänner 2026</div>
+          <div class="tl-desc">19 Bastelprojekte (CW/Morse, Messtechnik, Audio/NF, Digital/APRS, Steuerung), Verdrahtungstabellen, Wokwi-Simulator, KI-Bauanleitung.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.6.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">KI Code-Anpassung für Bastelprojekte per Chat-Interface.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.5.x</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">Projekte-Tab, Code-Viewer mit Syntax-Highlighting, Stücklisten-Export.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.4.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">Transparente KI-Verarbeitung mit Live-Status und Tool-Icons.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.3.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">EU-konforme Web-Suche via Tavily, DSGVO-konforme Links.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.2.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">Rufzeichen-Finder, Schwarzfunker-Erkennung, 9 Bundesländer.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.1.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">OERadio MCP Tools, Chat-Verlauf, Auto-Titel.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-ver">v1.0.0</div>
+          <div class="tl-date">Jänner 2026</div>
+          <div class="tl-desc">Voice CQ, QSO-Chat, Contest-Log-Analyse, Propagation, Dark/Light Mode.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section id="setup" class="section fade">
+    <div class="wrap">
+      <div class="section-tag">Setup</div>
+      <h2 class="section-title">In 3 Minuten starten</h2>
+      <p class="section-desc">Docker oder Node.js — deine Wahl.</p>
+
+      <div class="codeblock">
+        <div class="codeblock-bar">
+          <div class="cb-dot cb-r"></div><div class="cb-dot cb-y"></div><div class="cb-dot cb-b"></div>
+          <span>terminal</span>
+        </div>
+        <pre><span class="cm"># Repository klonen</span>
+<span class="kw">git clone</span> https://github.com/achildrenmile/funkpilot.git
+<span class="kw">cd</span> funkpilot
+
+<span class="cm"># Option A: Docker (empfohlen)</span>
+<span class="kw">docker compose up</span> <span class="fl">-d</span>
+
+<span class="cm"># Option B: Node.js</span>
+<span class="kw">npm install</span>
+<span class="kw">npm run dev</span>
+
+<span class="cm"># → http://localhost:5173</span></pre>
+      </div>
+
+      <div style="margin-top: 40px;">
+        <div class="section-tag">Tech Stack</div>
+        <div class="chips" style="margin-top: 12px;">
+          <div class="chip"><span class="chip-dot" style="background:#61dafb"></span>React</div>
+          <div class="chip"><span class="chip-dot" style="background:#3178c6"></span>TypeScript</div>
+          <div class="chip"><span class="chip-dot" style="background:#646cff"></span>Vite</div>
+          <div class="chip"><span class="chip-dot" style="background:#68a063"></span>Express.js</div>
+          <div class="chip"><span class="chip-dot" style="background:#f59e0b"></span>Groq / Llama 3.1</div>
+          <div class="chip"><span class="chip-dot" style="background:#2496ed"></span>Docker</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER — matches app footer style -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-inner">
+        <span>FunkPilot v1.6.2 - 73 de OE8YML</span>
+        <span class="foot-sep">|</span>
+        <a href="https://oeradio.at" target="_blank" rel="noopener">oeradio.at</a>
+        <span class="foot-sep">|</span>
+        <a href="https://github.com/achildrenmile/funkpilot" target="_blank" rel="noopener">GitHub</a>
+        <span class="foot-sep">|</span>
+        <a href="https://github.com/achildrenmile/funkpilot/issues" target="_blank" rel="noopener">Issues</a>
+        <span class="foot-sep">|</span>
+        <a href="https://github.com/achildrenmile/funkpilot/releases" target="_blank" rel="noopener">Releases</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const o = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade').forEach(el => o.observe(el));
+  </script>
+</body>
+</html>
