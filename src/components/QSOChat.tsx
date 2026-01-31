@@ -260,7 +260,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               {/* Mobile menu button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="md:hidden p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
+                className="md:hidden p-2.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title="Chat-Verlauf"
               >
                 <Menu className="w-5 h-5" />
@@ -317,7 +317,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
             {messages.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-2.5 sm:p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title="Verlauf löschen"
               >
                 <Trash2 className="w-5 h-5" />
@@ -371,7 +371,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-xl px-4 py-3 ${
+                  className={`max-w-[95%] sm:max-w-[85%] md:max-w-[75%] rounded-xl px-4 py-3 ${
                     message.role === 'user'
                       ? 'bg-sky-600 text-white'
                       : 'bg-slate-700 text-slate-100'
@@ -413,7 +413,7 @@ export default function QSOChat({ settings, solarData }: QSOChatProps) {
               <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center flex-shrink-0">
                 <span className="text-sm">AI</span>
               </div>
-              <div className="max-w-[80%] rounded-xl px-4 py-3 bg-slate-700 text-slate-100">
+              <div className="max-w-[95%] sm:max-w-[85%] md:max-w-[75%] rounded-xl px-4 py-3 bg-slate-700 text-slate-100">
                 <div className="prose prose-invert prose-sm max-w-none">
                   <ReactMarkdown components={markdownComponents}>{streamingContent}</ReactMarkdown>
                 </div>

@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.7.0',
+    date: '2026-01-31',
+    title: 'PWA & Mobile Optimierung',
+    changes: [
+      { type: 'feature', text: 'Progressive Web App (PWA): App auf Handy/Tablet installierbar' },
+      { type: 'feature', text: 'Auto-Update: App aktualisiert sich automatisch im Hintergrund' },
+      { type: 'feature', text: 'Offline-Grundfunktionen: Cached Ressourcen verfügbar ohne Internet' },
+      { type: 'improvement', text: 'Touch-optimierte Buttons (44x44px Mindestgröße)' },
+      { type: 'improvement', text: 'Responsive Chat-Bubbles für kleine Bildschirme' },
+      { type: 'improvement', text: 'Fullscreen Code-Viewer auf Mobile optimiert' },
+      { type: 'improvement', text: 'Modals besser auf kleinen Screens dargestellt' },
+    ],
+  },
+  {
     version: '1.6.2',
     date: '2026-01-31',
     title: '15 Neue Bastelprojekte',

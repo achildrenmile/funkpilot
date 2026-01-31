@@ -295,7 +295,7 @@ ${analysis}
           {stats.ratePerHour.length > 0 && (
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
               <h3 className="text-lg font-semibold mb-4">QSO-Rate über Zeit</h3>
-              <div className="h-40 flex items-end gap-1">
+              <div className="h-32 sm:h-40 flex items-end gap-1">
                 {stats.ratePerHour.map((rate, i) => {
                   const maxRate = Math.max(...stats.ratePerHour);
                   const height = maxRate > 0 ? (rate / maxRate) * 100 : 0;

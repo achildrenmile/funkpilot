@@ -33,7 +33,7 @@ export function CodeViewer({ code, fileName, language }: CodeViewerProps) {
   const langLabel = language === 'cpp' ? 'C++ / Arduino' : language === 'python' ? 'Python' : 'MicroPython';
 
   return (
-    <div className={`bg-slate-900 rounded-xl border border-slate-700 overflow-hidden ${expanded ? 'fixed inset-4 z-50' : ''}`}>
+    <div className={`bg-slate-900 rounded-xl border border-slate-700 overflow-hidden ${expanded ? 'fixed inset-0 sm:inset-4 z-50' : ''}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
         <div className="flex items-center gap-3">
