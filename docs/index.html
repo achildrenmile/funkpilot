@@ -11,12 +11,10 @@
   <meta property="og:description" content="Der österreichische Amateurfunk-Assistent mit KI-Unterstützung. 19 Bastelprojekte, Rufzeichen-Finder, Propagation und mehr.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://funkpilot.oeradio.at">
-  <!-- Actual logo from repo: sky-blue gradient circle with radio waves + mic -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%230ea5e9'/%3E%3Cstop offset='100%25' style='stop-color:%230369a1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='45' fill='url(%23bg)'/%3E%3Cpath d='M30 50 Q35 35, 50 35 Q65 35, 70 50' stroke='white' stroke-width='3' fill='none' opacity='0.9'/%3E%3Cpath d='M25 50 Q32 25, 50 25 Q68 25, 75 50' stroke='white' stroke-width='2.5' fill='none' opacity='0.7'/%3E%3Cpath d='M20 50 Q28 15, 50 15 Q72 15, 80 50' stroke='white' stroke-width='2' fill='none' opacity='0.5'/%3E%3Crect x='44' y='50' width='12' height='25' rx='2' fill='white'/%3E%3Crect x='42' y='75' width='16' height='4' rx='1' fill='white'/%3E%3Ccircle cx='75' cy='25' r='5' fill='%23fbbf24'/%3E%3Cpath d='M75 18 L75 32 M68 25 L82 25' stroke='%23fbbf24' stroke-width='2'/%3E%3C/svg%3E">
 
   <style>
     :root {
-      /* Exact app palette from src/index.css */
       --bg-primary: #0f172a;
       --bg-secondary: #1e293b;
       --bg-tertiary: #334155;
@@ -32,8 +30,6 @@
       --amber: #fbbf24;
       --amber-text: #f59e0b;
       --amber-bg: rgba(217,119,6,0.2);
-
-      /* App font: monospace */
       --font: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
       --radius: 12px;
       --radius-sm: 8px;
@@ -53,14 +49,9 @@
     a:hover { color: #fff; }
 
     /* ── Layout ─────────────────────────────── */
-    .wrap {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+    .wrap { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-    /* ── Nav — matches app header ───────────── */
+    /* ── Nav ─────────────────────────────────── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       background: var(--bg-secondary);
@@ -75,7 +66,6 @@
       display: flex; align-items: center; gap: 12px;
       color: #fff; font-weight: 700; font-size: 1.05rem;
     }
-    /* Logo box — exact match: bg-gradient-to-br from-sky-500 to-sky-700 rounded-lg */
     .logo-box {
       width: 36px; height: 36px; border-radius: 8px;
       background: linear-gradient(135deg, #0ea5e9, #0369a1);
@@ -84,6 +74,7 @@
     }
     .logo-box svg { width: 22px; height: 22px; color: #fff; }
     .nav-sub { font-size: .7rem; color: var(--text-muted); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
     .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; }
     .nav-links a { color: var(--text-muted); font-size: .82rem; font-weight: 500; }
     .nav-links a:hover { color: var(--text-primary); }
@@ -93,13 +84,29 @@
       transition: background .2s;
     }
     .btn-live:hover { background: var(--accent-hover); color: #fff !important; }
-    /* KI badge — amber like app */
     .ki-badge {
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--amber-bg); color: #f59e0b;
       padding: 4px 10px; border-radius: 6px; font-size: .7rem; font-weight: 600;
     }
     .nav-toggle { display: none; background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+
+    /* ── Language Switcher ────────────────────── */
+    .lang-switch {
+      display: flex; align-items: center; gap: 2px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px; padding: 2px; flex-shrink: 0;
+    }
+    .lang-btn {
+      padding: 3px 8px; border: none; border-radius: 4px;
+      background: transparent; color: var(--text-muted);
+      font-family: var(--font); font-size: .68rem; font-weight: 600;
+      cursor: pointer; transition: all .2s; letter-spacing: .03em;
+    }
+    .lang-btn:hover { color: var(--text-primary); }
+    .lang-btn.active { background: var(--accent); color: #fff; }
+
     @media (max-width: 640px) {
       .nav-links { display: none; }
       .nav-toggle { display: block; }
@@ -109,6 +116,7 @@
         background: var(--bg-secondary); padding: 20px 24px;
         border-bottom: 1px solid var(--border-color);
       }
+      .lang-switch { margin-right: 8px; }
     }
 
     /* ── Hero ───────────────────────────────── */
@@ -124,7 +132,6 @@
       border-radius: 50%; animation: blink 2s ease-in-out infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-
     .hero h1 {
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700; line-height: 1.15; letter-spacing: -.03em;
@@ -177,11 +184,8 @@
     .section-desc { color: var(--text-secondary); max-width: 520px; margin-bottom: 40px; font-size: .9rem; }
 
     /* ── Feature cards ──────────────────────── */
-    .grid-3 {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-    }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
-
     .card {
       background: var(--bg-secondary); border: 1px solid var(--border-color);
       border-radius: var(--radius); padding: 24px;
@@ -201,9 +205,7 @@
     .badge-new { background: var(--amber-bg); color: var(--amber-text); }
 
     /* ── Projects grid ──────────────────────── */
-    .grid-proj {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
-    }
+    .grid-proj { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
     .proj {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color);
@@ -269,7 +271,7 @@
     }
     .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-    /* ── Footer — matches app footer ────────── */
+    /* ── Footer ──────────────────────────────── */
     footer {
       border-top: 1px solid var(--border-color);
       background: rgba(30,41,59,0.5);
@@ -290,11 +292,10 @@
 </head>
 <body>
 
-  <!-- NAV — matches app header structure -->
+  <!-- NAV -->
   <nav>
     <div class="nav-inner">
       <a href="#" class="nav-brand">
-        <!-- Logo box: exact match from App.tsx -->
         <div class="logo-box">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 18.5V22M8 22h8M6 10c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/>
@@ -304,31 +305,38 @@
         </div>
         <div>
           FunkPilot
-          <div class="nav-sub">KI-Assistent für Funkamateure</div>
+          <div class="nav-sub" data-i18n="nav_sub">KI-Assistent für Funkamateure</div>
         </div>
       </a>
-      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menü">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
-      </button>
-      <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#projekte">Projekte</a></li>
-        <li><a href="#releases">Releases</a></li>
-        <li><a href="#setup">Setup</a></li>
-        <li><span class="ki-badge">✓ KI-System</span></li>
-        <li><a href="https://funkpilot.oeradio.at" class="btn-live" target="_blank" rel="noopener">Live Demo</a></li>
-      </ul>
+      <div class="nav-right">
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menü">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
+        </button>
+        <ul class="nav-links">
+          <li><a href="#features" data-i18n="nav_features">Features</a></li>
+          <li><a href="#projekte" data-i18n="nav_projects">Projekte</a></li>
+          <li><a href="#releases">Releases</a></li>
+          <li><a href="#setup">Setup</a></li>
+          <li><span class="ki-badge" data-i18n="nav_ki_badge">✓ KI-System</span></li>
+          <li><a href="https://funkpilot.oeradio.at" class="btn-live" target="_blank" rel="noopener">Live Demo</a></li>
+        </ul>
+        <div class="lang-switch">
+          <button class="lang-btn active" onclick="setLang('de')" data-lang="de">DE</button>
+          <button class="lang-btn" onclick="setLang('en')" data-lang="en">EN</button>
+          <button class="lang-btn" onclick="setLang('sl')" data-lang="sl">SI</button>
+        </div>
+      </div>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
     <div class="wrap">
-      <div class="hero-version"><span class="dot"></span> v1.6.2 — 19 Bastelprojekte</div>
-      <h1>KI-Assistent für<br><span class="accent">Amateurfunk</span></h1>
-      <p class="hero-sub">Voice CQ, QSO-Chat, Contest-Analyse, Propagation, Rufzeichen-Finder und 19 Arduino/ESP32 Bastelprojekte — alles in einer App.</p>
+      <div class="hero-version"><span class="dot"></span> <span data-i18n="hero_version">v1.6.2 — 19 Bastelprojekte</span></div>
+      <h1 data-i18n-html="hero_h1">KI-Assistent für<br><span class="accent">Amateurfunk</span></h1>
+      <p class="hero-sub" data-i18n="hero_sub">Voice CQ, QSO-Chat, Contest-Analyse, Propagation, Rufzeichen-Finder und 19 Arduino/ESP32 Bastelprojekte — alles in einer App.</p>
       <div class="hero-btns">
-        <a href="https://funkpilot.oeradio.at" class="btn-primary" target="_blank" rel="noopener">Jetzt ausprobieren →</a>
+        <a href="https://funkpilot.oeradio.at" class="btn-primary" target="_blank" rel="noopener" data-i18n="hero_cta">Jetzt ausprobieren →</a>
         <a href="https://github.com/achildrenmile/funkpilot" class="btn-outline" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           GitHub
@@ -336,9 +344,9 @@
       </div>
 
       <div class="stats">
-        <div class="stat"><div class="stat-val">19</div><div class="stat-label">Projekte</div></div>
-        <div class="stat"><div class="stat-val">7</div><div class="stat-label">KI-Module</div></div>
-        <div class="stat"><div class="stat-val">9</div><div class="stat-label">Bundesländer</div></div>
+        <div class="stat"><div class="stat-val">19</div><div class="stat-label" data-i18n="stat_projects">Projekte</div></div>
+        <div class="stat"><div class="stat-val">7</div><div class="stat-label" data-i18n="stat_modules">KI-Module</div></div>
+        <div class="stat"><div class="stat-val">9</div><div class="stat-label" data-i18n="stat_provinces">Bundesländer</div></div>
         <div class="stat"><div class="stat-val">v1.6</div><div class="stat-label">Release</div></div>
       </div>
     </div>
@@ -347,64 +355,64 @@
   <!-- FEATURES -->
   <section id="features" class="section fade">
     <div class="wrap">
-      <div class="section-tag">Features</div>
-      <h2 class="section-title">Alles was ein Funkamateur braucht</h2>
-      <p class="section-desc">Vom CQ-Ruf bis zur Bauanleitung — FunkPilot deckt alle Bereiche ab.</p>
+      <div class="section-tag" data-i18n="nav_features">Features</div>
+      <h2 class="section-title" data-i18n="feat_title">Alles was ein Funkamateur braucht</h2>
+      <p class="section-desc" data-i18n="feat_desc">Vom CQ-Ruf bis zur Bauanleitung — FunkPilot deckt alle Bereiche ab.</p>
 
       <div class="grid-3">
         <div class="card">
           <div class="card-icon">🎙️</div>
-          <h3>Voice CQ Generator</h3>
-          <p>Neural-Voices für CQ-Rufe mit NATO-Phonetik und Contest-Templates.</p>
-          <span class="card-badge badge-ki">KI</span>
+          <h3 data-i18n="feat_voice_t">Voice CQ Generator</h3>
+          <p data-i18n="feat_voice_d">Neural-Voices für CQ-Rufe mit NATO-Phonetik und Contest-Templates.</p>
+          <span class="card-badge badge-ki" data-i18n="badge_ki">KI</span>
         </div>
         <div class="card">
           <div class="card-icon">💬</div>
-          <h3>QSO-Chat-Assistent</h3>
-          <p>KI-Chat für Amateurfunk-Fragen. Versteht Kontext und kennt OE-Regeln.</p>
-          <span class="card-badge badge-ki">KI</span>
+          <h3 data-i18n="feat_qso_t">QSO-Chat-Assistent</h3>
+          <p data-i18n="feat_qso_d">KI-Chat für Amateurfunk-Fragen. Versteht Kontext und kennt OE-Regeln.</p>
+          <span class="card-badge badge-ki" data-i18n="badge_ki">KI</span>
         </div>
         <div class="card">
           <div class="card-icon">📋</div>
-          <h3>Contest-Log-Analyse</h3>
-          <p>ADIF importieren, per KI analysieren — Statistiken und Bandverteilung.</p>
-          <span class="card-badge badge-ki">KI</span>
+          <h3 data-i18n="feat_contest_t">Contest-Log-Analyse</h3>
+          <p data-i18n="feat_contest_d">ADIF importieren, per KI analysieren — Statistiken und Bandverteilung.</p>
+          <span class="card-badge badge-ki" data-i18n="badge_ki">KI</span>
         </div>
         <div class="card">
           <div class="card-icon">🌍</div>
-          <h3>Propagation-Berater</h3>
-          <p>Echtzeit-Solardaten, Bandprognosen und DX-Empfehlungen.</p>
+          <h3 data-i18n="feat_prop_t">Propagation-Berater</h3>
+          <p data-i18n="feat_prop_d">Echtzeit-Solardaten, Bandprognosen und DX-Empfehlungen.</p>
           <span class="card-badge badge-tool">Tool</span>
         </div>
         <div class="card">
           <div class="card-icon">🔍</div>
-          <h3>Rufzeichen-Finder</h3>
-          <p>Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.</p>
-          <span class="card-badge badge-new">Neu</span>
+          <h3 data-i18n="feat_call_t">Rufzeichen-Finder</h3>
+          <p data-i18n="feat_call_d">Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.</p>
+          <span class="card-badge badge-new" data-i18n="badge_new">Neu</span>
         </div>
         <div class="card">
           <div class="card-icon">🌐</div>
-          <h3>Web-Suche</h3>
-          <p>EU-konforme Suche via Tavily mit klickbaren Links und DSGVO-Warnung.</p>
+          <h3 data-i18n="feat_web_t">Web-Suche</h3>
+          <p data-i18n="feat_web_d">EU-konforme Suche via Tavily mit klickbaren Links und DSGVO-Warnung.</p>
           <span class="card-badge badge-tool">Tool</span>
         </div>
         <div class="card">
           <div class="card-icon">🔧</div>
-          <h3>KI Code-Anpassung</h3>
-          <p>Bastelprojekt-Code per Chat individuell anpassen mit Quick-Prompts.</p>
-          <span class="card-badge badge-ki">KI</span>
+          <h3 data-i18n="feat_code_t">KI Code-Anpassung</h3>
+          <p data-i18n="feat_code_d">Bastelprojekt-Code per Chat individuell anpassen mit Quick-Prompts.</p>
+          <span class="card-badge badge-ki" data-i18n="badge_ki">KI</span>
         </div>
         <div class="card">
           <div class="card-icon">📊</div>
-          <h3>Live-Verarbeitung</h3>
-          <p>Status-Icons für Web-Suche, Rufzeichen-Lookup und Tool-Ausführung.</p>
+          <h3 data-i18n="feat_live_t">Live-Verarbeitung</h3>
+          <p data-i18n="feat_live_d">Status-Icons für Web-Suche, Rufzeichen-Lookup und Tool-Ausführung.</p>
           <span class="card-badge badge-tool">Tool</span>
         </div>
         <div class="card">
           <div class="card-icon">🛠️</div>
-          <h3>OERadio MCP Tools</h3>
-          <p>Ham Radio MCP-Tools im Chat. Verlauf mit Auto-Titel-Generierung.</p>
-          <span class="card-badge badge-ki">KI</span>
+          <h3 data-i18n="feat_mcp_t">OERadio MCP Tools</h3>
+          <p data-i18n="feat_mcp_d">Ham Radio MCP-Tools im Chat. Verlauf mit Auto-Titel-Generierung.</p>
+          <span class="card-badge badge-ki" data-i18n="badge_ki">KI</span>
         </div>
       </div>
     </div>
@@ -413,30 +421,30 @@
   <!-- BASTELPROJEKTE -->
   <section id="projekte" class="section fade">
     <div class="wrap">
-      <div class="section-tag">Bastelprojekte</div>
-      <h2 class="section-title">19 Arduino & ESP32 Projekte</h2>
-      <p class="section-desc">Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.</p>
+      <div class="section-tag" data-i18n="proj_tag">Bastelprojekte</div>
+      <h2 class="section-title" data-i18n="proj_title">19 Arduino & ESP32 Projekte</h2>
+      <p class="section-desc" data-i18n="proj_desc">Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.</p>
 
       <div class="grid-proj">
-        <div class="proj"><span class="proj-icon">📟</span><div class="proj-text"><strong>Morse-Decoder</strong>OLED Display</div></div>
-        <div class="proj"><span class="proj-icon">🎓</span><div class="proj-text"><strong>Morse-Trainer</strong>Koch-Methode</div></div>
-        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong>Baken-Keyer</strong>Automatisch</div></div>
-        <div class="proj"><span class="proj-icon">🔢</span><div class="proj-text"><strong>Frequenzzähler</strong>bis 8 MHz</div></div>
-        <div class="proj"><span class="proj-icon">🔥</span><div class="proj-text"><strong>Dummy Load</strong>50Ω, Watt/Temp</div></div>
-        <div class="proj"><span class="proj-icon">📊</span><div class="proj-text"><strong>Feldstärkemesser</strong>S-Meter</div></div>
-        <div class="proj"><span class="proj-icon">🎧</span><div class="proj-text"><strong>CW-Audiofilter</strong>Digital einstellbar</div></div>
-        <div class="proj"><span class="proj-icon">🔊</span><div class="proj-text"><strong>NF-Verstärker</strong>LM386 + VU-Meter</div></div>
-        <div class="proj"><span class="proj-icon">🎤</span><div class="proj-text"><strong>VOX-Schaltung</strong>Anti-VOX</div></div>
-        <div class="proj"><span class="proj-icon">💻</span><div class="proj-text"><strong>Digimode</strong>PSK/RTTY Interface</div></div>
-        <div class="proj"><span class="proj-icon">⏱️</span><div class="proj-text"><strong>FT8-Sync</strong>NTP Display</div></div>
-        <div class="proj"><span class="proj-icon">📦</span><div class="proj-text"><strong>Packet TNC</strong>Simple</div></div>
-        <div class="proj"><span class="proj-icon">🔄</span><div class="proj-text"><strong>Rotorsteuerung</strong>Presets</div></div>
-        <div class="proj"><span class="proj-icon">🔘</span><div class="proj-text"><strong>USB-PTT</strong>Hamlib-kompatibel</div></div>
-        <div class="proj"><span class="proj-icon">🎚️</span><div class="proj-text"><strong>Bandfilter</strong>Auto-Umschalter</div></div>
-        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong>SWR-Meter</strong>Arduino</div></div>
-        <div class="proj"><span class="proj-icon">⚡</span><div class="proj-text"><strong>Antennen-Tuner</strong>Automatisch</div></div>
-        <div class="proj"><span class="proj-icon">🌡️</span><div class="proj-text"><strong>PA-Monitoring</strong>Temperatur</div></div>
-        <div class="proj"><span class="proj-icon">🔋</span><div class="proj-text"><strong>Akku-Monitor</strong>Portabel</div></div>
+        <div class="proj"><span class="proj-icon">📟</span><div class="proj-text"><strong data-i18n="p_morse_dec">Morse-Decoder</strong><span data-i18n="p_morse_dec_d">OLED Display</span></div></div>
+        <div class="proj"><span class="proj-icon">🎓</span><div class="proj-text"><strong data-i18n="p_morse_tr">Morse-Trainer</strong><span data-i18n="p_morse_tr_d">Koch-Methode</span></div></div>
+        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong data-i18n="p_beacon">Baken-Keyer</strong><span data-i18n="p_beacon_d">Automatisch</span></div></div>
+        <div class="proj"><span class="proj-icon">🔢</span><div class="proj-text"><strong data-i18n="p_freq">Frequenzzähler</strong><span data-i18n="p_freq_d">bis 8 MHz</span></div></div>
+        <div class="proj"><span class="proj-icon">🔥</span><div class="proj-text"><strong>Dummy Load</strong><span>50Ω, Watt/Temp</span></div></div>
+        <div class="proj"><span class="proj-icon">📊</span><div class="proj-text"><strong data-i18n="p_field">Feldstärkemesser</strong><span>S-Meter</span></div></div>
+        <div class="proj"><span class="proj-icon">🎧</span><div class="proj-text"><strong data-i18n="p_cwfilt">CW-Audiofilter</strong><span data-i18n="p_cwfilt_d">Digital einstellbar</span></div></div>
+        <div class="proj"><span class="proj-icon">🔊</span><div class="proj-text"><strong data-i18n="p_amp">NF-Verstärker</strong><span>LM386 + VU-Meter</span></div></div>
+        <div class="proj"><span class="proj-icon">🎤</span><div class="proj-text"><strong data-i18n="p_vox">VOX-Schaltung</strong><span>Anti-VOX</span></div></div>
+        <div class="proj"><span class="proj-icon">💻</span><div class="proj-text"><strong>Digimode</strong><span>PSK/RTTY Interface</span></div></div>
+        <div class="proj"><span class="proj-icon">⏱️</span><div class="proj-text"><strong>FT8-Sync</strong><span>NTP Display</span></div></div>
+        <div class="proj"><span class="proj-icon">📦</span><div class="proj-text"><strong>Packet TNC</strong><span>Simple</span></div></div>
+        <div class="proj"><span class="proj-icon">🔄</span><div class="proj-text"><strong data-i18n="p_rotor">Rotorsteuerung</strong><span>Presets</span></div></div>
+        <div class="proj"><span class="proj-icon">🔘</span><div class="proj-text"><strong>USB-PTT</strong><span data-i18n="p_ptt_d">Hamlib-kompatibel</span></div></div>
+        <div class="proj"><span class="proj-icon">🎚️</span><div class="proj-text"><strong data-i18n="p_band">Bandfilter</strong><span data-i18n="p_band_d">Auto-Umschalter</span></div></div>
+        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong>SWR-Meter</strong><span>Arduino</span></div></div>
+        <div class="proj"><span class="proj-icon">⚡</span><div class="proj-text"><strong data-i18n="p_tuner">Antennen-Tuner</strong><span data-i18n="p_tuner_d">Automatisch</span></div></div>
+        <div class="proj"><span class="proj-icon">🌡️</span><div class="proj-text"><strong data-i18n="p_pa">PA-Monitoring</strong><span data-i18n="p_pa_d">Temperatur</span></div></div>
+        <div class="proj"><span class="proj-icon">🔋</span><div class="proj-text"><strong data-i18n="p_batt">Akku-Monitor</strong><span data-i18n="p_batt_d">Portabel</span></div></div>
       </div>
     </div>
   </section>
@@ -445,57 +453,57 @@
   <section id="releases" class="section fade">
     <div class="wrap">
       <div class="section-tag">Releases</div>
-      <h2 class="section-title">Versionshistorie</h2>
-      <p class="section-desc">Vom ersten Release bis heute.</p>
+      <h2 class="section-title" data-i18n="rel_title">Versionshistorie</h2>
+      <p class="section-desc" data-i18n="rel_desc">Vom ersten Release bis heute.</p>
 
       <div class="tl">
         <div class="tl-item now">
           <div class="tl-dot"></div>
-          <div class="tl-ver">v1.6.2 <span class="tl-badge">Latest</span></div>
-          <div class="tl-date">31. Jänner 2026</div>
-          <div class="tl-desc">19 Bastelprojekte (CW/Morse, Messtechnik, Audio/NF, Digital/APRS, Steuerung), Verdrahtungstabellen, Wokwi-Simulator, KI-Bauanleitung.</div>
+          <div class="tl-ver">v1.6.2 <span class="tl-badge" data-i18n="rel_latest">Latest</span></div>
+          <div class="tl-date" data-i18n="rel_162_date">31. Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_162">19 Bastelprojekte (CW/Morse, Messtechnik, Audio/NF, Digital/APRS, Steuerung), Verdrahtungstabellen, Wokwi-Simulator, KI-Bauanleitung.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.6.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">KI Code-Anpassung für Bastelprojekte per Chat-Interface.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_160">KI Code-Anpassung für Bastelprojekte per Chat-Interface.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.5.x</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">Projekte-Tab, Code-Viewer mit Syntax-Highlighting, Stücklisten-Export.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_15x">Projekte-Tab, Code-Viewer mit Syntax-Highlighting, Stücklisten-Export.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.4.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">Transparente KI-Verarbeitung mit Live-Status und Tool-Icons.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_140">Transparente KI-Verarbeitung mit Live-Status und Tool-Icons.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.3.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">EU-konforme Web-Suche via Tavily, DSGVO-konforme Links.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_130">EU-konforme Web-Suche via Tavily, DSGVO-konforme Links.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.2.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">Rufzeichen-Finder, Schwarzfunker-Erkennung, 9 Bundesländer.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_120">Rufzeichen-Finder, Schwarzfunker-Erkennung, 9 Bundesländer.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.1.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">OERadio MCP Tools, Chat-Verlauf, Auto-Titel.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_110">OERadio MCP Tools, Chat-Verlauf, Auto-Titel.</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
           <div class="tl-ver">v1.0.0</div>
-          <div class="tl-date">Jänner 2026</div>
-          <div class="tl-desc">Voice CQ, QSO-Chat, Contest-Log-Analyse, Propagation, Dark/Light Mode.</div>
+          <div class="tl-date" data-i18n="rel_jan26">Jänner 2026</div>
+          <div class="tl-desc" data-i18n="rel_100">Voice CQ, QSO-Chat, Contest-Log-Analyse, Propagation, Dark/Light Mode.</div>
         </div>
       </div>
     </div>
@@ -505,22 +513,22 @@
   <section id="setup" class="section fade">
     <div class="wrap">
       <div class="section-tag">Setup</div>
-      <h2 class="section-title">In 3 Minuten starten</h2>
-      <p class="section-desc">Docker oder Node.js — deine Wahl.</p>
+      <h2 class="section-title" data-i18n="setup_title">In 3 Minuten starten</h2>
+      <p class="section-desc" data-i18n="setup_desc">Docker oder Node.js — deine Wahl.</p>
 
       <div class="codeblock">
         <div class="codeblock-bar">
           <div class="cb-dot cb-r"></div><div class="cb-dot cb-y"></div><div class="cb-dot cb-b"></div>
           <span>terminal</span>
         </div>
-        <pre><span class="cm"># Repository klonen</span>
+        <pre><span class="cm" data-i18n="code_clone"># Repository klonen</span>
 <span class="kw">git clone</span> https://github.com/achildrenmile/funkpilot.git
 <span class="kw">cd</span> funkpilot
 
-<span class="cm"># Option A: Docker (empfohlen)</span>
+<span class="cm" data-i18n="code_docker"># Option A: Docker (empfohlen)</span>
 <span class="kw">docker compose up</span> <span class="fl">-d</span>
 
-<span class="cm"># Option B: Node.js</span>
+<span class="cm" data-i18n="code_node"># Option B: Node.js</span>
 <span class="kw">npm install</span>
 <span class="kw">npm run dev</span>
 
@@ -541,7 +549,7 @@
     </div>
   </section>
 
-  <!-- FOOTER — matches app footer style -->
+  <!-- FOOTER -->
   <footer>
     <div class="wrap">
       <div class="foot-inner">
@@ -559,10 +567,150 @@
   </footer>
 
   <script>
+    const T = {
+      de: {
+        nav_sub:'KI-Assistent für Funkamateure', nav_features:'Features', nav_projects:'Projekte', nav_ki_badge:'✓ KI-System',
+        hero_version:'v1.6.2 — 19 Bastelprojekte', hero_h1:'KI-Assistent für<br><span class="accent">Amateurfunk</span>',
+        hero_sub:'Voice CQ, QSO-Chat, Contest-Analyse, Propagation, Rufzeichen-Finder und 19 Arduino/ESP32 Bastelprojekte — alles in einer App.',
+        hero_cta:'Jetzt ausprobieren →', stat_projects:'Projekte', stat_modules:'KI-Module', stat_provinces:'Bundesländer',
+        feat_title:'Alles was ein Funkamateur braucht', feat_desc:'Vom CQ-Ruf bis zur Bauanleitung — FunkPilot deckt alle Bereiche ab.',
+        feat_voice_t:'Voice CQ Generator', feat_voice_d:'Neural-Voices für CQ-Rufe mit NATO-Phonetik und Contest-Templates.',
+        feat_qso_t:'QSO-Chat-Assistent', feat_qso_d:'KI-Chat für Amateurfunk-Fragen. Versteht Kontext und kennt OE-Regeln.',
+        feat_contest_t:'Contest-Log-Analyse', feat_contest_d:'ADIF importieren, per KI analysieren — Statistiken und Bandverteilung.',
+        feat_prop_t:'Propagation-Berater', feat_prop_d:'Echtzeit-Solardaten, Bandprognosen und DX-Empfehlungen.',
+        feat_call_t:'Rufzeichen-Finder', feat_call_d:'Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.',
+        feat_web_t:'Web-Suche', feat_web_d:'EU-konforme Suche via Tavily mit klickbaren Links und DSGVO-Warnung.',
+        feat_code_t:'KI Code-Anpassung', feat_code_d:'Bastelprojekt-Code per Chat individuell anpassen mit Quick-Prompts.',
+        feat_live_t:'Live-Verarbeitung', feat_live_d:'Status-Icons für Web-Suche, Rufzeichen-Lookup und Tool-Ausführung.',
+        feat_mcp_t:'OERadio MCP Tools', feat_mcp_d:'Ham Radio MCP-Tools im Chat. Verlauf mit Auto-Titel-Generierung.',
+        badge_ki:'KI', badge_new:'Neu',
+        proj_tag:'Bastelprojekte', proj_title:'19 Arduino & ESP32 Projekte',
+        proj_desc:'Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.',
+        p_morse_dec:'Morse-Decoder', p_morse_dec_d:'OLED Display', p_morse_tr:'Morse-Trainer', p_morse_tr_d:'Koch-Methode',
+        p_beacon:'Baken-Keyer', p_beacon_d:'Automatisch', p_freq:'Frequenzzähler', p_freq_d:'bis 8 MHz',
+        p_field:'Feldstärkemesser', p_cwfilt:'CW-Audiofilter', p_cwfilt_d:'Digital einstellbar',
+        p_amp:'NF-Verstärker', p_vox:'VOX-Schaltung', p_rotor:'Rotorsteuerung', p_ptt_d:'Hamlib-kompatibel',
+        p_band:'Bandfilter', p_band_d:'Auto-Umschalter', p_tuner:'Antennen-Tuner', p_tuner_d:'Automatisch',
+        p_pa:'PA-Monitoring', p_pa_d:'Temperatur', p_batt:'Akku-Monitor', p_batt_d:'Portabel',
+        rel_title:'Versionshistorie', rel_desc:'Vom ersten Release bis heute.', rel_latest:'Latest',
+        rel_162_date:'31. Jänner 2026',
+        rel_162:'19 Bastelprojekte (CW/Morse, Messtechnik, Audio/NF, Digital/APRS, Steuerung), Verdrahtungstabellen, Wokwi-Simulator, KI-Bauanleitung.',
+        rel_jan26:'Jänner 2026',
+        rel_160:'KI Code-Anpassung für Bastelprojekte per Chat-Interface.',
+        rel_15x:'Projekte-Tab, Code-Viewer mit Syntax-Highlighting, Stücklisten-Export.',
+        rel_140:'Transparente KI-Verarbeitung mit Live-Status und Tool-Icons.',
+        rel_130:'EU-konforme Web-Suche via Tavily, DSGVO-konforme Links.',
+        rel_120:'Rufzeichen-Finder, Schwarzfunker-Erkennung, 9 Bundesländer.',
+        rel_110:'OERadio MCP Tools, Chat-Verlauf, Auto-Titel.',
+        rel_100:'Voice CQ, QSO-Chat, Contest-Log-Analyse, Propagation, Dark/Light Mode.',
+        setup_title:'In 3 Minuten starten', setup_desc:'Docker oder Node.js — deine Wahl.',
+        code_clone:'# Repository klonen', code_docker:'# Option A: Docker (empfohlen)', code_node:'# Option B: Node.js'
+      },
+      en: {
+        nav_sub:'AI Assistant for Ham Radio', nav_features:'Features', nav_projects:'Projects', nav_ki_badge:'✓ AI System',
+        hero_version:'v1.6.2 — 19 DIY Projects', hero_h1:'AI Assistant for<br><span class="accent">Ham Radio</span>',
+        hero_sub:'Voice CQ, QSO chat, contest analysis, propagation, callsign finder and 19 Arduino/ESP32 DIY projects — all in one app.',
+        hero_cta:'Try it now →', stat_projects:'Projects', stat_modules:'AI Modules', stat_provinces:'Provinces',
+        feat_title:'Everything a ham radio operator needs', feat_desc:'From CQ calls to build instructions — FunkPilot covers it all.',
+        feat_voice_t:'Voice CQ Generator', feat_voice_d:'Neural voices for CQ calls with NATO phonetics and contest templates.',
+        feat_qso_t:'QSO Chat Assistant', feat_qso_d:'AI chat for ham radio questions. Understands context and Austrian regulations.',
+        feat_contest_t:'Contest Log Analysis', feat_contest_d:'Import ADIF, analyze with AI — statistics and band distribution.',
+        feat_prop_t:'Propagation Advisor', feat_prop_d:'Real-time solar data, band forecasts and DX recommendations.',
+        feat_call_t:'Callsign Finder', feat_call_d:'Pirate detection, suffix availability across 9 Austrian provinces.',
+        feat_web_t:'Web Search', feat_web_d:'EU-compliant search via Tavily with clickable links and GDPR notice.',
+        feat_code_t:'AI Code Customization', feat_code_d:'Customize project code via chat with quick prompts.',
+        feat_live_t:'Live Processing', feat_live_d:'Status icons for web search, callsign lookup and tool execution.',
+        feat_mcp_t:'OERadio MCP Tools', feat_mcp_d:'Ham radio MCP tools in chat. History with auto-title generation.',
+        badge_ki:'AI', badge_new:'New',
+        proj_tag:'DIY Projects', proj_title:'19 Arduino & ESP32 Projects',
+        proj_desc:'Code, parts list, wiring table, Wokwi simulator and AI build guide.',
+        p_morse_dec:'Morse Decoder', p_morse_dec_d:'OLED Display', p_morse_tr:'Morse Trainer', p_morse_tr_d:'Koch Method',
+        p_beacon:'Beacon Keyer', p_beacon_d:'Automatic', p_freq:'Frequency Counter', p_freq_d:'up to 8 MHz',
+        p_field:'Field Strength Meter', p_cwfilt:'CW Audio Filter', p_cwfilt_d:'Digitally adjustable',
+        p_amp:'AF Amplifier', p_vox:'VOX Circuit', p_rotor:'Rotor Controller', p_ptt_d:'Hamlib compatible',
+        p_band:'Band Filter', p_band_d:'Auto Switcher', p_tuner:'Antenna Tuner', p_tuner_d:'Automatic',
+        p_pa:'PA Monitoring', p_pa_d:'Temperature', p_batt:'Battery Monitor', p_batt_d:'Portable',
+        rel_title:'Version History', rel_desc:'From first release to today.', rel_latest:'Latest',
+        rel_162_date:'January 31, 2026',
+        rel_162:'19 DIY projects (CW/Morse, measurement, audio/AF, digital/APRS, control), wiring tables, Wokwi simulator, AI build guide.',
+        rel_jan26:'January 2026',
+        rel_160:'AI code customization for DIY projects via chat interface.',
+        rel_15x:'Projects tab, code viewer with syntax highlighting, parts list export.',
+        rel_140:'Transparent AI processing with live status and tool icons.',
+        rel_130:'EU-compliant web search via Tavily, GDPR-compliant links.',
+        rel_120:'Callsign finder, pirate detection, 9 provinces.',
+        rel_110:'OERadio MCP tools, chat history, auto-title.',
+        rel_100:'Voice CQ, QSO chat, contest log analysis, propagation, dark/light mode.',
+        setup_title:'Get started in 3 minutes', setup_desc:'Docker or Node.js — your choice.',
+        code_clone:'# Clone repository', code_docker:'# Option A: Docker (recommended)', code_node:'# Option B: Node.js'
+      },
+      sl: {
+        nav_sub:'KI-pomočnik za radioamaterje', nav_features:'Funkcije', nav_projects:'Projekti', nav_ki_badge:'✓ KI-sistem',
+        hero_version:'v1.6.2 — 19 projektov za izdelavo', hero_h1:'KI-pomočnik za<br><span class="accent">radioamaterstvo</span>',
+        hero_sub:'Voice CQ, QSO klepet, analiza tekmovanj, propagacija, iskalnik klicnih znakov in 19 Arduino/ESP32 projektov — vse v eni aplikaciji.',
+        hero_cta:'Preizkusite zdaj →', stat_projects:'Projekti', stat_modules:'KI-moduli', stat_provinces:'Zvezne dežele',
+        feat_title:'Vse kar radioamater potrebuje', feat_desc:'Od CQ klica do navodil za gradnjo — FunkPilot pokriva vsa področja.',
+        feat_voice_t:'Voice CQ Generator', feat_voice_d:'Nevralni glasovi za CQ klice z NATO fonetiko in tekmovalnimi predlogami.',
+        feat_qso_t:'QSO klepetalni pomočnik', feat_qso_d:'KI-klepet za radioamaterska vprašanja. Razume kontekst in avstrijska pravila.',
+        feat_contest_t:'Analiza tekmovalnega dnevnika', feat_contest_d:'Uvoz ADIF, analiza s KI — statistika in razporeditev po pasovih.',
+        feat_prop_t:'Svetovalec za propagacijo', feat_prop_d:'Sončni podatki v realnem času, napovedi pasov in DX priporočila.',
+        feat_call_t:'Iskalnik klicnih znakov', feat_call_d:'Odkrivanje piratov, razpoložljivost sufiksov v 9 zveznih deželah.',
+        feat_web_t:'Spletno iskanje', feat_web_d:'EU-skladno iskanje prek Tavily s klikljivimi povezavami in GDPR opozorilom.',
+        feat_code_t:'KI prilagoditev kode', feat_code_d:'Prilagodite kodo projektov prek klepeta s hitrimi ukazi.',
+        feat_live_t:'Obdelava v živo', feat_live_d:'Statusne ikone za spletno iskanje, iskanje klicnih znakov in izvajanje orodij.',
+        feat_mcp_t:'OERadio MCP orodja', feat_mcp_d:'Radioamaterska MCP orodja v klepetu. Zgodovina z avtomatskim generiranjem naslovov.',
+        badge_ki:'KI', badge_new:'Novo',
+        proj_tag:'Projekti za izdelavo', proj_title:'19 Arduino & ESP32 projektov',
+        proj_desc:'Koda, seznam delov, tabela povezav, Wokwi simulator in KI navodila za gradnjo.',
+        p_morse_dec:'Morse dekoder', p_morse_dec_d:'OLED zaslon', p_morse_tr:'Morse trener', p_morse_tr_d:'Koch metoda',
+        p_beacon:'Beacon keyer', p_beacon_d:'Avtomatski', p_freq:'Frekvenčni števec', p_freq_d:'do 8 MHz',
+        p_field:'Merilnik jakosti polja', p_cwfilt:'CW avdio filter', p_cwfilt_d:'Digitalno nastavljiv',
+        p_amp:'NF ojačevalnik', p_vox:'VOX vezje', p_rotor:'Krmilnik rotorja', p_ptt_d:'Hamlib združljiv',
+        p_band:'Pasovni filter', p_band_d:'Avto preklopnik', p_tuner:'Antenski uglasnik', p_tuner_d:'Avtomatski',
+        p_pa:'PA nadzor', p_pa_d:'Temperatura', p_batt:'Monitor baterije', p_batt_d:'Prenosni',
+        rel_title:'Zgodovina verzij', rel_desc:'Od prve izdaje do danes.', rel_latest:'Najnovejša',
+        rel_162_date:'31. januar 2026',
+        rel_162:'19 projektov (CW/Morse, merilna tehnika, avdio/NF, digitalno/APRS, krmiljenje), tabele povezav, Wokwi simulator, KI navodila.',
+        rel_jan26:'Januar 2026',
+        rel_160:'KI prilagoditev kode za projekte prek klepetnega vmesnika.',
+        rel_15x:'Zavihek projektov, pregledovalnik kode s poudarjanjem sintakse, izvoz seznama delov.',
+        rel_140:'Transparentna KI obdelava s statusom v živo in ikonami orodij.',
+        rel_130:'EU-skladno spletno iskanje prek Tavily, GDPR-skladne povezave.',
+        rel_120:'Iskalnik klicnih znakov, odkrivanje piratov, 9 zveznih dežel.',
+        rel_110:'OERadio MCP orodja, zgodovina klepeta, samodejni naslov.',
+        rel_100:'Voice CQ, QSO klepet, analiza tekmovalnega dnevnika, propagacija, temni/svetli način.',
+        setup_title:'Začnite v 3 minutah', setup_desc:'Docker ali Node.js — vaša izbira.',
+        code_clone:'# Kloniraj repozitorij', code_docker:'# Možnost A: Docker (priporočeno)', code_node:'# Možnost B: Node.js'
+      }
+    };
+
+    const TITLE = { de:'FunkPilot – KI-Assistent für Funkamateure', en:'FunkPilot – AI Assistant for Ham Radio', sl:'FunkPilot – KI-pomočnik za radioamaterje' };
+
+    function setLang(lang) {
+      if (!T[lang]) return;
+      const s = T[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (s[k] !== undefined) el.textContent = s[k];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const k = el.getAttribute('data-i18n-html');
+        if (s[k] !== undefined) el.innerHTML = s[k];
+      });
+      document.documentElement.lang = lang === 'sl' ? 'sl' : lang;
+      document.title = TITLE[lang];
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-lang') === lang));
+      try { localStorage.setItem('fp-lang', lang); } catch(e) {}
+    }
+
+    // Scroll fade
     const o = new IntersectionObserver(es => {
       es.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
     }, { threshold: 0.08 });
     document.querySelectorAll('.fade').forEach(el => o.observe(el));
+
+    // Restore language
+    try { const s = localStorage.getItem('fp-lang'); if (s && T[s] && s !== 'de') setLang(s); } catch(e) {}
   </script>
 </body>
 </html>
