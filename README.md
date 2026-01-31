@@ -4,6 +4,10 @@
   <img src="public/favicon.svg" alt="FunkPilot Logo" width="100" height="100">
 </p>
 
+<p align="center">
+  <strong>🇦🇹 Deutsch</strong> | <strong>🇬🇧 English</strong> | <strong>🇸🇮 Slovenščina</strong>
+</p>
+
 FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mit praktischen Tools für den Amateurfunk-Betrieb kombiniert.
 
 ## Features
@@ -70,10 +74,17 @@ FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mi
 - Band-Status für alle Bänder (6m - 160m)
 - KI-Empfehlungen für DX-Verbindungen
 
+### 🌍 Mehrsprachigkeit
+- **Drei Sprachen**: Deutsch (Standard), English, Slovenščina
+- **Automatische Spracherkennung**: Browser-Sprache wird erkannt
+- **Sprachauswahl**: Im Header und in Einstellungen
+- **Vollständig übersetzt**: Alle UI-Texte in allen Sprachen
+
 ### 🎨 Themes & Design
 - **Dunkel-Modus** (Standard) - Augenfreundlich für lange Betriebssessions
 - **Hell-Modus** - Bessere Lesbarkeit bei Tageslicht
 - **Responsive Design** - Optimiert für Desktop, Tablet und Mobile
+- **PWA-Unterstützung** - Installierbar auf Handy/Tablet
 - Einstellung wird lokal gespeichert
 
 ### ❓ Hilfe
