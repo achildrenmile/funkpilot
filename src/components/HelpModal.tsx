@@ -97,6 +97,21 @@ export function HelpModal({ onClose }: HelpModalProps) {
                   Frage z.B. "Welcher Contest ist aktuell?" oder "Was ist heute auf den Bändern los?"
                 </p>
               </div>
+              <div className="mt-3 p-2 bg-purple-900/30 border border-purple-700/50 rounded">
+                <h4 className="text-sm font-medium text-purple-200">
+                  Transparente Verarbeitung
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  Während der Verarbeitung siehst du live, was passiert:
+                </p>
+                <ul className="text-xs text-slate-400 mt-1 space-y-0.5 ml-2">
+                  <li>🌐 Web-Suche nach aktuellen Infos</li>
+                  <li>📻 Rufzeichen-Lookup (OE-Liste, QRZ, HamQTH)</li>
+                  <li>🔍 Suffix-Verfügbarkeitsprüfung</li>
+                  <li>👤 Rufzeichen-Vorschläge generieren</li>
+                  <li>✨ KI generiert Antwort</li>
+                </ul>
+              </div>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
