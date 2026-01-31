@@ -6,6 +6,8 @@ import { CodeViewer } from './CodeViewer';
 import { ComponentList } from './ComponentList';
 import { WiringTable } from './WiringTable';
 import { ProjectChat } from './ProjectChat';
+import { LoRaHardwareCompare } from './LoRaHardwareCompare';
+import { LoRaRangeCalculator } from './LoRaRangeCalculator';
 
 interface ProjectDetailProps {
   project: HamProject;
@@ -120,48 +122,58 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
           )}
         </div>
 
-        {/* Right Column: Code */}
+        {/* Right Column: Code or Special Tools */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Modified indicator */}
-          {isModified && (
-            <div className="flex items-center justify-between bg-green-900/30 border border-green-700/50 rounded-lg px-4 py-2">
-              <span className="text-sm text-green-300">
-                Code wurde von der KI angepasst
-              </span>
-              <button
-                onClick={handleResetCode}
-                className="flex items-center gap-1.5 text-sm text-green-400 hover:text-green-300 transition-colors"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Original wiederherstellen
-              </button>
-            </div>
-          )}
-
-          <CodeViewer
-            code={currentCode}
-            fileName={project.codeFileName}
-            language={project.codeLanguage}
-          />
-
-          {/* AI Chat for code customization (not for guides) */}
-          {project.codeLanguage !== 'markdown' && (
+          {/* Special case: LoRa Tools */}
+          {project.id === 'lora-tools' ? (
             <>
-              <ProjectChat
+              <LoRaHardwareCompare />
+              <LoRaRangeCalculator />
+            </>
+          ) : (
+            <>
+              {/* Modified indicator */}
+              {isModified && (
+                <div className="flex items-center justify-between bg-green-900/30 border border-green-700/50 rounded-lg px-4 py-2">
+                  <span className="text-sm text-green-300">
+                    Code wurde von der KI angepasst
+                  </span>
+                  <button
+                    onClick={handleResetCode}
+                    className="flex items-center gap-1.5 text-sm text-green-400 hover:text-green-300 transition-colors"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Original wiederherstellen
+                  </button>
+                </div>
+              )}
+
+              <CodeViewer
                 code={currentCode}
-                projectName={project.name}
-                hardware={hardware.name}
+                fileName={project.codeFileName}
                 language={project.codeLanguage}
-                onCodeUpdate={handleCodeUpdate}
               />
 
-              {/* Tip */}
-              <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
-                <p className="text-sm text-amber-200">
-                  <strong>Tipp:</strong> Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO.
-                  Installiere ggf. benötigte Libraries über den Library Manager.
-                </p>
-              </div>
+              {/* AI Chat for code customization (not for guides) */}
+              {project.codeLanguage !== 'markdown' && (
+                <>
+                  <ProjectChat
+                    code={currentCode}
+                    projectName={project.name}
+                    hardware={hardware.name}
+                    language={project.codeLanguage}
+                    onCodeUpdate={handleCodeUpdate}
+                  />
+
+                  {/* Tip */}
+                  <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
+                    <p className="text-sm text-amber-200">
+                      <strong>Tipp:</strong> Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO.
+                      Installiere ggf. benötigte Libraries über den Library Manager.
+                    </p>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>

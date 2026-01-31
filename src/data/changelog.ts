@@ -10,6 +10,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.13.0',
+    date: '2026-01-31',
+    title: 'LoRa Interaktive Tools',
+    changes: [
+      { type: 'feature', text: 'Hardware-Vergleich: Filtere & vergleiche alle LoRa-Boards' },
+      { type: 'feature', text: 'Reichweiten-Rechner: Berechne theoretische Reichweite' },
+      { type: 'feature', text: 'Filter nach GPS, Display, Akku, Preis, Hersteller' },
+      { type: 'feature', text: 'Link-Budget und Fresnel-Zone Berechnung' },
+      { type: 'improvement', text: 'Jetzt 15 Mesh/LoRa Projekte verfügbar!' },
+    ],
+  },
+  {
     version: '1.12.0',
     date: '2026-01-31',
     title: 'Mesh/LoRa Komplett-Paket',

@@ -44,6 +44,7 @@ import { aprsGatewayGuide } from './aprs-gateway-guide';
 import { meshNetworkPlanning } from './mesh-network-planning';
 import { meshtasticSensors } from './meshtastic-sensors';
 import { meshtasticHamMode } from './meshtastic-ham-mode';
+import { loraTools } from './lora-tools';
 
 import type { HamProject } from '../../types/projects';
 
@@ -63,6 +64,7 @@ export const ALL_PROJECTS: HamProject[] = [
   meshNetworkPlanning,
   meshtasticSensors,
   meshtasticHamMode,
+  loraTools,
 
   // CW/Morse
   cwKeyerBasic,
@@ -120,6 +122,7 @@ export {
   meshNetworkPlanning,
   meshtasticSensors,
   meshtasticHamMode,
+  loraTools,
   // Existing
   cwKeyerBasic,
   swrMeter,
