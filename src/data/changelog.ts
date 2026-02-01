@@ -10,13 +10,23 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.15.1',
+    date: '2026-02-01',
+    title: 'Shareable Language URLs',
+    changes: [
+      { type: 'feature', text: 'Language now included in URL for direct sharing' },
+      { type: 'feature', text: 'Share links like #/en/projects/meshtastic-getting-started' },
+      { type: 'fix', text: 'Guide content now updates when switching language' },
+    ],
+  },
+  {
     version: '1.15.0',
     date: '2026-02-01',
-    title: 'Mehrsprachige Projekte',
+    title: 'Multilingual Projects',
     changes: [
-      { type: 'feature', text: 'Alle Projekte jetzt in DE/EN/SL verfügbar' },
-      { type: 'feature', text: 'Sprache wechseln - Projekte werden übersetzt' },
-      { type: 'improvement', text: 'UI-Texte in allen unterstützten Sprachen' },
+      { type: 'feature', text: 'All 35 projects now available in DE/EN/SL' },
+      { type: 'feature', text: 'Switch language - projects translate automatically' },
+      { type: 'improvement', text: 'UI text in all supported languages' },
     ],
   },
   {
