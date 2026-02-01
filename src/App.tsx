@@ -38,32 +38,39 @@ const ROUTE_TO_TAB: Record<string, TabId> = Object.fromEntries(
   Object.entries(TAB_ROUTES).map(([k, v]) => [v, k as TabId])
 ) as Record<string, TabId>;
 
-// Parse hash route: #/lang/tab or #/lang/projects/project-id
-// Also supports legacy format: #/tab or #/projects/project-id
+// Parse hash route: #/tab/lang or #/projects/project-id/lang
+// Language at end is optional - uses saved language if not specified
+// Examples: #/chat/en, #/projects/meshtastic-getting-started/sl, #/propagation
 function parseHash(): { tab: TabId; projectId?: string; lang?: SupportedLanguage } {
   const hash = window.location.hash.slice(1); // Remove #
   if (!hash || hash === '/') return { tab: 'voice' };
 
   const parts = hash.split('/').filter(Boolean);
 
-  // Check if first part is a language code
-  let lang: SupportedLanguage | undefined;
-  let tabIndex = 0;
-
-  if (SUPPORTED_LANGS.includes(parts[0] as SupportedLanguage)) {
-    lang = parts[0] as SupportedLanguage;
-    tabIndex = 1;
-  }
-
-  const tabRoute = parts[tabIndex];
+  // First part is always the tab route
+  const tabRoute = parts[0];
   const tab = ROUTE_TO_TAB[tabRoute] || 'voice';
 
-  // Check for project deep link
-  if (tab === 'projects' && parts[tabIndex + 1]) {
-    return { tab, projectId: parts[tabIndex + 1], lang };
+  // Check for project deep link: #/projects/{id} or #/projects/{id}/{lang}
+  if (tab === 'projects' && parts[1]) {
+    // Check if last part is a language code
+    const lastPart = parts[2];
+    if (lastPart && SUPPORTED_LANGS.includes(lastPart as SupportedLanguage)) {
+      return { tab, projectId: parts[1], lang: lastPart as SupportedLanguage };
+    }
+    // Check if second part is language (no project id, just #/projects/en)
+    if (SUPPORTED_LANGS.includes(parts[1] as SupportedLanguage)) {
+      return { tab, lang: parts[1] as SupportedLanguage };
+    }
+    return { tab, projectId: parts[1] };
   }
 
-  return { tab, lang };
+  // Regular tab: #/chat or #/chat/en
+  if (parts[1] && SUPPORTED_LANGS.includes(parts[1] as SupportedLanguage)) {
+    return { tab, lang: parts[1] as SupportedLanguage };
+  }
+
+  return { tab };
 }
 
 function App() {
@@ -94,10 +101,13 @@ function App() {
   }, []);
 
   // Update URL hash when navigation or language changes
+  // Format: #/tab/lang or #/projects/project-id/lang
   const updateHash = useCallback((tab: TabId, projectId?: string, lang?: SupportedLanguage) => {
     const route = TAB_ROUTES[tab];
     const langCode = lang || currentLang;
-    const hash = projectId ? `#/${langCode}/${route}/${projectId}` : `#/${langCode}/${route}`;
+    const hash = projectId
+      ? `#/${route}/${projectId}/${langCode}`
+      : `#/${route}/${langCode}`;
     if (window.location.hash !== hash) {
       window.history.pushState(null, '', hash);
     }
@@ -148,7 +158,7 @@ function App() {
   // Set initial hash if none
   useEffect(() => {
     if (!window.location.hash) {
-      window.history.replaceState(null, '', `#/${currentLang}/${TAB_ROUTES[activeTab]}`);
+      window.history.replaceState(null, '', `#/${TAB_ROUTES[activeTab]}/${currentLang}`);
     }
   }, []);
 

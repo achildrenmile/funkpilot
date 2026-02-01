@@ -10,12 +10,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.15.2',
+    date: '2026-02-01',
+    title: 'Cleaner URL Format',
+    changes: [
+      { type: 'improvement', text: 'Language moved to end of URL for better readability' },
+      { type: 'feature', text: 'New format: #/projects/meshtastic-getting-started/sl' },
+      { type: 'improvement', text: 'Content-first URLs are easier to share' },
+    ],
+  },
+  {
     version: '1.15.1',
     date: '2026-02-01',
     title: 'Shareable Language URLs',
     changes: [
       { type: 'feature', text: 'Language now included in URL for direct sharing' },
-      { type: 'feature', text: 'Share links like #/en/projects/meshtastic-getting-started' },
       { type: 'fix', text: 'Guide content now updates when switching language' },
     ],
   },
