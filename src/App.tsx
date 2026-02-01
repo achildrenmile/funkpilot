@@ -18,7 +18,10 @@ import { useConfig } from './hooks/useConfig';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
+import { changeLanguage, getCurrentLanguage, type SupportedLanguage } from './i18n';
 import type { TabId, UserSettings, SolarData } from './types';
+
+const SUPPORTED_LANGS = ['de', 'en', 'sl'] as const;
 
 // Map tab IDs to URL-friendly names
 const TAB_ROUTES: Record<TabId, string> = {
@@ -35,30 +38,44 @@ const ROUTE_TO_TAB: Record<string, TabId> = Object.fromEntries(
   Object.entries(TAB_ROUTES).map(([k, v]) => [v, k as TabId])
 ) as Record<string, TabId>;
 
-// Parse hash route: #/tab or #/projects/project-id
-function parseHash(): { tab: TabId; projectId?: string } {
+// Parse hash route: #/lang/tab or #/lang/projects/project-id
+// Also supports legacy format: #/tab or #/projects/project-id
+function parseHash(): { tab: TabId; projectId?: string; lang?: SupportedLanguage } {
   const hash = window.location.hash.slice(1); // Remove #
   if (!hash || hash === '/') return { tab: 'voice' };
 
   const parts = hash.split('/').filter(Boolean);
-  const tabRoute = parts[0];
+
+  // Check if first part is a language code
+  let lang: SupportedLanguage | undefined;
+  let tabIndex = 0;
+
+  if (SUPPORTED_LANGS.includes(parts[0] as SupportedLanguage)) {
+    lang = parts[0] as SupportedLanguage;
+    tabIndex = 1;
+  }
+
+  const tabRoute = parts[tabIndex];
   const tab = ROUTE_TO_TAB[tabRoute] || 'voice';
 
   // Check for project deep link
-  if (tab === 'projects' && parts[1]) {
-    return { tab, projectId: parts[1] };
+  if (tab === 'projects' && parts[tabIndex + 1]) {
+    return { tab, projectId: parts[tabIndex + 1], lang };
   }
 
-  return { tab };
+  return { tab, lang };
 }
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Initialize from URL hash
   const initialRoute = parseHash();
   const [activeTab, setActiveTab] = useState<TabId>(initialRoute.tab);
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(initialRoute.projectId);
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(
+    initialRoute.lang || getCurrentLanguage()
+  );
 
   const [settings, setSettings] = useState<UserSettings>(getUserSettings());
   const [solarData, setSolarData] = useState<SolarData | null>(null);
@@ -69,14 +86,22 @@ function App() {
   const [hasNewChanges, setHasNewChanges] = useState(!hasSeenChangelog(LATEST_VERSION));
   const { config } = useConfig();
 
-  // Update URL hash when navigation changes
-  const updateHash = useCallback((tab: TabId, projectId?: string) => {
+  // Apply language from URL on initial load
+  useEffect(() => {
+    if (initialRoute.lang && initialRoute.lang !== getCurrentLanguage()) {
+      changeLanguage(initialRoute.lang);
+    }
+  }, []);
+
+  // Update URL hash when navigation or language changes
+  const updateHash = useCallback((tab: TabId, projectId?: string, lang?: SupportedLanguage) => {
     const route = TAB_ROUTES[tab];
-    const hash = projectId ? `#/${route}/${projectId}` : `#/${route}`;
+    const langCode = lang || currentLang;
+    const hash = projectId ? `#/${langCode}/${route}/${projectId}` : `#/${langCode}/${route}`;
     if (window.location.hash !== hash) {
       window.history.pushState(null, '', hash);
     }
-  }, []);
+  }, [currentLang]);
 
   // Handle tab change
   const handleTabChange = useCallback((tab: TabId) => {
@@ -97,16 +122,33 @@ function App() {
       const route = parseHash();
       setActiveTab(route.tab);
       setSelectedProjectId(route.projectId);
+      if (route.lang && route.lang !== currentLang) {
+        changeLanguage(route.lang);
+        setCurrentLang(route.lang);
+      }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [currentLang]);
+
+  // Sync language state with i18n changes (from LanguageSelector)
+  useEffect(() => {
+    const handleLanguageChanged = (lng: string) => {
+      const lang = lng.split('-')[0] as SupportedLanguage;
+      if (SUPPORTED_LANGS.includes(lang) && lang !== currentLang) {
+        setCurrentLang(lang);
+        updateHash(activeTab, selectedProjectId, lang);
+      }
+    };
+    i18n.on('languageChanged', handleLanguageChanged);
+    return () => i18n.off('languageChanged', handleLanguageChanged);
+  }, [i18n, activeTab, selectedProjectId, currentLang, updateHash]);
 
   // Set initial hash if none
   useEffect(() => {
     if (!window.location.hash) {
-      window.history.replaceState(null, '', `#/${TAB_ROUTES[activeTab]}`);
+      window.history.replaceState(null, '', `#/${currentLang}/${TAB_ROUTES[activeTab]}`);
     }
   }, []);
 
