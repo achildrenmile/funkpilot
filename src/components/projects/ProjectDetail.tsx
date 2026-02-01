@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, ExternalLink, Cpu, Lightbulb, RotateCcw } from 'lucide-react';
 import type { HamProject } from '../../types/projects';
 import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS, getLocalized } from '../../types/projects';
@@ -21,6 +21,13 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
   const [currentCode, setCurrentCode] = useState(code);
   const [isModified, setIsModified] = useState(false);
   const category = CATEGORY_INFO[project.category];
+
+  // Update code when language changes (important for guides)
+  useEffect(() => {
+    if (!isModified) {
+      setCurrentCode(code);
+    }
+  }, [code, isModified]);
   const hardware = HARDWARE_INFO[project.hardware];
 
   const handleCodeUpdate = (newCode: string) => {
