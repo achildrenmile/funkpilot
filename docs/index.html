@@ -206,6 +206,8 @@
 
     /* ── Projects grid ──────────────────────── */
     .grid-proj { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+    .proj-cat { font-size: .85rem; font-weight: 600; color: var(--accent); margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .05em; }
+    .proj-cat:first-of-type { margin-top: 0; }
     .proj {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color);
@@ -387,7 +389,7 @@
         <div class="card">
           <div class="card-icon">🔍</div>
           <h3 data-i18n="feat_call_t">Rufzeichen-Finder</h3>
-          <p data-i18n="feat_call_d">Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.</p>
+          <p data-i18n="feat_call_d">Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in allen Bundesländern.</p>
           <span class="card-badge badge-new" data-i18n="badge_new">Neu</span>
         </div>
         <div class="card">
@@ -422,29 +424,66 @@
   <section id="projekte" class="section fade">
     <div class="wrap">
       <div class="section-tag" data-i18n="proj_tag">Bastelprojekte</div>
-      <h2 class="section-title" data-i18n="proj_title">Arduino & ESP32 Projekte</h2>
+      <h2 class="section-title" data-i18n="proj_title">Arduino, ESP32 & Mesh/LoRa</h2>
       <p class="section-desc" data-i18n="proj_desc">Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.</p>
 
+      <h3 class="proj-cat" data-i18n="proj_cat_mesh">Mesh / LoRa</h3>
       <div class="grid-proj">
-        <div class="proj"><span class="proj-icon">📟</span><div class="proj-text"><strong data-i18n="p_morse_dec">Morse-Decoder</strong><span data-i18n="p_morse_dec_d">OLED Display</span></div></div>
-        <div class="proj"><span class="proj-icon">🎓</span><div class="proj-text"><strong data-i18n="p_morse_tr">Morse-Trainer</strong><span data-i18n="p_morse_tr_d">Koch-Methode</span></div></div>
+        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong>Meshtastic</strong><span>Getting Started</span></div></div>
+        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong>MeshCom</strong><span>Einstieg</span></div></div>
+        <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong>MeshCore</strong><span>Getting Started</span></div></div>
+        <div class="proj"><span class="proj-icon">☀️</span><div class="proj-text"><strong data-i18n="p_solar">Solar Mesh-Node</strong><span data-i18n="p_solar_d">Autark</span></div></div>
+        <div class="proj"><span class="proj-icon">📦</span><div class="proj-text"><strong data-i18n="p_enclosure">LoRa-Gehäuse</strong><span data-i18n="p_enclosure_d">Wetterfest</span></div></div>
+        <div class="proj"><span class="proj-icon">📶</span><div class="proj-text"><strong data-i18n="p_ant868">868 MHz Antenne</strong><span>DIY</span></div></div>
+        <div class="proj"><span class="proj-icon">📏</span><div class="proj-text"><strong data-i18n="p_range">Reichweiten-Tester</strong><span>LoRa</span></div></div>
+        <div class="proj"><span class="proj-icon">🔁</span><div class="proj-text"><strong data-i18n="p_repeater">Repeater & Gateway</strong><span>Meshtastic</span></div></div>
+        <div class="proj"><span class="proj-icon">⚖️</span><div class="proj-text"><strong data-i18n="p_fwcomp">Firmware-Vergleich</strong><span data-i18n="p_fwcomp_d">3 Systeme</span></div></div>
+        <div class="proj"><span class="proj-icon">🌐</span><div class="proj-text"><strong>MQTT-Bridge</strong><span>Internet</span></div></div>
+        <div class="proj"><span class="proj-icon">🔗</span><div class="proj-text"><strong data-i18n="p_aprsgw">APRS-Gateway</strong><span>Meshtastic ↔ APRS</span></div></div>
+        <div class="proj"><span class="proj-icon">🗺️</span><div class="proj-text"><strong data-i18n="p_meshplan">Netzwerk planen</strong><span>Mesh</span></div></div>
+        <div class="proj"><span class="proj-icon">🌡️</span><div class="proj-text"><strong data-i18n="p_sensors">Sensoren</strong><span>Meshtastic</span></div></div>
+        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong data-i18n="p_hammode">HAM-Modus</strong><span>Meshtastic</span></div></div>
+        <div class="proj"><span class="proj-icon">🧮</span><div class="proj-text"><strong data-i18n="p_loratools">LoRa Tools</strong><span data-i18n="p_loratools_d">Rechner</span></div></div>
+        <div class="proj"><span class="proj-icon">⚙️</span><div class="proj-text"><strong data-i18n="p_customfw">Custom Firmware</strong><span data-i18n="p_customfw_d">Kompilieren</span></div></div>
+      </div>
+
+      <h3 class="proj-cat" data-i18n="proj_cat_cw">CW / Morse</h3>
+      <div class="grid-proj">
+        <div class="proj"><span class="proj-icon">🔑</span><div class="proj-text"><strong>CW-Keyer</strong><span>Basic</span></div></div>
+        <div class="proj"><span class="proj-icon">📟</span><div class="proj-text"><strong data-i18n="p_morse_dec">Morse-Decoder</strong><span>OLED</span></div></div>
+        <div class="proj"><span class="proj-icon">🎓</span><div class="proj-text"><strong data-i18n="p_morse_tr">Morse-Trainer</strong><span>Koch</span></div></div>
         <div class="proj"><span class="proj-icon">📡</span><div class="proj-text"><strong data-i18n="p_beacon">Baken-Keyer</strong><span data-i18n="p_beacon_d">Automatisch</span></div></div>
-        <div class="proj"><span class="proj-icon">🔢</span><div class="proj-text"><strong data-i18n="p_freq">Frequenzzähler</strong><span data-i18n="p_freq_d">bis 8 MHz</span></div></div>
-        <div class="proj"><span class="proj-icon">🔥</span><div class="proj-text"><strong>Dummy Load</strong><span>50Ω, Watt/Temp</span></div></div>
+      </div>
+
+      <h3 class="proj-cat" data-i18n="proj_cat_measure">Messtechnik</h3>
+      <div class="grid-proj">
+        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong>SWR-Meter</strong><span>OLED</span></div></div>
+        <div class="proj"><span class="proj-icon">🔢</span><div class="proj-text"><strong data-i18n="p_freq">Frequenzzähler</strong><span>8 MHz</span></div></div>
+        <div class="proj"><span class="proj-icon">🔥</span><div class="proj-text"><strong>Dummy Load</strong><span>50Ω</span></div></div>
         <div class="proj"><span class="proj-icon">📊</span><div class="proj-text"><strong data-i18n="p_field">Feldstärkemesser</strong><span>S-Meter</span></div></div>
+      </div>
+
+      <h3 class="proj-cat" data-i18n="proj_cat_audio">Audio / NF</h3>
+      <div class="grid-proj">
         <div class="proj"><span class="proj-icon">🎧</span><div class="proj-text"><strong data-i18n="p_cwfilt">CW-Audiofilter</strong><span data-i18n="p_cwfilt_d">Digital einstellbar</span></div></div>
-        <div class="proj"><span class="proj-icon">🔊</span><div class="proj-text"><strong data-i18n="p_amp">NF-Verstärker</strong><span>LM386 + VU-Meter</span></div></div>
+        <div class="proj"><span class="proj-icon">🔊</span><div class="proj-text"><strong data-i18n="p_amp">NF-Verstärker</strong><span>LM386</span></div></div>
         <div class="proj"><span class="proj-icon">🎤</span><div class="proj-text"><strong data-i18n="p_vox">VOX-Schaltung</strong><span>Anti-VOX</span></div></div>
-        <div class="proj"><span class="proj-icon">💻</span><div class="proj-text"><strong>Digimode</strong><span>PSK/RTTY Interface</span></div></div>
-        <div class="proj"><span class="proj-icon">⏱️</span><div class="proj-text"><strong>FT8-Sync</strong><span>NTP Display</span></div></div>
+      </div>
+
+      <h3 class="proj-cat" data-i18n="proj_cat_digital">Digital / APRS</h3>
+      <div class="grid-proj">
+        <div class="proj"><span class="proj-icon">📍</span><div class="proj-text"><strong>APRS-Tracker</strong><span>GPS</span></div></div>
+        <div class="proj"><span class="proj-icon">💻</span><div class="proj-text"><strong>Digimode</strong><span>PSK/RTTY</span></div></div>
+        <div class="proj"><span class="proj-icon">⏱️</span><div class="proj-text"><strong>FT8-Sync</strong><span>NTP</span></div></div>
         <div class="proj"><span class="proj-icon">📦</span><div class="proj-text"><strong>Packet TNC</strong><span>Simple</span></div></div>
+      </div>
+
+      <h3 class="proj-cat" data-i18n="proj_cat_control">Steuerung</h3>
+      <div class="grid-proj">
+        <div class="proj"><span class="proj-icon">⚡</span><div class="proj-text"><strong data-i18n="p_switch">Antennenumschalter</strong><span>4-fach</span></div></div>
         <div class="proj"><span class="proj-icon">🔄</span><div class="proj-text"><strong data-i18n="p_rotor">Rotorsteuerung</strong><span>Presets</span></div></div>
-        <div class="proj"><span class="proj-icon">🔘</span><div class="proj-text"><strong>USB-PTT</strong><span data-i18n="p_ptt_d">Hamlib-kompatibel</span></div></div>
+        <div class="proj"><span class="proj-icon">🔘</span><div class="proj-text"><strong>USB-PTT</strong><span>Hamlib</span></div></div>
         <div class="proj"><span class="proj-icon">🎚️</span><div class="proj-text"><strong data-i18n="p_band">Bandfilter</strong><span data-i18n="p_band_d">Auto-Umschalter</span></div></div>
-        <div class="proj"><span class="proj-icon">📻</span><div class="proj-text"><strong>SWR-Meter</strong><span>Arduino</span></div></div>
-        <div class="proj"><span class="proj-icon">⚡</span><div class="proj-text"><strong data-i18n="p_tuner">Antennen-Tuner</strong><span data-i18n="p_tuner_d">Automatisch</span></div></div>
-        <div class="proj"><span class="proj-icon">🌡️</span><div class="proj-text"><strong data-i18n="p_pa">PA-Monitoring</strong><span data-i18n="p_pa_d">Temperatur</span></div></div>
-        <div class="proj"><span class="proj-icon">🔋</span><div class="proj-text"><strong data-i18n="p_batt">Akku-Monitor</strong><span data-i18n="p_batt_d">Portabel</span></div></div>
       </div>
     </div>
   </section>
@@ -578,20 +617,26 @@
         feat_qso_t:'QSO-Chat-Assistent', feat_qso_d:'KI-Chat für Amateurfunk-Fragen. Versteht Kontext und kennt OE-Regeln.',
         feat_contest_t:'Contest-Log-Analyse', feat_contest_d:'ADIF importieren, per KI analysieren — Statistiken und Bandverteilung.',
         feat_prop_t:'Propagation-Berater', feat_prop_d:'Echtzeit-Solardaten, Bandprognosen und DX-Empfehlungen.',
-        feat_call_t:'Rufzeichen-Finder', feat_call_d:'Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in 9 Bundesländern.',
+        feat_call_t:'Rufzeichen-Finder', feat_call_d:'Schwarzfunker-Erkennung, Suffix-Verfügbarkeit in allen Bundesländern.',
         feat_web_t:'Web-Suche', feat_web_d:'EU-konforme Suche via Tavily mit klickbaren Links und DSGVO-Warnung.',
         feat_code_t:'KI Code-Anpassung', feat_code_d:'Bastelprojekt-Code per Chat individuell anpassen mit Quick-Prompts.',
         feat_live_t:'Live-Verarbeitung', feat_live_d:'Status-Icons für Web-Suche, Rufzeichen-Lookup und Tool-Ausführung.',
         feat_mcp_t:'OERadio MCP Tools', feat_mcp_d:'Ham Radio MCP-Tools im Chat. Verlauf mit Auto-Titel-Generierung.',
         badge_ki:'KI', badge_new:'Neu',
-        proj_tag:'Bastelprojekte', proj_title:'Arduino & ESP32 Projekte',
+        proj_tag:'Bastelprojekte', proj_title:'Arduino, ESP32 & Mesh/LoRa',
         proj_desc:'Code, Stückliste, Verdrahtungstabelle, Wokwi-Simulator und KI-Bauanleitung.',
-        p_morse_dec:'Morse-Decoder', p_morse_dec_d:'OLED Display', p_morse_tr:'Morse-Trainer', p_morse_tr_d:'Koch-Methode',
-        p_beacon:'Baken-Keyer', p_beacon_d:'Automatisch', p_freq:'Frequenzzähler', p_freq_d:'bis 8 MHz',
+        proj_cat_mesh:'Mesh / LoRa', proj_cat_cw:'CW / Morse', proj_cat_measure:'Messtechnik',
+        proj_cat_audio:'Audio / NF', proj_cat_digital:'Digital / APRS', proj_cat_control:'Steuerung',
+        p_solar:'Solar Mesh-Node', p_solar_d:'Autark', p_enclosure:'LoRa-Gehäuse', p_enclosure_d:'Wetterfest',
+        p_ant868:'868 MHz Antenne', p_range:'Reichweiten-Tester', p_repeater:'Repeater & Gateway',
+        p_fwcomp:'Firmware-Vergleich', p_fwcomp_d:'3 Systeme', p_aprsgw:'APRS-Gateway',
+        p_meshplan:'Netzwerk planen', p_sensors:'Sensoren', p_hammode:'HAM-Modus',
+        p_loratools:'LoRa Tools', p_loratools_d:'Rechner', p_customfw:'Custom Firmware', p_customfw_d:'Kompilieren',
+        p_morse_dec:'Morse-Decoder', p_morse_tr:'Morse-Trainer',
+        p_beacon:'Baken-Keyer', p_beacon_d:'Automatisch', p_freq:'Frequenzzähler',
         p_field:'Feldstärkemesser', p_cwfilt:'CW-Audiofilter', p_cwfilt_d:'Digital einstellbar',
-        p_amp:'NF-Verstärker', p_vox:'VOX-Schaltung', p_rotor:'Rotorsteuerung', p_ptt_d:'Hamlib-kompatibel',
-        p_band:'Bandfilter', p_band_d:'Auto-Umschalter', p_tuner:'Antennen-Tuner', p_tuner_d:'Automatisch',
-        p_pa:'PA-Monitoring', p_pa_d:'Temperatur', p_batt:'Akku-Monitor', p_batt_d:'Portabel',
+        p_amp:'NF-Verstärker', p_vox:'VOX-Schaltung', p_rotor:'Rotorsteuerung',
+        p_band:'Bandfilter', p_band_d:'Auto-Umschalter', p_switch:'Antennenumschalter',
         rel_title:'Versionshistorie', rel_desc:'Vom ersten Release bis heute.', rel_latest:'Latest',
         rel_113_date:'31. Jänner 2026',
         rel_113:'LoRa Interaktive Tools: Hardware-Vergleich, Reichweiten-Rechner, Custom Firmware Guide. Chat empfiehlt passende Projekte.',
@@ -617,20 +662,26 @@
         feat_qso_t:'QSO Chat Assistant', feat_qso_d:'AI chat for ham radio questions. Understands context and Austrian regulations.',
         feat_contest_t:'Contest Log Analysis', feat_contest_d:'Import ADIF, analyze with AI — statistics and band distribution.',
         feat_prop_t:'Propagation Advisor', feat_prop_d:'Real-time solar data, band forecasts and DX recommendations.',
-        feat_call_t:'Callsign Finder', feat_call_d:'Pirate detection, suffix availability across 9 Austrian provinces.',
+        feat_call_t:'Callsign Finder', feat_call_d:'Pirate detection, suffix availability across all Austrian provinces.',
         feat_web_t:'Web Search', feat_web_d:'EU-compliant search via Tavily with clickable links and GDPR notice.',
         feat_code_t:'AI Code Customization', feat_code_d:'Customize project code via chat with quick prompts.',
         feat_live_t:'Live Processing', feat_live_d:'Status icons for web search, callsign lookup and tool execution.',
         feat_mcp_t:'OERadio MCP Tools', feat_mcp_d:'Ham radio MCP tools in chat. History with auto-title generation.',
         badge_ki:'AI', badge_new:'New',
-        proj_tag:'DIY Projects', proj_title:'Arduino & ESP32 Projects',
+        proj_tag:'DIY Projects', proj_title:'Arduino, ESP32 & Mesh/LoRa',
         proj_desc:'Code, parts list, wiring table, Wokwi simulator and AI build guide.',
-        p_morse_dec:'Morse Decoder', p_morse_dec_d:'OLED Display', p_morse_tr:'Morse Trainer', p_morse_tr_d:'Koch Method',
-        p_beacon:'Beacon Keyer', p_beacon_d:'Automatic', p_freq:'Frequency Counter', p_freq_d:'up to 8 MHz',
+        proj_cat_mesh:'Mesh / LoRa', proj_cat_cw:'CW / Morse', proj_cat_measure:'Measurement',
+        proj_cat_audio:'Audio / AF', proj_cat_digital:'Digital / APRS', proj_cat_control:'Control',
+        p_solar:'Solar Mesh Node', p_solar_d:'Self-sufficient', p_enclosure:'LoRa Enclosure', p_enclosure_d:'Weatherproof',
+        p_ant868:'868 MHz Antenna', p_range:'Range Tester', p_repeater:'Repeater & Gateway',
+        p_fwcomp:'Firmware Comparison', p_fwcomp_d:'3 Systems', p_aprsgw:'APRS Gateway',
+        p_meshplan:'Network Planning', p_sensors:'Sensors', p_hammode:'HAM Mode',
+        p_loratools:'LoRa Tools', p_loratools_d:'Calculator', p_customfw:'Custom Firmware', p_customfw_d:'Compile',
+        p_morse_dec:'Morse Decoder', p_morse_tr:'Morse Trainer',
+        p_beacon:'Beacon Keyer', p_beacon_d:'Automatic', p_freq:'Frequency Counter',
         p_field:'Field Strength Meter', p_cwfilt:'CW Audio Filter', p_cwfilt_d:'Digitally adjustable',
-        p_amp:'AF Amplifier', p_vox:'VOX Circuit', p_rotor:'Rotor Controller', p_ptt_d:'Hamlib compatible',
-        p_band:'Band Filter', p_band_d:'Auto Switcher', p_tuner:'Antenna Tuner', p_tuner_d:'Automatic',
-        p_pa:'PA Monitoring', p_pa_d:'Temperature', p_batt:'Battery Monitor', p_batt_d:'Portable',
+        p_amp:'AF Amplifier', p_vox:'VOX Circuit', p_rotor:'Rotor Control',
+        p_band:'Band Filter', p_band_d:'Auto Switch', p_switch:'Antenna Switch',
         rel_title:'Version History', rel_desc:'From first release to today.', rel_latest:'Latest',
         rel_113_date:'January 31, 2026',
         rel_113:'LoRa interactive tools: hardware comparison, range calculator, custom firmware guide. Chat recommends matching projects.',
@@ -656,20 +707,26 @@
         feat_qso_t:'QSO klepetalni pomočnik', feat_qso_d:'KI-klepet za radioamaterska vprašanja. Razume kontekst in avstrijska pravila.',
         feat_contest_t:'Analiza tekmovalnega dnevnika', feat_contest_d:'Uvoz ADIF, analiza s KI — statistika in razporeditev po pasovih.',
         feat_prop_t:'Svetovalec za propagacijo', feat_prop_d:'Sončni podatki v realnem času, napovedi pasov in DX priporočila.',
-        feat_call_t:'Iskalnik klicnih znakov', feat_call_d:'Odkrivanje piratov, razpoložljivost sufiksov v 9 zveznih deželah.',
+        feat_call_t:'Iskalnik klicnih znakov', feat_call_d:'Odkrivanje piratov, razpoložljivost sufiksov v vseh zveznih deželah.',
         feat_web_t:'Spletno iskanje', feat_web_d:'EU-skladno iskanje prek Tavily s klikljivimi povezavami in GDPR opozorilom.',
         feat_code_t:'KI prilagoditev kode', feat_code_d:'Prilagodite kodo projektov prek klepeta s hitrimi ukazi.',
         feat_live_t:'Obdelava v živo', feat_live_d:'Statusne ikone za spletno iskanje, iskanje klicnih znakov in izvajanje orodij.',
         feat_mcp_t:'OERadio MCP orodja', feat_mcp_d:'Radioamaterska MCP orodja v klepetu. Zgodovina z avtomatskim generiranjem naslovov.',
         badge_ki:'KI', badge_new:'Novo',
-        proj_tag:'Projekti za izdelavo', proj_title:'Arduino & ESP32 projektov',
+        proj_tag:'Projekti za izdelavo', proj_title:'Arduino, ESP32 & Mesh/LoRa',
         proj_desc:'Koda, seznam delov, tabela povezav, Wokwi simulator in KI navodila za gradnjo.',
-        p_morse_dec:'Morse dekoder', p_morse_dec_d:'OLED zaslon', p_morse_tr:'Morse trener', p_morse_tr_d:'Koch metoda',
-        p_beacon:'Beacon keyer', p_beacon_d:'Avtomatski', p_freq:'Frekvenčni števec', p_freq_d:'do 8 MHz',
+        proj_cat_mesh:'Mesh / LoRa', proj_cat_cw:'CW / Morse', proj_cat_measure:'Merilna tehnika',
+        proj_cat_audio:'Avdio / NF', proj_cat_digital:'Digitalno / APRS', proj_cat_control:'Krmiljenje',
+        p_solar:'Solarno Mesh vozlišče', p_solar_d:'Avtonomno', p_enclosure:'LoRa ohišje', p_enclosure_d:'Vodoodporno',
+        p_ant868:'868 MHz antena', p_range:'Tester dosega', p_repeater:'Repeater & Gateway',
+        p_fwcomp:'Primerjava firmware', p_fwcomp_d:'3 sistemi', p_aprsgw:'APRS prehod',
+        p_meshplan:'Načrtovanje omrežja', p_sensors:'Senzorji', p_hammode:'HAM način',
+        p_loratools:'LoRa orodja', p_loratools_d:'Kalkulator', p_customfw:'Lastna firmware', p_customfw_d:'Kompilacija',
+        p_morse_dec:'Morse dekoder', p_morse_tr:'Morse trener',
+        p_beacon:'Beacon keyer', p_beacon_d:'Avtomatski', p_freq:'Frekvenčni števec',
         p_field:'Merilnik jakosti polja', p_cwfilt:'CW avdio filter', p_cwfilt_d:'Digitalno nastavljiv',
-        p_amp:'NF ojačevalnik', p_vox:'VOX vezje', p_rotor:'Krmilnik rotorja', p_ptt_d:'Hamlib združljiv',
-        p_band:'Pasovni filter', p_band_d:'Avto preklopnik', p_tuner:'Antenski uglasnik', p_tuner_d:'Avtomatski',
-        p_pa:'PA nadzor', p_pa_d:'Temperatura', p_batt:'Monitor baterije', p_batt_d:'Prenosni',
+        p_amp:'NF ojačevalnik', p_vox:'VOX vezje', p_rotor:'Krmilnik rotorja',
+        p_band:'Pasovni filter', p_band_d:'Avto preklopnik', p_switch:'Antensko stikalo',
         rel_title:'Zgodovina verzij', rel_desc:'Od prve izdaje do danes.', rel_latest:'Najnovejša',
         rel_113_date:'31. januar 2026',
         rel_113:'LoRa interaktivna orodja: primerjava strojne opreme, kalkulator dosega, vodič za lastno strojno programsko opremo. Klepet priporoča ustrezne projekte.',
