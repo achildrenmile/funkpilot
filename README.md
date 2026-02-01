@@ -1,4 +1,4 @@
-# FunkPilot - KI-Assistent für Funkamateure
+# FunkPilot - AI Assistant for Amateur Radio
 
 <p align="center">
   <img src="public/favicon.svg" alt="FunkPilot Logo" width="100" height="100">
@@ -8,275 +8,283 @@
   <strong>🇦🇹 Deutsch</strong> | <strong>🇬🇧 English</strong> | <strong>🇸🇮 Slovenščina</strong>
 </p>
 
-FunkPilot ist ein moderner Web-Assistent für Funkamateure, der KI-Funktionen mit praktischen Tools für den Amateurfunk-Betrieb kombiniert.
+FunkPilot is a modern web assistant for amateur radio operators, combining AI capabilities with practical tools for ham radio operation.
 
 ## Features
 
 ### 🎙️ Voice CQ Generator
-- Generiere natürlich klingende CQ-Rufe und Contest-Phrasen
-- **Edge TTS Neural Voices** (kostenlos, hochwertig)
-  - Englisch: Guy, Christopher, Jenny (US), Ryan, Sonia (UK)
-  - Deutsch: Ingrid, Jonas (AT), Conrad, Katja (DE)
-- NATO-Phonetik Unterstützung für Rufzeichen
-- Vorlagen für alle gängigen Contests (CQWW, WPX, SOTA, POTA)
-- Browser TTS als Fallback
+- Generate natural-sounding CQ calls and contest phrases
+- **Edge TTS Neural Voices** (free, high quality)
+  - English: Guy, Christopher, Jenny (US), Ryan, Sonia (UK)
+  - German: Ingrid, Jonas (AT), Conrad, Katja (DE)
+- NATO phonetic alphabet support for callsigns
+- Templates for common contests (CQWW, WPX, SOTA, POTA)
+- Browser TTS as fallback
 
-### 🤖 QSO-Chat-Assistent
-- KI-gestützter Chat speziell für Amateurfunk-Fragen
-- **Transparente Verarbeitung**: Live-Status während der Verarbeitung
-  - 🌐 Web-Suche (Tavily) für aktuelle Infos
-  - 📻 Rufzeichen-Lookup (OE-Liste, QRZ, HamQTH)
-  - 🔍 Suffix-Verfügbarkeitsprüfung
-  - 👤 Rufzeichen-Vorschläge generieren
-  - ✨ KI-Verarbeitung
-- **Rufzeichen-Abfrage**: Automatische Suche in offizieller OE-Liste, QRZ.com & HamQTH
-- **Web-Suche**: Aktuelle Infos zu Contests, Propagation & News (via Tavily)
-- Technik, Betriebsverfahren, Vorschriften
-- Propagation-Beratung mit aktuellen Solar-Daten
-- **Chat-Verlauf** mit mehreren Konversationen:
-  - Sidebar mit allen Chats (Desktop: permanent, Mobile: Drawer)
-  - Automatische Titel-Generierung aus erster Nachricht
-  - Zwischen Konversationen wechseln
-  - Chats löschen
-  - Lokale Speicherung (max. 50 Chats, 50 Nachrichten/Chat)
+### 🤖 QSO Chat Assistant
+- AI-powered chat specifically for amateur radio questions
+- **Transparent Processing**: Live status during processing
+  - 🌐 Web search (Tavily) for current information
+  - 📻 Callsign lookup (OE list, QRZ, HamQTH)
+  - 🔍 Suffix availability check
+  - 👤 Callsign suggestion generator
+  - ✨ AI processing
+- **Callsign Query**: Automatic search in official OE list, QRZ.com & HamQTH
+- **Web Search**: Current info on contests, propagation & news (via Tavily)
+- Technical questions, operating procedures, regulations
+- Propagation advice with current solar data
+- **Chat History** with multiple conversations:
+  - Sidebar with all chats (Desktop: permanent, Mobile: drawer)
+  - Automatic title generation from first message
+  - Switch between conversations
+  - Delete chats
+  - Local storage (max 50 chats, 50 messages/chat)
 - **QRZ.com Integration**:
-  - Automatische Rufzeichen-Abfrage bei Erwähnung im Chat
-  - Name, QTH, Grid-Locator, Lizenzklasse
-  - Benötigt QRZ XML Subscription
-- **Ham Radio Tools** (mit Groq MCP):
-  - Bandplan-Abfragen
-  - Wellenlängen-Berechnung
-  - EIRP-Berechnung
-  - Kabelverlust-Berechnung
-  - SWR-Verlust-Berechnung
-  - Akkulaufzeit-Berechnung
-  - Leistungs-Umrechnung (W ↔ dBm)
+  - Automatic callsign query when mentioned in chat
+  - Name, QTH, grid locator, license class
+  - Requires QRZ XML Subscription
+- **Ham Radio Tools** (with Groq MCP):
+  - Band plan queries
+  - Wavelength calculation
+  - EIRP calculation
+  - Cable loss calculation
+  - SWR loss calculation
+  - Battery runtime calculation
+  - Power conversion (W ↔ dBm)
 
-### 📊 Contest-Log-Analyse
-- ADIF-Import für Contest-Logs
-- Detaillierte Statistiken
-- KI-generierte Analyse mit Verbesserungsvorschlägen
+### 📊 Contest Log Analysis
+- ADIF import for contest logs
+- Detailed statistics
+- AI-generated analysis with improvement suggestions
 
-### 📻 Rufzeichen-Finder
-- **Rufzeichen-Suche**: OE-Rufzeichen nachschlagen mit offiziellen Daten vom Fernmeldebüro
-- **Schwarzfunker-Erkennung**: Warnung wenn Rufzeichen in QRZ aber nicht offiziell registriert
-- **Verfügbarkeitsprüfung**: Suffix in allen 9 Bundesländern (OE1-OE9) prüfen
-- **Vorschlagsgenerator**: Passende Rufzeichen basierend auf Namen generieren
-- **Chat-Integration**: Alle Features auch direkt im Chat nutzbar
-  - "Wer ist OE3NSC?" → Rufzeichen-Lookup
-  - "Ist Suffix ABC noch frei?" → Verfügbarkeit prüfen
-  - "Rufzeichen für Max Mustermann" → Vorschläge generieren
-- Datenquelle: Offizielle Fernmeldebüro-Liste (7400+ OE-Rufzeichen)
+### 📻 Callsign Finder
+- **Callsign Search**: Look up OE callsigns with official data from the telecommunications office
+- **Pirate Detection**: Warning if callsign exists in QRZ but is not officially registered
+- **Availability Check**: Check suffix in all 9 states (OE1-OE9)
+- **Suggestion Generator**: Generate matching callsigns based on names
+- **Chat Integration**: All features also available directly in chat
+  - "Who is OE3NSC?" → Callsign lookup
+  - "Is suffix ABC still available?" → Check availability
+  - "Callsign for Max Mustermann" → Generate suggestions
+- Data source: Official telecommunications office list (7400+ OE callsigns)
 
-### 🌍 Propagation-Berater
-- Echtzeit Solar-Daten (SFI, K-Index, A-Index)
-- **QTH-basierte Berechnungen** (Tag/Nacht/Greyline basierend auf deinem Standort)
-- Band-Status für alle Bänder (6m - 160m)
-- KI-Empfehlungen für DX-Verbindungen
+### 🌍 Propagation Advisor
+- Real-time solar data (SFI, K-Index, A-Index)
+- **QTH-based calculations** (day/night/greyline based on your location)
+- Band status for all bands (6m - 160m)
+- AI recommendations for DX connections
 
-### 🌍 Mehrsprachigkeit
-- **Drei Sprachen**: Deutsch (Standard), English, Slovenščina
-- **Automatische Spracherkennung**: Browser-Sprache wird erkannt
-- **Sprachauswahl**: Im Header und in Einstellungen
-- **Vollständig übersetzt**: Alle UI-Texte in allen Sprachen
+### 🔧 DIY Projects
+- **35 Ham Radio Projects** with full documentation
+- Build guides, code, wiring diagrams
+- Categories: CW/Morse, Measurement, Antenna, Digital/APRS, Audio, Control, Mesh/LoRa
+- **Available in 3 languages**: German, English, Slovenian
+- **Deep linking**: Share projects directly via URL
+
+### 🌍 Multilingual
+- **Three Languages**: German (default), English, Slovenščina
+- **Automatic Detection**: Browser language is detected
+- **Language Selection**: In header and settings
+- **Fully Translated**: All UI text in all languages
+- **Shareable URLs**: Language in URL (e.g., `#/projects/meshtastic-getting-started/sl`)
 
 ### 🎨 Themes & Design
-- **Dunkel-Modus** (Standard) - Augenfreundlich für lange Betriebssessions
-- **Hell-Modus** - Bessere Lesbarkeit bei Tageslicht
-- **Responsive Design** - Optimiert für Desktop, Tablet und Mobile
-- **PWA-Unterstützung** - Installierbar auf Handy/Tablet
-- Einstellung wird lokal gespeichert
+- **Dark Mode** (default) - Easy on the eyes for long operating sessions
+- **Light Mode** - Better readability in daylight
+- **Responsive Design** - Optimized for desktop, tablet and mobile
+- **PWA Support** - Installable on phone/tablet
+- Settings saved locally
 
-### ❓ Hilfe
-- Integrierte Hilfe-Seite mit Feature-Dokumentation
-- Tastenkürzel: `?` öffnet Hilfe-Modal
-- `Esc` schließt Dialoge
+### ❓ Help
+- Integrated help page with feature documentation
+- Keyboard shortcut: `?` opens help modal
+- `Esc` closes dialogs
 
-## Quick Start mit Docker
+## Quick Start with Docker
 
 ```bash
-# Repository klonen
+# Clone repository
 git clone https://github.com/oe8yml/funkpilot.git
 cd funkpilot
 
-# .env Datei erstellen
+# Create .env file
 cp .env.docker .env
 
-# API-Key eintragen (mindestens einen)
+# Add API key (at least one required)
 nano .env
 
-# Docker Container starten
+# Start Docker container
 docker compose up -d
 ```
 
-Die App läuft unter http://localhost:3001
+The app runs at http://localhost:3001
 
-## API-Keys
+## API Keys
 
-FunkPilot unterstützt drei KI-Provider. Mindestens einer muss konfiguriert werden:
+FunkPilot supports three AI providers. At least one must be configured:
 
-### Option 1: Groq (Empfohlen - Kostenlos + Ham Radio Tools)
-- **Llama 3.3 70B ist komplett kostenlos** mit großzügigen Rate Limits
-- Sehr schnelle Antwortzeiten
-- **MCP Integration**: Zugang zu Ham Radio Berechnungs-Tools
-  - Bandplan, Wellenlänge, EIRP, Kabelverlust, SWR, Akkulaufzeit
-- Key erstellen: [console.groq.com/keys](https://console.groq.com/keys)
+### Option 1: Groq (Recommended - Free + Ham Radio Tools)
+- **Llama 3.3 70B is completely free** with generous rate limits
+- Very fast response times
+- **MCP Integration**: Access to Ham Radio calculation tools
+  - Band plan, wavelength, EIRP, cable loss, SWR, battery runtime
+- Create key: [console.groq.com/keys](https://console.groq.com/keys)
 
 ```bash
 GROQ_API_KEY=gsk_...
 ```
 
-### Option 2: Anthropic Claude (Beste Qualität)
-- Höchste Qualität für deutschsprachige Antworten
-- Kosten: ~$3/Million Tokens
-- Key erstellen: [console.anthropic.com](https://console.anthropic.com)
+### Option 2: Anthropic Claude (Best Quality)
+- Highest quality for German language responses
+- Cost: ~$3/Million Tokens
+- Create key: [console.anthropic.com](https://console.anthropic.com)
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 ### Option 3: OpenRouter (Fallback)
-- Zugang zu vielen Modellen
-- Backup-Option falls andere Provider nicht verfügbar
-- Key erstellen: [openrouter.ai/keys](https://openrouter.ai/keys)
+- Access to many models
+- Backup option if other providers unavailable
+- Create key: [openrouter.ai/keys](https://openrouter.ai/keys)
 
 ```bash
 OPENROUTER_API_KEY=sk-or-...
 ```
 
-### Optional: QRZ.com (Rufzeichen-Lookup)
-- Automatische Abfrage von Rufzeichen-Informationen
-- Zeigt Name, QTH, Grid, Lizenzklasse
-- Benötigt QRZ XML Subscription (~$35/Jahr): [qrz.com/page/xml_data.html](https://www.qrz.com/page/xml_data.html)
+### Optional: QRZ.com (Callsign Lookup)
+- Automatic callsign information query
+- Shows name, QTH, grid, license class
+- Requires QRZ XML Subscription (~$35/year): [qrz.com/page/xml_data.html](https://www.qrz.com/page/xml_data.html)
 
 ```bash
-QRZ_USERNAME=DEIN_RUFZEICHEN
-QRZ_PASSWORD=DEIN_QRZ_PASSWORT
+QRZ_USERNAME=YOUR_CALLSIGN
+QRZ_PASSWORD=YOUR_QRZ_PASSWORD
 ```
 
-### Optional: Tavily (Web-Suche)
-- Aktuelle Informationen zu Contests, Propagation und Amateurfunk-News
-- EU GDPR-konform, keine Speicherung von Suchanfragen
-- Kostenloser API-Key: [tavily.com](https://tavily.com)
+### Optional: Tavily (Web Search)
+- Current information on contests, propagation and amateur radio news
+- EU GDPR compliant, no storage of search queries
+- Free API key: [tavily.com](https://tavily.com)
 
 ```bash
 TAVILY_API_KEY=tvly-...
 ```
 
-### Provider-Priorität
+### Provider Priority
 
-FunkPilot versucht die Provider in dieser Reihenfolge:
-1. **Groq + MCP** (kostenlos, schnell, mit Ham Radio Tools)
-2. **Groq** (Fallback ohne MCP)
-3. **Anthropic** (beste Qualität)
-4. **OpenRouter** (Fallback)
+FunkPilot tries providers in this order:
+1. **Groq + MCP** (free, fast, with Ham Radio Tools)
+2. **Groq** (fallback without MCP)
+3. **Anthropic** (best quality)
+4. **OpenRouter** (fallback)
 
 ### Ham Radio Tools (MCP)
 
-Mit GROQ_API_KEY hat der Chat-Assistent Zugang zu speziellen Amateurfunk-Tools:
+With GROQ_API_KEY, the chat assistant has access to special amateur radio tools:
 
-| Tool | Beschreibung |
+| Tool | Description |
 |------|-------------|
-| `get_band_plan` | IARU Region 1 Bandplan abrufen |
-| `calculate_wavelength` | Wellenlänge aus Frequenz |
-| `calculate_eirp` | EIRP aus TX-Leistung + Antennengewinn |
-| `calculate_cable_loss` | Kabeldämpfung berechnen |
-| `compare_cables` | Kabeltypen vergleichen |
-| `calculate_battery_runtime` | Akkulaufzeit berechnen |
-| `check_frequency` | Frequenz im Bandplan prüfen |
-| `convert_power` | Watt ↔ dBm umrechnen |
-| `calculate_swr_loss` | Verlust durch SWR |
-| `get_antenna_gain` | Antennengewinn nachschlagen |
+| `get_band_plan` | Get IARU Region 1 band plan |
+| `calculate_wavelength` | Wavelength from frequency |
+| `calculate_eirp` | EIRP from TX power + antenna gain |
+| `calculate_cable_loss` | Calculate cable attenuation |
+| `compare_cables` | Compare cable types |
+| `calculate_battery_runtime` | Calculate battery runtime |
+| `check_frequency` | Check frequency in band plan |
+| `convert_power` | Watt ↔ dBm conversion |
+| `calculate_swr_loss` | Loss due to SWR |
+| `get_antenna_gain` | Look up antenna gain |
 
-## Entwicklung
+## Development
 
-### Voraussetzungen
+### Prerequisites
 - Node.js 20+
 - npm
 
-### Lokale Entwicklung
+### Local Development
 
 ```bash
-# Dependencies installieren
+# Install dependencies
 npm install
 
-# Frontend + Backend starten
+# Start frontend + backend
 npm run dev:full
 
-# Nur Frontend
+# Frontend only
 npm run dev
 
-# Nur Backend
+# Backend only
 npm run dev:server
 ```
 
-### Umgebungsvariablen
+### Environment Variables
 
-Erstelle eine `.env` Datei im Root-Verzeichnis:
+Create a `.env` file in the root directory:
 
 ```bash
-# Mindestens einen API-Key setzen (Groq empfohlen)
+# Set at least one API key (Groq recommended)
 GROQ_API_KEY=gsk_...
-# oder
+# or
 ANTHROPIC_API_KEY=sk-ant-...
-# oder
+# or
 OPENROUTER_API_KEY=sk-or-...
 ```
 
 ### Build
 
 ```bash
-# Production Build
+# Production build
 npm run build:all
 
-# Server starten
+# Start server
 npm start
 ```
 
 ### Testing
 
-FunkPilot verwendet Vitest für automatisierte Tests.
+FunkPilot uses Vitest for automated tests.
 
 ```bash
-# Alle Tests ausführen
+# Run all tests
 npm test
 
-# Tests im Watch-Modus
+# Tests in watch mode
 npm run test:watch
 
-# Mit Coverage-Report
+# With coverage report
 npm run test:coverage
 ```
 
-**Getestete Bereiche:**
-- `phonetic.ts` - NATO-Alphabet Konvertierung
-- `locator.ts` - Maidenhead-Locator Berechnungen
-- `adifParser.ts` - ADIF Import/Export
-- `i18n` - Übersetzungs-Vollständigkeit (DE, EN, SL)
-- `API` - Endpunkt-Integration
+**Tested Areas:**
+- `phonetic.ts` - NATO alphabet conversion
+- `locator.ts` - Maidenhead locator calculations
+- `adifParser.ts` - ADIF import/export
+- `i18n` - Translation completeness (DE, EN, SL)
+- `API` - Endpoint integration
 
 ## Docker
 
-### Mit Docker Compose (Empfohlen)
+### With Docker Compose (Recommended)
 
 ```bash
-# Starten
+# Start
 docker compose up -d
 
-# Logs anzeigen
+# View logs
 docker compose logs -f
 
-# Stoppen
+# Stop
 docker compose down
 ```
 
-### Manueller Docker Build
+### Manual Docker Build
 
 ```bash
-# Image bauen
+# Build image
 docker build -t funkpilot .
 
-# Container starten (mit Groq - empfohlen)
+# Start container (with Groq - recommended)
 docker run -d \
   -p 3001:3001 \
   -e GROQ_API_KEY=gsk_... \
@@ -284,14 +292,14 @@ docker run -d \
   funkpilot
 ```
 
-## Projektstruktur
+## Project Structure
 
 ```
 funkpilot/
 ├── src/                    # Frontend (React)
-│   ├── components/         # UI Komponenten
+│   ├── components/         # UI Components
 │   ├── services/          # API Client
-│   ├── utils/             # Hilfsfunktionen
+│   ├── utils/             # Helper functions
 │   └── types/             # TypeScript Types
 ├── server/                 # Backend (Express)
 │   └── index.ts           # API Server
@@ -300,7 +308,7 @@ funkpilot/
 └── package.json
 ```
 
-## Architektur
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -310,19 +318,19 @@ funkpilot/
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │               FRONTEND (React + Vite)                    │   │
 │  │                                                          │   │
-│  │  Voice CQ │ Chat │ Log-Analyse │ Propagation │ Rufzeichen│   │
+│  │  Voice CQ │ Chat │ Log Analysis │ Propagation │ Callsign │   │
 │  └─────────────────────────┬───────────────────────────────┘   │
 │                            │                                   │
 │                            ▼                                   │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │               BACKEND (Express.js)                       │   │
 │  │                                                          │   │
-│  │  /api/chat           - KI Chat (Standard)               │   │
-│  │  /api/chat-groq-mcp  - KI Chat + Ham Radio Tools        │   │
-│  │  /api/callsign/*     - Rufzeichen Suche/Vorschläge      │   │
-│  │  /api/analyze        - Log Analyse                      │   │
-│  │  /api/propagation    - DX Empfehlungen                  │   │
-│  │  /api/solar          - Solar Daten Proxy                │   │
+│  │  /api/chat           - AI Chat (Standard)               │   │
+│  │  /api/chat-groq-mcp  - AI Chat + Ham Radio Tools        │   │
+│  │  /api/callsign/*     - Callsign Search/Suggestions      │   │
+│  │  /api/analyze        - Log Analysis                     │   │
+│  │  /api/propagation    - DX Recommendations               │   │
+│  │  /api/solar          - Solar Data Proxy                 │   │
 │  │  /api/tts/*          - Edge TTS Neural Voices           │   │
 │  └─────────────────────────┬───────────────────────────────┘   │
 │                            │                                   │
@@ -334,7 +342,7 @@ funkpilot/
 │  └───┬────┘ └─────────┘ └──────────┘ └───────────┘ └──────┘ └────────┘│
 │      │                                                        │
 │      │  ┌──────────┐                                         │
-│      │  │ Tavily   │  Web-Suche für aktuelle Infos           │
+│      │  │ Tavily   │  Web search for current info            │
 │      │  │ Search   │  (Contests, Propagation, News)          │
 │      │  └──────────┘                                         │
 │      │                                                        │
@@ -348,11 +356,11 @@ funkpilot/
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Parent-Site Branding
+## Parent Site Branding
 
-FunkPilot kann als Teil einer größeren Website mit eigenem Branding eingebettet werden.
+FunkPilot can be embedded as part of a larger website with custom branding.
 
-### Über Docker Umgebungsvariablen
+### Via Docker Environment Variables
 
 ```bash
 docker run -d \
@@ -363,9 +371,9 @@ docker run -d \
   funkpilot
 ```
 
-### Über config.json
+### Via config.json
 
-Alternativ kann `public/config.json` direkt editiert werden:
+Alternatively, edit `public/config.json` directly:
 
 ```json
 {
@@ -375,36 +383,36 @@ Alternativ kann `public/config.json` direkt editiert werden:
 }
 ```
 
-| Variable | Beschreibung |
+| Variable | Description |
 |----------|-------------|
-| `PARENT_SITE_URL` | URL der übergeordneten Website |
-| `PARENT_SITE_LOGO` | Logo-URL der übergeordneten Website |
-| `PARENT_SITE_NAME` | Name der übergeordneten Website |
+| `PARENT_SITE_URL` | URL of the parent website |
+| `PARENT_SITE_LOGO` | Logo URL of the parent website |
+| `PARENT_SITE_NAME` | Name of the parent website |
 
-## Sicherheit
+## Security
 
-- API-Keys werden nur serverseitig gespeichert
-- Keine API-Keys im Frontend oder LocalStorage
-- CORS konfiguriert für sichere Kommunikation
-- Health-Check Endpoint zeigt nur ob Keys vorhanden sind, nicht die Keys selbst
+- API keys are stored server-side only
+- No API keys in frontend or localStorage
+- CORS configured for secure communication
+- Health check endpoint only shows if keys exist, not the keys themselves
 
-## Amateurfunk-Ressourcen
+## Amateur Radio Resources
 
-- [IARU Region 1 Bandplan](https://www.iaru-r1.org/reference/band-plans/)
-- [ÖVSV Bandplan](https://www.oevsv.at/technik/bandplaene/)
+- [IARU Region 1 Band Plan](https://www.iaru-r1.org/reference/band-plans/)
+- [OEVSV Band Plan](https://www.oevsv.at/technik/bandplaene/)
 - [WA7BNM Contest Calendar](https://www.contestcalendar.com/)
 - [PSK Reporter](https://pskreporter.info/)
 
 ## Contributing
 
-Beiträge sind willkommen! Bitte erstelle einen Pull Request oder Issue auf GitHub.
+Contributions are welcome! Please create a pull request or issue on GitHub.
 
-## Lizenz
+## License
 
-MIT License - siehe [LICENSE](LICENSE)
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
 **73 de OE8YML**
 
-*FunkPilot - Dein KI-Assistent für den Amateurfunk*
+*FunkPilot - Your AI Assistant for Amateur Radio*
