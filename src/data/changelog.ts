@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.14.0',
+    date: '2026-01-31',
+    title: 'Deep Linking',
+    changes: [
+      { type: 'feature', text: 'Direkte Links zu Projekten und Tabs teilbar' },
+      { type: 'feature', text: 'Browser Zurück/Vorwärts funktioniert jetzt' },
+      { type: 'improvement', text: 'URL spiegelt aktuelle Navigation wider' },
+    ],
+  },
+  {
     version: '1.13.3',
     date: '2026-01-31',
     title: 'Chat kennt Projekte',

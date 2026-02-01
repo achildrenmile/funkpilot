@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mic, MessageCircle, BarChart3, Globe, Radio, Settings, HelpCircle, Github, Wrench } from 'lucide-react';
 import VoiceCQ from './components/VoiceCQ';
@@ -20,9 +20,46 @@ import { getUserSettings, saveUserSettings } from './utils/storage';
 import { getSolarData } from './services/solar';
 import type { TabId, UserSettings, SolarData } from './types';
 
+// Map tab IDs to URL-friendly names
+const TAB_ROUTES: Record<TabId, string> = {
+  voice: 'voice',
+  chat: 'chat',
+  log: 'log',
+  propagation: 'propagation',
+  rufzeichen: 'callsign',
+  projects: 'projects',
+  settings: 'settings',
+};
+
+const ROUTE_TO_TAB: Record<string, TabId> = Object.fromEntries(
+  Object.entries(TAB_ROUTES).map(([k, v]) => [v, k as TabId])
+) as Record<string, TabId>;
+
+// Parse hash route: #/tab or #/projects/project-id
+function parseHash(): { tab: TabId; projectId?: string } {
+  const hash = window.location.hash.slice(1); // Remove #
+  if (!hash || hash === '/') return { tab: 'voice' };
+
+  const parts = hash.split('/').filter(Boolean);
+  const tabRoute = parts[0];
+  const tab = ROUTE_TO_TAB[tabRoute] || 'voice';
+
+  // Check for project deep link
+  if (tab === 'projects' && parts[1]) {
+    return { tab, projectId: parts[1] };
+  }
+
+  return { tab };
+}
+
 function App() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<TabId>('voice');
+
+  // Initialize from URL hash
+  const initialRoute = parseHash();
+  const [activeTab, setActiveTab] = useState<TabId>(initialRoute.tab);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(initialRoute.projectId);
+
   const [settings, setSettings] = useState<UserSettings>(getUserSettings());
   const [solarData, setSolarData] = useState<SolarData | null>(null);
   const [isLoadingSolar, setIsLoadingSolar] = useState(true);
@@ -31,6 +68,47 @@ function App() {
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasNewChanges, setHasNewChanges] = useState(!hasSeenChangelog(LATEST_VERSION));
   const { config } = useConfig();
+
+  // Update URL hash when navigation changes
+  const updateHash = useCallback((tab: TabId, projectId?: string) => {
+    const route = TAB_ROUTES[tab];
+    const hash = projectId ? `#/${route}/${projectId}` : `#/${route}`;
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, '', hash);
+    }
+  }, []);
+
+  // Handle tab change
+  const handleTabChange = useCallback((tab: TabId) => {
+    setActiveTab(tab);
+    setSelectedProjectId(undefined);
+    updateHash(tab);
+  }, [updateHash]);
+
+  // Handle project selection (called from ProjectsTab)
+  const handleProjectChange = useCallback((projectId: string | undefined) => {
+    setSelectedProjectId(projectId);
+    updateHash('projects', projectId);
+  }, [updateHash]);
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseHash();
+      setActiveTab(route.tab);
+      setSelectedProjectId(route.projectId);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Set initial hash if none
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.history.replaceState(null, '', `#/${TAB_ROUTES[activeTab]}`);
+    }
+  }, []);
 
   const TABS = [
     { id: 'voice' as TabId, nameKey: 'nav.voiceCQ', icon: Mic },
@@ -118,7 +196,12 @@ function App() {
       case 'rufzeichen':
         return <CallsignFinder />;
       case 'projects':
-        return <ProjectsTab />;
+        return (
+          <ProjectsTab
+            initialProjectId={selectedProjectId}
+            onProjectChange={handleProjectChange}
+          />
+        );
       case 'settings':
         return <SettingsPanel settings={settings} onUpdate={updateSettings} />;
       default:
@@ -204,7 +287,7 @@ function App() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`
                     flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium
                     transition-colors whitespace-nowrap flex-1 sm:flex-none

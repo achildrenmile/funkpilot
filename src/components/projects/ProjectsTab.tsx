@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Wrench, Search } from 'lucide-react';
-import { ALL_PROJECTS, getProjectsByCategory } from '../../data/projects';
+import { ALL_PROJECTS, getProjectsByCategory, getProjectById } from '../../data/projects';
 import { CATEGORY_INFO, type ProjectCategory } from '../../types/projects';
 import { ProjectCard } from './ProjectCard';
 import { ProjectDetail } from './ProjectDetail';
@@ -8,10 +8,29 @@ import type { HamProject } from '../../types/projects';
 
 type CategoryFilter = 'all' | ProjectCategory;
 
-export default function ProjectsTab() {
+interface ProjectsTabProps {
+  initialProjectId?: string;
+  onProjectChange?: (projectId: string | undefined) => void;
+}
+
+export default function ProjectsTab({ initialProjectId, onProjectChange }: ProjectsTabProps) {
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
-  const [selectedProject, setSelectedProject] = useState<HamProject | null>(null);
+  const [selectedProject, setSelectedProject] = useState<HamProject | null>(
+    initialProjectId ? getProjectById(initialProjectId) || null : null
+  );
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync with external initialProjectId changes (browser back/forward)
+  useEffect(() => {
+    const project = initialProjectId ? getProjectById(initialProjectId) || null : null;
+    setSelectedProject(project);
+  }, [initialProjectId]);
+
+  // Handle project selection
+  const handleSelectProject = (project: HamProject | null) => {
+    setSelectedProject(project);
+    onProjectChange?.(project?.id);
+  };
 
   // Filter projects
   let filteredProjects = selectedCategory === 'all'
@@ -33,7 +52,7 @@ export default function ProjectsTab() {
     return (
       <ProjectDetail
         project={selectedProject}
-        onBack={() => setSelectedProject(null)}
+        onBack={() => handleSelectProject(null)}
       />
     );
   }
@@ -108,7 +127,7 @@ export default function ProjectsTab() {
             <ProjectCard
               key={project.id}
               project={project}
-              onClick={() => setSelectedProject(project)}
+              onClick={() => handleSelectProject(project)}
             />
           ))}
         </div>
