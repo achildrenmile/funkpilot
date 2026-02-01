@@ -1,6 +1,7 @@
 import { Cpu } from 'lucide-react';
 import type { HamProject } from '../../types/projects';
-import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS } from '../../types/projects';
+import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS, getLocalized } from '../../types/projects';
+import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
 
 interface ProjectCardProps {
   project: HamProject;
@@ -8,6 +9,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const lang = useCurrentLanguage();
   const category = CATEGORY_INFO[project.category];
   const hardware = HARDWARE_INFO[project.hardware];
 
@@ -21,14 +23,14 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         <div className="flex items-center gap-2">
           <span className="text-2xl">{category.icon}</span>
           <h3 className="font-semibold text-slate-100 group-hover:text-sky-400 transition-colors">
-            {project.name}
+            {getLocalized(project.name, lang)}
           </h3>
         </div>
       </div>
 
       {/* Description */}
       <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-        {project.description}
+        {getLocalized(project.description, lang)}
       </p>
 
       {/* Footer */}
@@ -41,7 +43,7 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
 
         {/* Difficulty */}
         <span className="text-xs text-slate-500">
-          {'⭐'.repeat(project.difficulty)} {DIFFICULTY_LABELS[project.difficulty]}
+          {'⭐'.repeat(project.difficulty)} {getLocalized(DIFFICULTY_LABELS[project.difficulty], lang)}
         </span>
 
         {/* Cost */}

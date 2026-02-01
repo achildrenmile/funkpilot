@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { ArrowLeft, ExternalLink, Cpu, Lightbulb, RotateCcw } from 'lucide-react';
 import type { HamProject } from '../../types/projects';
-import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS } from '../../types/projects';
+import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS, getLocalized } from '../../types/projects';
 import { CodeViewer } from './CodeViewer';
 import { ComponentList } from './ComponentList';
 import { WiringTable } from './WiringTable';
 import { ProjectChat } from './ProjectChat';
 import { LoRaHardwareCompare } from './LoRaHardwareCompare';
 import { LoRaRangeCalculator } from './LoRaRangeCalculator';
+import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
 
 interface ProjectDetailProps {
   project: HamProject;
@@ -15,7 +16,9 @@ interface ProjectDetailProps {
 }
 
 export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
-  const [currentCode, setCurrentCode] = useState(project.code);
+  const lang = useCurrentLanguage();
+  const code = getLocalized(project.code, lang);
+  const [currentCode, setCurrentCode] = useState(code);
   const [isModified, setIsModified] = useState(false);
   const category = CATEGORY_INFO[project.category];
   const hardware = HARDWARE_INFO[project.hardware];
@@ -26,8 +29,43 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
   };
 
   const handleResetCode = () => {
-    setCurrentCode(project.code);
+    setCurrentCode(code);
     setIsModified(false);
+  };
+
+  // Localize components
+  const localizedComponents = project.components.map(c => ({
+    name: getLocalized(c.name, lang),
+    quantity: c.quantity,
+    notes: c.notes ? getLocalized(c.notes, lang) : undefined,
+  }));
+
+  // Localize wiring
+  const localizedWiring = project.wiring?.map(w => ({
+    from: getLocalized(w.from, lang),
+    to: getLocalized(w.to, lang),
+    color: w.color,
+    notes: w.notes ? getLocalized(w.notes, lang) : undefined,
+  }));
+
+  // Localize customization suggestions
+  const localizedSuggestions = project.customizationSuggestions.map(s => getLocalized(s, lang));
+
+  // Localize external links
+  const localizedLinks = project.externalLinks?.map(l => ({
+    title: getLocalized(l.title, lang),
+    url: l.url,
+  }));
+
+  // UI text translations
+  const texts = {
+    description: { de: 'Beschreibung', en: 'Description', sl: 'Opis' },
+    extensions: { de: 'Erweiterungsideen', en: 'Extension ideas', sl: 'Ideje za razširitev' },
+    links: { de: 'Links', en: 'Links', sl: 'Povezave' },
+    codeModified: { de: 'Code wurde von der KI angepasst', en: 'Code was modified by AI', sl: 'Kodo je spremenila UI' },
+    restoreOriginal: { de: 'Original wiederherstellen', en: 'Restore original', sl: 'Obnovi izvirnik' },
+    tip: { de: 'Tipp', en: 'Tip', sl: 'Namig' },
+    tipText: { de: 'Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO. Installiere ggf. benötigte Libraries über den Library Manager.', en: 'Open the downloaded file in Arduino IDE or PlatformIO. Install required libraries via Library Manager if needed.', sl: 'Odpri preneseno datoteko v Arduino IDE ali PlatformIO. Po potrebi namesti zahtevane knjižnice preko Library Managerja.' },
   };
 
   return (
@@ -43,7 +81,7 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-xl sm:text-2xl">{category.icon}</span>
-            <h2 className="text-lg sm:text-2xl font-bold truncate">{project.name}</h2>
+            <h2 className="text-lg sm:text-2xl font-bold truncate">{getLocalized(project.name, lang)}</h2>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-1">
             <span className={`${hardware.color} text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1`}>
@@ -51,7 +89,7 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
               {hardware.name}
             </span>
             <span className="text-xs sm:text-sm text-slate-400">
-              {'⭐'.repeat(project.difficulty)} {DIFFICULTY_LABELS[project.difficulty]}
+              {'⭐'.repeat(project.difficulty)} {getLocalized(DIFFICULTY_LABELS[project.difficulty], lang)}
             </span>
             <span className="text-xs sm:text-sm text-green-400">{project.estimatedCost}</span>
           </div>
@@ -63,21 +101,21 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
         <div className="space-y-4">
           {/* Description */}
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold text-slate-100 mb-2">Beschreibung</h3>
-            <p className="text-sm text-slate-300">{project.description}</p>
+            <h3 className="font-semibold text-slate-100 mb-2">{getLocalized(texts.description, lang)}</h3>
+            <p className="text-sm text-slate-300">{getLocalized(project.description, lang)}</p>
           </div>
 
           {/* Components */}
           <ComponentList
-            components={project.components}
+            components={localizedComponents}
             estimatedCost={project.estimatedCost}
-            projectName={project.name}
+            projectName={getLocalized(project.name, lang)}
           />
 
           {/* Wiring Table */}
-          {project.wiring && project.wiring.length > 0 && (
+          {localizedWiring && localizedWiring.length > 0 && (
             <WiringTable
-              wiring={project.wiring}
+              wiring={localizedWiring}
               wokwiUrl={project.wokwiUrl}
               code={currentCode}
               hardware={hardware.name}
@@ -88,10 +126,10 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
             <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
               <Lightbulb className="w-4 h-4 text-amber-400" />
-              Erweiterungsideen
+              {getLocalized(texts.extensions, lang)}
             </h3>
             <ul className="space-y-2">
-              {project.customizationSuggestions.map((suggestion, idx) => (
+              {localizedSuggestions.map((suggestion, idx) => (
                 <li key={idx} className="text-sm text-slate-400 flex items-start gap-2">
                   <span className="text-sky-400">•</span>
                   {suggestion}
@@ -101,11 +139,11 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
           </div>
 
           {/* External Links */}
-          {project.externalLinks && project.externalLinks.length > 0 && (
+          {localizedLinks && localizedLinks.length > 0 && (
             <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <h3 className="font-semibold text-slate-100 mb-3">Links</h3>
+              <h3 className="font-semibold text-slate-100 mb-3">{getLocalized(texts.links, lang)}</h3>
               <div className="space-y-2">
-                {project.externalLinks.map((link, idx) => (
+                {localizedLinks.map((link, idx) => (
                   <a
                     key={idx}
                     href={link.url}
@@ -136,14 +174,14 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
               {isModified && (
                 <div className="flex items-center justify-between bg-green-900/30 border border-green-700/50 rounded-lg px-4 py-2">
                   <span className="text-sm text-green-300">
-                    Code wurde von der KI angepasst
+                    {getLocalized(texts.codeModified, lang)}
                   </span>
                   <button
                     onClick={handleResetCode}
                     className="flex items-center gap-1.5 text-sm text-green-400 hover:text-green-300 transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    Original wiederherstellen
+                    {getLocalized(texts.restoreOriginal, lang)}
                   </button>
                 </div>
               )}
@@ -159,7 +197,7 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
                 <>
                   <ProjectChat
                     code={currentCode}
-                    projectName={project.name}
+                    projectName={getLocalized(project.name, lang)}
                     hardware={hardware.name}
                     language={project.codeLanguage}
                     onCodeUpdate={handleCodeUpdate}
@@ -168,8 +206,7 @@ export function ProjectDetail({ project, onBack }: ProjectDetailProps) {
                   {/* Tip */}
                   <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
                     <p className="text-sm text-amber-200">
-                      <strong>Tipp:</strong> Öffne die heruntergeladene Datei in der Arduino IDE oder PlatformIO.
-                      Installiere ggf. benötigte Libraries über den Library Manager.
+                      <strong>{getLocalized(texts.tip, lang)}:</strong> {getLocalized(texts.tipText, lang)}
                     </p>
                   </div>
                 </>

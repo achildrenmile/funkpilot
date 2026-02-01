@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Cable, ExternalLink, Copy, Check, X, AlertTriangle } from 'lucide-react';
-import type { WiringConnection } from '../../types/projects';
+import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
+
+// Simple wiring type with already-localized strings
+interface WiringConnection {
+  from: string;
+  to: string;
+  color?: string;
+  notes?: string;
+}
 
 interface WiringTableProps {
   wiring: WiringConnection[];
@@ -37,12 +45,39 @@ const WOKWI_TEMPLATES: Record<string, string> = {
   'Arduino Nano': 'https://wokwi.com/projects/new/arduino-nano',
   'Arduino Uno': 'https://wokwi.com/projects/new/arduino-uno',
   'ESP32': 'https://wokwi.com/projects/new/esp32',
-  'ESP8266': 'https://wokwi.com/projects/new/esp32', // Wokwi uses ESP32 for both
+  'ESP8266': 'https://wokwi.com/projects/new/esp32',
 };
 
 export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTableProps) {
+  const lang = useCurrentLanguage();
   const [showWokwiModal, setShowWokwiModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // UI text translations
+  const texts = {
+    wiring: { de: 'Verdrahtung', en: 'Wiring', sl: 'Ožičenje' },
+    testInSimulator: { de: 'Im Simulator testen', en: 'Test in simulator', sl: 'Testiraj v simulatorju' },
+    from: { de: 'Von', en: 'From', sl: 'Od' },
+    to: { de: 'Nach', en: 'To', sl: 'Do' },
+    cable: { de: 'Kabel', en: 'Wire', sl: 'Kabel' },
+    note: { de: 'Hinweis', en: 'Note', sl: 'Opomba' },
+    legend: { de: 'VCC = 5V/3.3V Versorgung | GND = Masse | Die Kabelfarben sind Empfehlungen', en: 'VCC = 5V/3.3V supply | GND = Ground | Wire colors are suggestions', sl: 'VCC = 5V/3.3V napajanje | GND = Masa | Barve kablov so priporočila' },
+    wokwiSimulator: { de: 'Wokwi Simulator', en: 'Wokwi Simulator', sl: 'Wokwi Simulator' },
+    externalService: { de: 'Externer Dienst', en: 'External service', sl: 'Zunanja storitev' },
+    externalServiceWarning: { de: 'Wokwi.com ist eine externe Website. Mit Klick auf "Simulator öffnen" verlässt du FunkPilot. Mehr Infos in unserer Datenschutzerklärung.', en: 'Wokwi.com is an external website. By clicking "Open simulator" you will leave FunkPilot. More info in our privacy policy.', sl: 'Wokwi.com je zunanja spletna stran. S klikom na "Odpri simulator" zapustiš FunkPilot. Več info v naši politiki zasebnosti.' },
+    howTo: { de: "So geht's:", en: 'How to:', sl: 'Kako:' },
+    step1: { de: 'Klicke auf "Code kopieren" unten', en: 'Click "Copy code" below', sl: 'Klikni "Kopiraj kodo" spodaj' },
+    step2: { de: 'Klicke auf "Simulator öffnen" - Wokwi öffnet sich', en: 'Click "Open simulator" - Wokwi opens', sl: 'Klikni "Odpri simulator" - Wokwi se odpre' },
+    step3: { de: 'Lösche den Beispielcode im Editor (Strg+A, Entf)', en: 'Delete example code in editor (Ctrl+A, Del)', sl: 'Izbriši vzorčno kodo v urejevalniku (Ctrl+A, Del)' },
+    step4: { de: 'Füge den kopierten Code ein (Strg+V)', en: 'Paste the copied code (Ctrl+V)', sl: 'Prilepi kopirano kodo (Ctrl+V)' },
+    step5: { de: 'Klicke auf den grünen "Play" Button zum Starten', en: 'Click the green "Play" button to start', sl: 'Klikni zeleni gumb "Play" za zagon' },
+    wiringHint: { de: 'Hinweis: Die Verdrahtung muss im Simulator manuell erstellt werden. Nutze die Tabelle oben als Referenz.', en: 'Note: Wiring must be created manually in the simulator. Use the table above as reference.', sl: 'Opomba: Ožičenje je treba ustvariti ročno v simulatorju. Uporabi zgornjo tabelo kot referenco.' },
+    copyCode: { de: 'Code kopieren', en: 'Copy code', sl: 'Kopiraj kodo' },
+    copied: { de: 'Kopiert!', en: 'Copied!', sl: 'Kopirano!' },
+    openSimulator: { de: 'Simulator öffnen', en: 'Open simulator', sl: 'Odpri simulator' },
+  };
+
+  const t = (key: keyof typeof texts) => texts[key][lang] || texts[key].de;
 
   if (!wiring || wiring.length === 0) {
     return null;
@@ -69,7 +104,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
         <div className="flex items-center justify-between px-4 py-3 bg-slate-700/50 border-b border-slate-700">
           <h3 className="font-semibold text-slate-100 flex items-center gap-2">
             <Cable className="w-4 h-4 text-sky-400" />
-            Verdrahtung
+            {t('wiring')}
           </h3>
           {code && (
             <button
@@ -77,7 +112,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
               className="flex items-center gap-1.5 text-xs px-2.5 py-1 bg-purple-600 hover:bg-purple-500 rounded transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              Im Simulator testen
+              {t('testInSimulator')}
             </button>
           )}
         </div>
@@ -88,10 +123,10 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-slate-400 border-b border-slate-700">
-                  <th className="pb-2 pr-4">Von</th>
-                  <th className="pb-2 pr-4">Nach</th>
-                  <th className="pb-2 pr-4">Kabel</th>
-                  <th className="pb-2">Hinweis</th>
+                  <th className="pb-2 pr-4">{t('from')}</th>
+                  <th className="pb-2 pr-4">{t('to')}</th>
+                  <th className="pb-2 pr-4">{t('cable')}</th>
+                  <th className="pb-2">{t('note')}</th>
                 </tr>
               </thead>
               <tbody className="text-slate-300">
@@ -149,7 +184,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
           {/* Legend */}
           <div className="mt-4 pt-3 border-t border-slate-700">
             <p className="text-xs text-slate-500">
-              VCC = 5V/3.3V Versorgung | GND = Masse | Die Kabelfarben sind Empfehlungen
+              {t('legend')}
             </p>
           </div>
         </div>
@@ -166,7 +201,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
               <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
                 <ExternalLink className="w-5 h-5 text-purple-400" />
-                Wokwi Simulator
+                {t('wokwiSimulator')}
               </h2>
               <button
                 onClick={() => setShowWokwiModal(false)}
@@ -182,42 +217,40 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
               <div className="flex items-start gap-3 bg-amber-900/30 border border-amber-700/50 rounded-lg p-3">
                 <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="text-amber-200 font-medium">Externer Dienst</p>
+                  <p className="text-amber-200 font-medium">{t('externalService')}</p>
                   <p className="text-amber-200/80 mt-1">
-                    Wokwi.com ist eine externe Website. Mit Klick auf "Simulator öffnen"
-                    verlässt du FunkPilot. Mehr Infos in unserer Datenschutzerklärung.
+                    {t('externalServiceWarning')}
                   </p>
                 </div>
               </div>
 
               {/* Instructions */}
               <div className="space-y-3">
-                <p className="text-slate-300 font-medium">So geht's:</p>
+                <p className="text-slate-300 font-medium">{t('howTo')}</p>
                 <ol className="space-y-2 text-sm text-slate-400">
                   <li className="flex items-start gap-2">
                     <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">1</span>
-                    <span>Klicke auf "Code kopieren" unten</span>
+                    <span>{t('step1')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">2</span>
-                    <span>Klicke auf "Simulator öffnen" - Wokwi öffnet sich</span>
+                    <span>{t('step2')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">3</span>
-                    <span>Lösche den Beispielcode im Editor (Strg+A, Entf)</span>
+                    <span>{t('step3')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">4</span>
-                    <span>Füge den kopierten Code ein (Strg+V)</span>
+                    <span>{t('step4')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">5</span>
-                    <span>Klicke auf den grünen "Play" Button zum Starten</span>
+                    <span>{t('step5')}</span>
                   </li>
                 </ol>
                 <p className="text-xs text-slate-500 mt-2">
-                  Hinweis: Die Verdrahtung muss im Simulator manuell erstellt werden.
-                  Nutze die Tabelle oben als Referenz.
+                  {t('wiringHint')}
                 </p>
               </div>
             </div>
@@ -231,12 +264,12 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
                 {copied ? (
                   <>
                     <Check className="w-4 h-4 text-green-400" />
-                    <span className="text-green-400">Kopiert!</span>
+                    <span className="text-green-400">{t('copied')}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4" />
-                    <span>Code kopieren</span>
+                    <span>{t('copyCode')}</span>
                   </>
                 )}
               </button>
@@ -247,7 +280,7 @@ export function WiringTable({ wiring, wokwiUrl, code, hardware }: WiringTablePro
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
-                Simulator öffnen
+                {t('openSimulator')}
               </a>
             </div>
           </div>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Wrench, Search } from 'lucide-react';
 import { ALL_PROJECTS, getProjectsByCategory, getProjectById } from '../../data/projects';
-import { CATEGORY_INFO, type ProjectCategory } from '../../types/projects';
+import { CATEGORY_INFO, type ProjectCategory, getLocalized } from '../../types/projects';
 import { ProjectCard } from './ProjectCard';
 import { ProjectDetail } from './ProjectDetail';
+import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
 import type { HamProject } from '../../types/projects';
 
 type CategoryFilter = 'all' | ProjectCategory;
@@ -14,6 +15,7 @@ interface ProjectsTabProps {
 }
 
 export default function ProjectsTab({ initialProjectId, onProjectChange }: ProjectsTabProps) {
+  const lang = useCurrentLanguage();
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [selectedProject, setSelectedProject] = useState<HamProject | null>(
     initialProjectId ? getProjectById(initialProjectId) || null : null
@@ -37,14 +39,16 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
     ? ALL_PROJECTS
     : getProjectsByCategory(selectedCategory);
 
-  // Search filter
+  // Search filter (search in localized content)
   if (searchQuery.trim()) {
     const query = searchQuery.toLowerCase();
-    filteredProjects = filteredProjects.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.description.toLowerCase().includes(query) ||
-      p.hardware.toLowerCase().includes(query)
-    );
+    filteredProjects = filteredProjects.filter(p => {
+      const name = getLocalized(p.name, lang).toLowerCase();
+      const description = getLocalized(p.description, lang).toLowerCase();
+      return name.includes(query) ||
+        description.includes(query) ||
+        p.hardware.toLowerCase().includes(query);
+    });
   }
 
   // Show project detail if selected
@@ -57,16 +61,27 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
     );
   }
 
+  // Translations
+  const texts = {
+    title: { de: 'Bastelprojekte', en: 'DIY Projects', sl: 'DIY projekti' },
+    subtitle: { de: 'Arduino & ESP32 Projekte für Funkamateure', en: 'Arduino & ESP32 projects for ham radio operators', sl: 'Arduino & ESP32 projekti za radioamaterje' },
+    searchPlaceholder: { de: 'Projekt suchen...', en: 'Search projects...', sl: 'Išči projekte...' },
+    all: { de: 'Alle', en: 'All', sl: 'Vse' },
+    noResults: { de: 'Keine Projekte gefunden', en: 'No projects found', sl: 'Ni najdenih projektov' },
+    tryOther: { de: 'Versuche eine andere Suche oder Kategorie', en: 'Try a different search or category', sl: 'Poskusi drugo iskanje ali kategorijo' },
+    moreComingSoon: { de: 'Mehr Projekte kommen bald! Vorschläge?', en: 'More projects coming soon! Suggestions?', sl: 'Več projektov prihaja kmalu! Predlogi?' },
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
           <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400" />
-          Bastelprojekte
+          {getLocalized(texts.title, lang)}
         </h2>
         <p className="text-slate-400 mt-1 text-sm sm:text-base">
-          Arduino & ESP32 Projekte für Funkamateure
+          {getLocalized(texts.subtitle, lang)}
         </p>
       </div>
 
@@ -79,7 +94,7 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Projekt suchen..."
+            placeholder={getLocalized(texts.searchPlaceholder, lang)}
             className="flex-1 bg-transparent px-3 py-2 focus:outline-none"
           />
         </div>
@@ -95,7 +110,7 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
-              Alle ({ALL_PROJECTS.length})
+              {getLocalized(texts.all, lang)} ({ALL_PROJECTS.length})
             </button>
             {(Object.keys(CATEGORY_INFO) as ProjectCategory[]).map((cat) => {
               const count = getProjectsByCategory(cat).length;
@@ -111,7 +126,7 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
                   }`}
                 >
                   <span>{CATEGORY_INFO[cat].icon}</span>
-                  <span className="hidden sm:inline">{CATEGORY_INFO[cat].name}</span>
+                  <span className="hidden sm:inline">{getLocalized(CATEGORY_INFO[cat].name, lang)}</span>
                   <span className="text-xs opacity-70">({count})</span>
                 </button>
               );
@@ -134,15 +149,15 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
       ) : (
         <div className="text-center py-12 text-slate-400">
           <Wrench className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>Keine Projekte gefunden</p>
-          <p className="text-sm mt-1">Versuche eine andere Suche oder Kategorie</p>
+          <p>{getLocalized(texts.noResults, lang)}</p>
+          <p className="text-sm mt-1">{getLocalized(texts.tryOther, lang)}</p>
         </div>
       )}
 
       {/* Coming Soon Note */}
       <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
         <p className="text-sm text-slate-400 text-center">
-          Mehr Projekte kommen bald! Vorschläge? <a href="mailto:oe8yml@rednil.at" className="text-sky-400 hover:underline">oe8yml@rednil.at</a>
+          {getLocalized(texts.moreComingSoon, lang)} <a href="mailto:oe8yml@rednil.at" className="text-sky-400 hover:underline">oe8yml@rednil.at</a>
         </p>
       </div>
     </div>

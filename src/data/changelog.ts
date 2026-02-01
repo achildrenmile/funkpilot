@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.15.0',
+    date: '2026-02-01',
+    title: 'Mehrsprachige Projekte',
+    changes: [
+      { type: 'feature', text: 'Alle Projekte jetzt in DE/EN/SL verfügbar' },
+      { type: 'feature', text: 'Sprache wechseln - Projekte werden übersetzt' },
+      { type: 'improvement', text: 'UI-Texte in allen unterstützten Sprachen' },
+    ],
+  },
+  {
     version: '1.14.0',
     date: '2026-01-31',
     title: 'Deep Linking',

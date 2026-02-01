@@ -1,39 +1,63 @@
 // HAM Bastelprojekte Types
 
+// Supported languages
+export type SupportedLanguage = 'de' | 'en' | 'sl';
+
+// Localized string type - all languages required
+export interface LocalizedString {
+  de: string;
+  en: string;
+  sl: string;
+}
+
+// Flexible text type - allows either localized or plain string (backwards compatible)
+export type FlexText = LocalizedString | string;
+
+// Helper to create localized strings
+export function localized(de: string, en: string, sl: string): LocalizedString {
+  return { de, en, sl };
+}
+
+// Get string for current language with fallback to German
+export function getLocalized(str: FlexText, lang: SupportedLanguage): string {
+  if (typeof str === 'string') return str; // Backwards compatibility
+  return str[lang] || str.de;
+}
+
 export interface HamProject {
   id: string;
-  name: string;
+  name: FlexText;
   category: ProjectCategory;
   difficulty: 1 | 2 | 3;
-  description: string;
+  description: FlexText;
   hardware: HardwarePlatform;
 
   // Project type: 'build' for code projects, 'guide' for documentation
   projectType?: 'build' | 'guide';
 
   // Stückliste
-  components: Component[];
+  components: FlexComponent[];
   estimatedCost: string;
 
-  // Code (for build projects)
-  code: string;
+  // Code/Content (for build projects = code, for guides = markdown content)
+  code: FlexText;
   codeLanguage: 'cpp' | 'python' | 'micropython' | 'markdown';
   codeFileName: string;
 
   // Verdrahtung
-  wiring?: WiringConnection[];
+  wiring?: FlexWiringConnection[];
 
   // Optional
   schematicUrl?: string;
   wokwiUrl?: string;  // Wokwi Simulator Link
-  externalLinks?: { title: string; url: string }[];
+  externalLinks?: { title: FlexText; url: string }[];
 
   // KI-Anpassungs-Vorschläge
-  customizationSuggestions: string[];
+  customizationSuggestions: FlexText[];
 
   // Guide-specific fields
-  guideSections?: GuideSection[];
-  hardwareOptions?: HardwareOption[];
+  guideSections?: FlexGuideSection[];
+  hardwareOptions?: FlexHardwareOption[];
 }
 
 export type ProjectCategory =
@@ -57,44 +81,52 @@ export type HardwarePlatform =
   | 'heltec-lora'
   | 'rak-wisblock';
 
-export interface Component {
-  name: string;
+// Flexible component type (backwards compatible)
+export interface FlexComponent {
+  name: FlexText;
   quantity: number;
-  notes?: string;
+  notes?: FlexText;
 }
 
-export interface WiringConnection {
-  from: string;        // z.B. "Arduino Pin 9"
-  to: string;          // z.B. "Taster Pin 1"
-  color?: string;      // Kabelfarbe (optional)
-  notes?: string;      // z.B. "über 10k Widerstand"
+// Flexible wiring type (backwards compatible)
+export interface FlexWiringConnection {
+  from: FlexText;
+  to: FlexText;
+  color?: string;
+  notes?: FlexText;
 }
 
-// Guide-specific types
-export interface GuideSection {
+// Guide-specific types (flexible)
+export interface FlexGuideSection {
   id: string;
-  title: string;
+  title: FlexText;
   icon?: string;
-  content: string;     // Markdown content
+  content: FlexText;
 }
 
-export interface HardwareOption {
-  name: string;
+export interface FlexHardwareOption {
+  name: FlexText;
   image?: string;
   price: string;
-  features: string[];
+  features: FlexText[];
   recommended?: boolean;
   buyLinks?: { store: string; url: string }[];
 }
 
-export const CATEGORY_INFO: Record<ProjectCategory, { name: string; icon: string }> = {
-  'cw-morse': { name: 'CW / Morse', icon: '📡' },
-  'measurement': { name: 'Mess- & Anzeige', icon: '📊' },
-  'antenna': { name: 'Antennen', icon: '📶' },
-  'digital-aprs': { name: 'Digital / APRS', icon: '💻' },
-  'audio': { name: 'Audio / NF', icon: '🔊' },
-  'control': { name: 'Steuerung', icon: '🎛️' },
-  'mesh-lora': { name: 'Mesh / LoRa', icon: '🌐' },
+// Legacy type aliases for backwards compatibility
+export type LocalizedComponent = FlexComponent;
+export type LocalizedWiringConnection = FlexWiringConnection;
+export type LocalizedGuideSection = FlexGuideSection;
+export type LocalizedHardwareOption = FlexHardwareOption;
+
+export const CATEGORY_INFO: Record<ProjectCategory, { name: LocalizedString; icon: string }> = {
+  'cw-morse': { name: { de: 'CW / Morse', en: 'CW / Morse', sl: 'CW / Morse' }, icon: '📡' },
+  'measurement': { name: { de: 'Mess- & Anzeige', en: 'Measurement', sl: 'Merilne naprave' }, icon: '📊' },
+  'antenna': { name: { de: 'Antennen', en: 'Antennas', sl: 'Antene' }, icon: '📶' },
+  'digital-aprs': { name: { de: 'Digital / APRS', en: 'Digital / APRS', sl: 'Digitalno / APRS' }, icon: '💻' },
+  'audio': { name: { de: 'Audio / NF', en: 'Audio / AF', sl: 'Avdio / NF' }, icon: '🔊' },
+  'control': { name: { de: 'Steuerung', en: 'Control', sl: 'Krmiljenje' }, icon: '🎛️' },
+  'mesh-lora': { name: { de: 'Mesh / LoRa', en: 'Mesh / LoRa', sl: 'Mesh / LoRa' }, icon: '🌐' },
 };
 
 export const HARDWARE_INFO: Record<HardwarePlatform, { name: string; color: string }> = {
@@ -110,8 +142,8 @@ export const HARDWARE_INFO: Record<HardwarePlatform, { name: string; color: stri
   'rak-wisblock': { name: 'RAK WisBlock', color: 'bg-indigo-500' },
 };
 
-export const DIFFICULTY_LABELS: Record<1 | 2 | 3, string> = {
-  1: 'Einfach',
-  2: 'Mittel',
-  3: 'Fortgeschritten',
+export const DIFFICULTY_LABELS: Record<1 | 2 | 3, LocalizedString> = {
+  1: { de: 'Einfach', en: 'Easy', sl: 'Enostavno' },
+  2: { de: 'Mittel', en: 'Medium', sl: 'Srednje' },
+  3: { de: 'Fortgeschritten', en: 'Advanced', sl: 'Napredno' },
 };

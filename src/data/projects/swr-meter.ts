@@ -2,35 +2,49 @@ import type { HamProject } from '../../types/projects';
 
 export const swrMeter: HamProject = {
   id: 'swr-meter',
-  name: 'SWR-Meter mit OLED',
+  name: {
+    de: 'SWR-Meter mit OLED',
+    en: 'SWR Meter with OLED',
+    sl: 'SWR meter z OLED'
+  },
   category: 'measurement',
   difficulty: 2,
-  description: 'Digitales SWR-Meter mit OLED-Display. Zeigt SWR, Vorwärts- und Rücklaufleistung an. Verwendet einen Richtkoppler-Bausatz. Kalibrierbar über Software.',
+  description: {
+    de: 'Digitales SWR-Meter mit OLED-Display. Zeigt SWR, Vorwärts- und Rücklaufleistung an. Verwendet einen Richtkoppler-Bausatz. Kalibrierbar über Software.',
+    en: 'Digital SWR meter with OLED display. Shows SWR, forward and reflected power. Uses a directional coupler kit. Calibratable via software.',
+    sl: 'Digitalni SWR meter z OLED zaslonom. Prikazuje SWR, oddano in odbito moč. Uporablja komplet smernega sklopnika. Kalibracija preko programske opreme.'
+  },
   hardware: 'arduino-nano',
 
   components: [
-    { name: 'Arduino Nano', quantity: 1 },
-    { name: 'OLED Display 0.96" I2C', quantity: 1, notes: 'SSD1306, 128x64' },
-    { name: 'Richtkoppler-Bausatz', quantity: 1, notes: 'z.B. QRP-Labs oder Eigenbau' },
-    { name: 'Schottky-Dioden 1N5711', quantity: 2, notes: 'für HF-Gleichrichtung' },
-    { name: 'Kondensator 100nF', quantity: 4 },
-    { name: 'Kondensator 10µF', quantity: 2 },
-    { name: 'Widerstand 10k', quantity: 2 },
-    { name: 'Widerstand 100k', quantity: 2 },
-    { name: 'Gehäuse Alu', quantity: 1, notes: 'für HF-Schirmung' },
-    { name: 'BNC-Buchsen', quantity: 2, notes: 'Input/Output' },
+    { name: { de: 'Arduino Nano', en: 'Arduino Nano', sl: 'Arduino Nano' }, quantity: 1 },
+    { name: { de: 'OLED Display 0.96" I2C', en: 'OLED Display 0.96" I2C', sl: 'OLED zaslon 0.96" I2C' }, quantity: 1, notes: { de: 'SSD1306, 128x64', en: 'SSD1306, 128x64', sl: 'SSD1306, 128x64' } },
+    { name: { de: 'Richtkoppler-Bausatz', en: 'Directional coupler kit', sl: 'Komplet smernega sklopnika' }, quantity: 1, notes: { de: 'z.B. QRP-Labs oder Eigenbau', en: 'e.g. QRP-Labs or homebrew', sl: 'npr. QRP-Labs ali lastna izdelava' } },
+    { name: { de: 'Schottky-Dioden 1N5711', en: 'Schottky diodes 1N5711', sl: 'Schottky diode 1N5711' }, quantity: 2, notes: { de: 'für HF-Gleichrichtung', en: 'for RF rectification', sl: 'za RF usmerjanje' } },
+    { name: { de: 'Kondensator 100nF', en: 'Capacitor 100nF', sl: 'Kondenzator 100nF' }, quantity: 4 },
+    { name: { de: 'Kondensator 10µF', en: 'Capacitor 10µF', sl: 'Kondenzator 10µF' }, quantity: 2 },
+    { name: { de: 'Widerstand 10k', en: 'Resistor 10k', sl: 'Upor 10k' }, quantity: 2 },
+    { name: { de: 'Widerstand 100k', en: 'Resistor 100k', sl: 'Upor 100k' }, quantity: 2 },
+    { name: { de: 'Gehäuse Alu', en: 'Aluminum enclosure', sl: 'Aluminijasto ohišje' }, quantity: 1, notes: { de: 'für HF-Schirmung', en: 'for RF shielding', sl: 'za RF oklopljenje' } },
+    { name: { de: 'BNC-Buchsen', en: 'BNC connectors', sl: 'BNC konektorji' }, quantity: 2, notes: { de: 'Input/Output', en: 'Input/Output', sl: 'Vhod/Izhod' } },
   ],
   estimatedCost: '~25€',
 
   code: `// =====================================================
+// SWR Meter with OLED Display - FunkPilot DIY Project
 // SWR-Meter mit OLED Display - FunkPilot Bastelprojekt
+// SWR meter z OLED zaslonom - FunkPilot projekt
 // Hardware: Arduino Nano + SSD1306 OLED
-// Autor: FunkPilot / OE8YML
-// Lizenz: MIT
+// Author/Autor/Avtor: FunkPilot / OE8YML
+// License/Lizenz/Licenca: MIT
 // =====================================================
 //
+// WARNING: Only use up to approx. 30W!
 // ACHTUNG: Nur bis ca. 30W verwenden!
+// OPOZORILO: Uporabljajte samo do pribl. 30W!
+// For higher power, adjust voltage divider.
 // Für höhere Leistungen Spannungsteiler anpassen.
+// Za višje moči prilagodite napetostni delilnik.
 //
 // =====================================================
 
@@ -38,24 +52,26 @@ export const swrMeter: HamProject = {
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// OLED Konfiguration
+// OLED Configuration / OLED Konfiguration / OLED nastavitve
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// Pin-Belegung
-const int FWD_PIN = A0;     // Vorwärtsleistung vom Richtkoppler
-const int REF_PIN = A1;     // Rücklaufleistung vom Richtkoppler
+// Pin assignment / Pin-Belegung / Razporeditev pinov
+const int FWD_PIN = A0;     // Forward power from directional coupler / Vorwärtsleistung vom Richtkoppler / Oddana moč iz smernega sklopnika
+const int REF_PIN = A1;     // Reflected power from directional coupler / Rücklaufleistung vom Richtkoppler / Odbita moč iz smernega sklopnika
 
+// Calibration (adjust according to directional coupler!)
 // Kalibrierung (anpassen nach Richtkoppler!)
-const float CAL_FACTOR = 0.1;   // Kalibrierfaktor
-const float DIODE_DROP = 0.3;   // Diodenspannung (Schottky)
+// Kalibracija (prilagodite glede na smerni sklopnik!)
+const float CAL_FACTOR = 0.1;   // Calibration factor / Kalibrierfaktor / Kalibracijski faktor
+const float DIODE_DROP = 0.3;   // Diode voltage (Schottky) / Diodenspannung (Schottky) / Napetost diode (Schottky)
 
-// Mittelwertbildung
+// Averaging / Mittelwertbildung / Povprečenje
 const int NUM_SAMPLES = 50;
 
-// Variablen
+// Variables / Variablen / Spremenljivke
 float fwdPower = 0;
 float refPower = 0;
 float swr = 1.0;
@@ -65,9 +81,9 @@ float refVoltage = 0;
 void setup() {
   Serial.begin(9600);
 
-  // OLED initialisieren
+  // Initialize OLED / OLED initialisieren / Inicializacija OLED
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 nicht gefunden!"));
+    Serial.println(F("SSD1306 not found! / nicht gefunden! / ni najden!"));
     while (1);
   }
 
@@ -83,13 +99,13 @@ void setup() {
 }
 
 void loop() {
-  // Messwerte einlesen (mit Mittelwertbildung)
+  // Read measurements (with averaging) / Messwerte einlesen (mit Mittelwertbildung) / Branje meritev (s povprečenjem)
   readPower();
 
-  // SWR berechnen
+  // Calculate SWR / SWR berechnen / Izračun SWR
   calculateSWR();
 
-  // Auf Display anzeigen
+  // Show on display / Auf Display anzeigen / Prikaz na zaslonu
   updateDisplay();
 
   // Serial Debug
@@ -107,48 +123,50 @@ void readPower() {
   long fwdSum = 0;
   long refSum = 0;
 
-  // Mehrere Samples für Mittelwert
+  // Multiple samples for averaging / Mehrere Samples für Mittelwert / Več vzorcev za povprečje
   for (int i = 0; i < NUM_SAMPLES; i++) {
     fwdSum += analogRead(FWD_PIN);
     refSum += analogRead(REF_PIN);
     delayMicroseconds(100);
   }
 
-  // ADC zu Spannung (0-5V bei Arduino)
+  // ADC to voltage (0-5V on Arduino) / ADC zu Spannung (0-5V bei Arduino) / ADC v napetost (0-5V pri Arduino)
   fwdVoltage = (fwdSum / NUM_SAMPLES) * (5.0 / 1023.0);
   refVoltage = (refSum / NUM_SAMPLES) * (5.0 / 1023.0);
 
-  // Diodenspannung kompensieren
+  // Compensate diode voltage / Diodenspannung kompensieren / Kompenzacija napetosti diode
   if (fwdVoltage > DIODE_DROP) fwdVoltage -= DIODE_DROP;
   else fwdVoltage = 0;
 
   if (refVoltage > DIODE_DROP) refVoltage -= DIODE_DROP;
   else refVoltage = 0;
 
+  // Voltage to power (adjust according to directional coupler!)
   // Spannung zu Leistung (anpassen nach Richtkoppler!)
-  // P = (V^2) / R, mit Kalibrierfaktor
+  // Napetost v moč (prilagodite glede na smerni sklopnik!)
+  // P = (V^2) / R, with calibration factor / mit Kalibrierfaktor / s kalibracijskim faktorjem
   fwdPower = (fwdVoltage * fwdVoltage) / CAL_FACTOR;
   refPower = (refVoltage * refVoltage) / CAL_FACTOR;
 }
 
 void calculateSWR() {
   if (fwdPower < 0.1) {
-    // Keine Leistung -> SWR undefiniert
+    // No power -> SWR undefined / Keine Leistung -> SWR undefiniert / Ni moči -> SWR nedefiniran
     swr = 0;
     return;
   }
 
-  // Reflexionskoeffizient
+  // Reflection coefficient / Reflexionskoeffizient / Koeficient odboja
   float rho = sqrt(refPower / fwdPower);
 
-  // SWR berechnen
+  // Calculate SWR / SWR berechnen / Izračun SWR
   if (rho >= 0.99) {
-    swr = 99.9;  // Maximum anzeigen
+    swr = 99.9;  // Show maximum / Maximum anzeigen / Prikaz maksimuma
   } else {
     swr = (1 + rho) / (1 - rho);
   }
 
-  // Begrenzen auf sinnvollen Bereich
+  // Limit to reasonable range / Begrenzen auf sinnvollen Bereich / Omejitev na smiselno območje
   if (swr > 99.9) swr = 99.9;
   if (swr < 1.0) swr = 1.0;
 }
@@ -156,12 +174,12 @@ void calculateSWR() {
 void updateDisplay() {
   display.clearDisplay();
 
-  // Überschrift
+  // Header / Überschrift / Naslov
   display.setTextSize(1);
   display.setCursor(0, 0);
   display.println(F("=== SWR-Meter ==="));
 
-  // SWR gross anzeigen
+  // Show SWR large / SWR gross anzeigen / Velik prikaz SWR
   display.setTextSize(2);
   display.setCursor(0, 16);
   display.print(F("SWR:"));
@@ -175,7 +193,7 @@ void updateDisplay() {
     display.println(F(":1"));
   }
 
-  // Leistungsanzeige
+  // Power display / Leistungsanzeige / Prikaz moči
   display.setTextSize(1);
   display.setCursor(0, 40);
   display.print(F("FWD: "));
@@ -187,7 +205,7 @@ void updateDisplay() {
   display.print(refPower, 1);
   display.println(F(" W"));
 
-  // SWR-Balkenanzeige
+  // SWR bar graph / SWR-Balkenanzeige / SWR stolpični prikaz
   int barWidth = 0;
   if (swr > 0 && swr <= 10) {
     barWidth = map(swr * 10, 10, 100, 0, 60);
@@ -195,7 +213,7 @@ void updateDisplay() {
   display.drawRect(64, 40, 62, 20, SSD1306_WHITE);
   display.fillRect(65, 41, barWidth, 18, SSD1306_WHITE);
 
-  // Skala
+  // Scale / Skala / Lestvica
   display.setCursor(64, 52);
   display.print(F("1"));
   display.setCursor(90, 52);
@@ -210,25 +228,25 @@ void updateDisplay() {
   codeFileName: 'swr_meter.ino',
 
   wiring: [
-    { from: 'Arduino A4 (SDA)', to: 'OLED SDA', color: 'Blau', notes: 'I2C Daten' },
-    { from: 'Arduino A5 (SCL)', to: 'OLED SCL', color: 'Gelb', notes: 'I2C Clock' },
-    { from: 'Arduino A0', to: 'Richtkoppler FWD', color: 'Rot', notes: 'über Spannungsteiler' },
-    { from: 'Arduino A1', to: 'Richtkoppler REF', color: 'Orange', notes: 'über Spannungsteiler' },
+    { from: 'Arduino A4 (SDA)', to: 'OLED SDA', color: 'Blau', notes: { de: 'I2C Daten', en: 'I2C Data', sl: 'I2C podatki' } },
+    { from: 'Arduino A5 (SCL)', to: 'OLED SCL', color: 'Gelb', notes: { de: 'I2C Clock', en: 'I2C Clock', sl: 'I2C ura' } },
+    { from: 'Arduino A0', to: { de: 'Richtkoppler FWD', en: 'Directional coupler FWD', sl: 'Smerni sklopnik FWD' }, color: 'Rot', notes: { de: 'über Spannungsteiler', en: 'via voltage divider', sl: 'preko napetostnega delilnika' } },
+    { from: 'Arduino A1', to: { de: 'Richtkoppler REF', en: 'Directional coupler REF', sl: 'Smerni sklopnik REF' }, color: 'Orange', notes: { de: 'über Spannungsteiler', en: 'via voltage divider', sl: 'preko napetostnega delilnika' } },
     { from: 'Arduino 5V', to: 'OLED VCC', color: 'Rot' },
     { from: 'Arduino GND', to: 'OLED GND', color: 'Schwarz' },
-    { from: 'BNC Input', to: 'Richtkoppler IN', notes: 'vom Transceiver' },
-    { from: 'Richtkoppler OUT', to: 'BNC Output', notes: 'zur Antenne' },
+    { from: { de: 'BNC Input', en: 'BNC Input', sl: 'BNC vhod' }, to: { de: 'Richtkoppler IN', en: 'Directional coupler IN', sl: 'Smerni sklopnik IN' }, notes: { de: 'vom Transceiver', en: 'from transceiver', sl: 'iz oddajnika' } },
+    { from: { de: 'Richtkoppler OUT', en: 'Directional coupler OUT', sl: 'Smerni sklopnik OUT' }, to: { de: 'BNC Output', en: 'BNC Output', sl: 'BNC izhod' }, notes: { de: 'zur Antenne', en: 'to antenna', sl: 'do antene' } },
   ],
 
   customizationSuggestions: [
-    'Peak-Hold Funktion für maximalen SWR',
-    'Akustische Warnung bei hohem SWR',
-    'Kalibrierung über Tasten im Menü',
-    'Frequenzanzeige mit Frequenzzähler kombinieren',
-    'Logging auf SD-Karte',
+    { de: 'Peak-Hold Funktion für maximalen SWR', en: 'Peak-hold function for maximum SWR', sl: 'Peak-hold funkcija za maksimalni SWR' },
+    { de: 'Akustische Warnung bei hohem SWR', en: 'Audible warning for high SWR', sl: 'Zvočno opozorilo pri visokem SWR' },
+    { de: 'Kalibrierung über Tasten im Menü', en: 'Calibration via buttons in menu', sl: 'Kalibracija preko tipk v meniju' },
+    { de: 'Frequenzanzeige mit Frequenzzähler kombinieren', en: 'Combine frequency display with frequency counter', sl: 'Kombinacija prikaza frekvence s frekvenčnim števcem' },
+    { de: 'Logging auf SD-Karte', en: 'Logging to SD card', sl: 'Beleženje na SD kartico' },
   ],
 
   externalLinks: [
-    { title: 'Richtkoppler Theorie', url: 'https://www.qrp-labs.com/coupler.html' },
+    { title: { de: 'Richtkoppler Theorie', en: 'Directional Coupler Theory', sl: 'Teorija smernega sklopnika' }, url: 'https://www.qrp-labs.com/coupler.html' },
   ],
 };
