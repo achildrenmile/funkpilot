@@ -176,6 +176,48 @@ export async function getSolarData(): Promise<{
   return response.json();
 }
 
+// VHF ES Alert types
+export interface VhfSpot {
+  senderCallsign: string;
+  receiverCallsign: string;
+  frequency: number;
+  band: string;
+  senderLocator: string;
+  receiverLocator: string;
+  distance: number;
+  snr: number;
+  mode: string;
+  timestamp: string;
+}
+
+export interface EsAlert {
+  band: string;
+  frequency: number;
+  active: boolean;
+  spotCount: number;
+  maxDistance: number;
+  avgDistance: number;
+  lastSpot: string | null;
+  recentSpots: VhfSpot[];
+  regions: string[];
+}
+
+export interface EsAlertsResponse {
+  timestamp: string;
+  alerts: EsAlert[];
+  totalSpots: number;
+  dataAge: number | null;
+}
+
+// Fetch VHF Sporadic-E alerts
+export async function getEsAlerts(): Promise<EsAlertsResponse> {
+  const response = await fetch(`${API_BASE}/api/vhf/es-alerts`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ES alerts: ${response.status}`);
+  }
+  return response.json();
+}
+
 // Streaming chat API using Server-Sent Events
 export async function* sendChatStream(
   messages: Array<{ role: string; content: string }>,

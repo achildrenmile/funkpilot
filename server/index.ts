@@ -1780,6 +1780,300 @@ Beispiele für Anfragen:
   }
 });
 
+// ========== VHF Sporadic-E Alert Service ==========
+
+interface VhfSpot {
+  senderCallsign: string;
+  receiverCallsign: string;
+  frequency: number;
+  band: string;
+  senderLocator: string;
+  receiverLocator: string;
+  distance: number;
+  snr: number;
+  mode: string;
+  timestamp: Date;
+}
+
+interface EsAlert {
+  band: string;
+  frequency: number;
+  active: boolean;
+  spotCount: number;
+  maxDistance: number;
+  avgDistance: number;
+  lastSpot: Date | null;
+  recentSpots: VhfSpot[];
+  regions: string[]; // Active regions (e.g., "Central EU", "Southern EU")
+}
+
+// Cache for VHF spots
+let vhfSpotsCache: VhfSpot[] = [];
+let vhfSpotsCacheTime: number = 0;
+const VHF_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+// Fetch VHF spots from PSKReporter
+async function fetchVhfSpots(): Promise<VhfSpot[]> {
+  const now = Date.now();
+
+  // Return cached data if fresh
+  if (vhfSpotsCache.length > 0 && (now - vhfSpotsCacheTime) < VHF_CACHE_TTL) {
+    return vhfSpotsCache;
+  }
+
+  try {
+    // PSKReporter API - fetch last 15 minutes of VHF spots
+    // Filter for 50, 70, and 144 MHz bands
+    const bands = [
+      { name: '6m', min: 50000000, max: 54000000 },
+      { name: '4m', min: 70000000, max: 70500000 },
+      { name: '2m', min: 144000000, max: 148000000 },
+    ];
+
+    const spots: VhfSpot[] = [];
+
+    // Fetch spots for each band
+    for (const band of bands) {
+      try {
+        // PSKReporter API query for specific frequency range
+        const url = `https://retrieve.pskreporter.info/query?flowStartSeconds=-900&frange=${band.min}-${band.max}&rronly=1&noactive=1&callback=`;
+
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.log(`PSKReporter ${band.name}: HTTP ${response.status}`);
+          continue;
+        }
+
+        const text = await response.text();
+
+        // PSKReporter returns JSONP or XML depending on endpoint
+        // Try to parse as JSON first
+        let data;
+        try {
+          // Remove JSONP callback if present
+          const jsonText = text.replace(/^[^({]*/, '').replace(/[^})\]]*$/, '');
+          data = JSON.parse(jsonText);
+        } catch {
+          // If JSON fails, try XML parsing
+          const receptionReports = text.match(/<receptionReport[^>]*>/g) || [];
+
+          for (const report of receptionReports.slice(0, 50)) { // Limit to 50 per band
+            const getValue = (attr: string): string | null => {
+              const match = report.match(new RegExp(`${attr}="([^"]+)"`));
+              return match ? match[1] : null;
+            };
+
+            const freq = parseInt(getValue('frequency') || '0', 10);
+            const senderLoc = getValue('senderLocator') || '';
+            const receiverLoc = getValue('receiverLocator') || '';
+
+            // Only include spots with valid locators and distance > 500km (likely ES)
+            if (senderLoc && receiverLoc && senderLoc.length >= 4 && receiverLoc.length >= 4) {
+              const distance = calculateGridDistance(senderLoc, receiverLoc);
+
+              // ES typically > 500km for 6m, > 800km for 4m, > 1000km for 2m
+              const minDistance = band.name === '2m' ? 800 : band.name === '4m' ? 600 : 400;
+
+              if (distance >= minDistance) {
+                spots.push({
+                  senderCallsign: getValue('senderCallsign') || 'Unknown',
+                  receiverCallsign: getValue('receiverCallsign') || 'Unknown',
+                  frequency: freq,
+                  band: band.name,
+                  senderLocator: senderLoc,
+                  receiverLocator: receiverLoc,
+                  distance: Math.round(distance),
+                  snr: parseInt(getValue('sNR') || '0', 10),
+                  mode: getValue('mode') || 'FT8',
+                  timestamp: new Date(parseInt(getValue('flowStartSeconds') || '0', 10) * 1000 || Date.now()),
+                });
+              }
+            }
+          }
+          continue;
+        }
+
+        // Process JSON response
+        if (data && data.receptionReport) {
+          for (const report of data.receptionReport.slice(0, 50)) {
+            const senderLoc = report.senderLocator || '';
+            const receiverLoc = report.receiverLocator || '';
+
+            if (senderLoc && receiverLoc && senderLoc.length >= 4 && receiverLoc.length >= 4) {
+              const distance = calculateGridDistance(senderLoc, receiverLoc);
+              const minDistance = band.name === '2m' ? 800 : band.name === '4m' ? 600 : 400;
+
+              if (distance >= minDistance) {
+                spots.push({
+                  senderCallsign: report.senderCallsign || 'Unknown',
+                  receiverCallsign: report.receiverCallsign || 'Unknown',
+                  frequency: report.frequency,
+                  band: band.name,
+                  senderLocator: senderLoc,
+                  receiverLocator: receiverLoc,
+                  distance: Math.round(distance),
+                  snr: report.sNR || 0,
+                  mode: report.mode || 'FT8',
+                  timestamp: new Date(report.flowStartSeconds * 1000 || Date.now()),
+                });
+              }
+            }
+          }
+        }
+      } catch (bandError) {
+        console.error(`Error fetching ${band.name} spots:`, bandError);
+      }
+    }
+
+    // Sort by timestamp (newest first)
+    spots.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+    vhfSpotsCache = spots;
+    vhfSpotsCacheTime = now;
+
+    console.log(`VHF ES: Fetched ${spots.length} potential ES spots`);
+    return spots;
+  } catch (error) {
+    console.error('Error fetching VHF spots:', error);
+    return vhfSpotsCache; // Return cached data on error
+  }
+}
+
+// Calculate distance between two Maidenhead locators
+function calculateGridDistance(loc1: string, loc2: string): number {
+  const toLatLng = (locator: string): { lat: number; lng: number } | null => {
+    if (locator.length < 4) return null;
+
+    const loc = locator.toUpperCase();
+    // Field (18x18)
+    const lng1 = (loc.charCodeAt(0) - 65) * 20 - 180;
+    const lat1 = (loc.charCodeAt(1) - 65) * 10 - 90;
+    // Square (10x10)
+    const lng2 = parseInt(loc[2], 10) * 2;
+    const lat2 = parseInt(loc[3], 10) * 1;
+    // Subsquare (24x24) - optional
+    let lng3 = 1, lat3 = 0.5;
+    if (locator.length >= 6) {
+      lng3 = ((loc.charCodeAt(4) - 65) / 24) * 2 + 1/24;
+      lat3 = ((loc.charCodeAt(5) - 65) / 24) * 1 + 1/48;
+    }
+
+    return {
+      lat: lat1 + lat2 + lat3,
+      lng: lng1 + lng2 + lng3,
+    };
+  };
+
+  const pos1 = toLatLng(loc1);
+  const pos2 = toLatLng(loc2);
+
+  if (!pos1 || !pos2) return 0;
+
+  // Haversine formula
+  const R = 6371; // Earth's radius in km
+  const dLat = (pos2.lat - pos1.lat) * Math.PI / 180;
+  const dLng = (pos2.lng - pos1.lng) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(pos1.lat * Math.PI / 180) * Math.cos(pos2.lat * Math.PI / 180) *
+            Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Get region from locator
+function getRegionFromLocator(locator: string): string {
+  if (locator.length < 2) return 'Unknown';
+
+  const field = locator.substring(0, 2).toUpperCase();
+
+  // European regions
+  const regions: Record<string, string> = {
+    'JN': 'Central EU',
+    'JO': 'Northern EU',
+    'JM': 'Western EU',
+    'KN': 'Eastern EU',
+    'KO': 'NE Europe',
+    'IN': 'Southern EU',
+    'IO': 'UK/Ireland',
+    'IM': 'SW Europe',
+    'KM': 'SE Europe',
+    'LN': 'Far East EU',
+  };
+
+  return regions[field] || field;
+}
+
+// VHF ES Alert API endpoint
+app.get('/api/vhf/es-alerts', async (_req, res) => {
+  try {
+    const spots = await fetchVhfSpots();
+    const now = Date.now();
+    const fifteenMinutesAgo = now - 15 * 60 * 1000;
+
+    // Build alerts for each band
+    const alerts: Record<string, EsAlert> = {
+      '6m': { band: '6m', frequency: 50, active: false, spotCount: 0, maxDistance: 0, avgDistance: 0, lastSpot: null, recentSpots: [], regions: [] },
+      '4m': { band: '4m', frequency: 70, active: false, spotCount: 0, maxDistance: 0, avgDistance: 0, lastSpot: null, recentSpots: [], regions: [] },
+      '2m': { band: '2m', frequency: 144, active: false, spotCount: 0, maxDistance: 0, avgDistance: 0, lastSpot: null, recentSpots: [], regions: [] },
+    };
+
+    // Process spots
+    for (const spot of spots) {
+      const alert = alerts[spot.band];
+      if (!alert) continue;
+
+      // Only count recent spots (last 15 minutes)
+      if (spot.timestamp.getTime() >= fifteenMinutesAgo) {
+        alert.spotCount++;
+        alert.recentSpots.push(spot);
+
+        if (spot.distance > alert.maxDistance) {
+          alert.maxDistance = spot.distance;
+        }
+
+        if (!alert.lastSpot || spot.timestamp > alert.lastSpot) {
+          alert.lastSpot = spot.timestamp;
+        }
+
+        // Collect unique regions
+        const senderRegion = getRegionFromLocator(spot.senderLocator);
+        const receiverRegion = getRegionFromLocator(spot.receiverLocator);
+        if (!alert.regions.includes(senderRegion)) alert.regions.push(senderRegion);
+        if (!alert.regions.includes(receiverRegion)) alert.regions.push(receiverRegion);
+      }
+    }
+
+    // Calculate averages and set active status
+    for (const band of Object.keys(alerts)) {
+      const alert = alerts[band];
+      if (alert.spotCount > 0) {
+        alert.avgDistance = Math.round(
+          alert.recentSpots.reduce((sum, s) => sum + s.distance, 0) / alert.spotCount
+        );
+        // Consider active if at least 2 spots in last 15 minutes
+        alert.active = alert.spotCount >= 2;
+      }
+      // Limit recentSpots to 10 for response size
+      alert.recentSpots = alert.recentSpots.slice(0, 10);
+    }
+
+    res.json({
+      timestamp: new Date().toISOString(),
+      alerts: Object.values(alerts),
+      totalSpots: spots.length,
+      dataAge: vhfSpotsCacheTime ? Math.round((now - vhfSpotsCacheTime) / 1000) : null,
+    });
+  } catch (error) {
+    console.error('ES Alert error:', error);
+    res.status(500).json({ error: 'Fehler beim Abrufen der ES-Alerts' });
+  }
+});
+
 // SPA fallback
 app.get('*', (_req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));

@@ -10,6 +10,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.17.0',
+    date: '2026-02-02',
+    title: 'Real-Time ES Alerts',
+    changes: [
+      { type: 'feature', text: 'Live Sporadic-E detection from PSKReporter data' },
+      { type: 'feature', text: 'Real-time alerts for 6m, 4m, and 2m bands' },
+      { type: 'feature', text: 'Distance-based ES detection (>400km 6m, >600km 4m, >800km 2m)' },
+      { type: 'improvement', text: 'Auto-refresh every 2 minutes for latest ES activity' },
+      { type: 'improvement', text: 'Shows max/avg distance and active regions' },
+    ],
+  },
+  {
     version: '1.16.0',
     date: '2026-02-02',
     title: 'VHF Propagation (2m & 4m)',

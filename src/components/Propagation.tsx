@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, RefreshCw, Loader2, AlertCircle, Minus, MapPin } from 'lucide-react';
+import { Globe, RefreshCw, Loader2, AlertCircle, Minus, MapPin, Radio, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getSolarData, getConditionQuality } from '../services/solar';
 import { getPropagationAdvice } from '../services/claude';
-import { checkHealth } from '../services/api';
+import { checkHealth, getEsAlerts } from '../services/api';
+import type { EsAlert, VhfSpot } from '../services/api';
 import { PROPAGATION_TARGETS } from '../data/phrases';
 import { locatorToLatLng, getSolarPosition } from '../utils/locator';
 import type { UserSettings, SolarData } from '../types';
@@ -25,6 +26,12 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
 
+  // ES Alert state
+  const [esAlerts, setEsAlerts] = useState<EsAlert[]>([]);
+  const [esLoading, setEsLoading] = useState(false);
+  const [esError, setEsError] = useState<string | null>(null);
+  const [lastEsUpdate, setLastEsUpdate] = useState<Date | null>(null);
+
   // Check API availability on mount
   useEffect(() => {
     checkHealth()
@@ -34,6 +41,29 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
       .catch(() => {
         setApiAvailable(false);
       });
+  }, []);
+
+  // Fetch ES alerts
+  const fetchEsAlerts = async () => {
+    setEsLoading(true);
+    setEsError(null);
+    try {
+      const data = await getEsAlerts();
+      setEsAlerts(data.alerts);
+      setLastEsUpdate(new Date(data.timestamp));
+    } catch (err) {
+      console.error('ES Alert fetch error:', err);
+      setEsError(err instanceof Error ? err.message : 'Failed to fetch ES alerts');
+    } finally {
+      setEsLoading(false);
+    }
+  };
+
+  // Fetch ES alerts on mount and every 2 minutes
+  useEffect(() => {
+    fetchEsAlerts();
+    const interval = setInterval(fetchEsAlerts, 2 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const quality = solarData ? getConditionQuality(solarData) : null;
@@ -576,22 +606,86 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
               </div>
             </div>
 
+            {/* VHF ES Alert Banner */}
+            {esAlerts.some(a => a.active) && (
+              <div className="mb-4 bg-gradient-to-r from-green-900/40 to-emerald-900/40 border border-green-500/50 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Zap className="w-5 h-5 text-green-400 animate-pulse" />
+                  <h4 className="font-bold text-green-400">{t('propagation.esAlertTitle')}</h4>
+                  <span className="text-xs text-slate-400 ml-auto">
+                    {lastEsUpdate && `${t('propagation.updated')}: ${lastEsUpdate.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}`}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {esAlerts.filter(a => a.active).map(alert => (
+                    <div key={alert.band} className="bg-slate-800/50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-lg text-green-400">{alert.band}</span>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                          {alert.spotCount} {t('propagation.spots')}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-400 space-y-1">
+                        <p>{t('propagation.maxDistance')}: <span className="text-white">{alert.maxDistance} km</span></p>
+                        <p>{t('propagation.avgDistance')}: <span className="text-white">{alert.avgDistance} km</span></p>
+                        <p>{t('propagation.regions')}: <span className="text-white">{alert.regions.slice(0, 3).join(', ')}</span></p>
+                      </div>
+                      {alert.recentSpots.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-slate-700">
+                          <p className="text-xs text-slate-500 mb-1">{t('propagation.recentSpots')}:</p>
+                          {alert.recentSpots.slice(0, 2).map((spot: VhfSpot, idx: number) => (
+                            <p key={idx} className="text-xs text-slate-400 truncate">
+                              {spot.senderCallsign} → {spot.receiverCallsign} ({spot.distance} km)
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ES Alert Loading/Error */}
+            {esLoading && !esAlerts.length && (
+              <div className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t('propagation.loadingEsAlerts')}
+              </div>
+            )}
+
             {/* VHF Bands (2m, 4m, 6m) */}
-            <p className="text-sm text-slate-400 mb-2">{t('propagation.vhfBands')} ({t('propagation.vhfEuropeNote')})</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-slate-400">{t('propagation.vhfBands')} ({t('propagation.vhfEuropeNote')})</p>
+              <button
+                onClick={fetchEsAlerts}
+                disabled={esLoading}
+                className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1"
+                title={t('propagation.refreshEsAlerts')}
+              >
+                <Radio className={`w-3 h-3 ${esLoading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{t('propagation.liveEs')}</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               {allBands.filter(b => b.category === 'vhf').map((bandInfo) => {
                 const result = bandInfo.getStatus();
+                // Check if there's an active ES alert for this band
+                const esAlert = esAlerts.find(a => a.band === bandInfo.band && a.active);
+                const hasLiveEs = !!esAlert;
+
                 return (
                   <div
                     key={bandInfo.band}
-                    className={`rounded-lg p-3 border flex items-center justify-between ${getColorClasses(result.color, result.open)}`}
+                    className={`rounded-lg p-3 border flex items-center justify-between ${hasLiveEs ? 'bg-green-500/20 border-green-500/50' : getColorClasses(result.color, result.open)}`}
                   >
                     <div className="flex items-center gap-3">
                       <p className="font-bold text-lg">{bandInfo.band}</p>
                       <p className="text-sm text-slate-400">{bandInfo.label}</p>
+                      {hasLiveEs && <Zap className="w-4 h-4 text-green-400" />}
                     </div>
-                    <p className={`text-sm font-medium ${getTextColor(result.color)}`}>
-                      {result.status}
+                    <p className={`text-sm font-medium ${hasLiveEs ? 'text-green-400' : getTextColor(result.color)}`}>
+                      {hasLiveEs ? `ES! ${esAlert.spotCount} QSOs` : result.status}
                     </p>
                   </div>
                 );

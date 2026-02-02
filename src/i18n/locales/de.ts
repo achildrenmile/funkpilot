@@ -221,6 +221,19 @@ export default {
     // VHF section
     vhfBands: 'VHF-Bänder',
     vhfEuropeNote: 'ES/Tropo/MS, EU-Fokus',
+    // ES Alerts
+    esAlertTitle: 'Sporadic-E Aktivität erkannt!',
+    loadingEsAlerts: 'Lade ES-Alerts...',
+    refreshEsAlerts: 'ES-Alerts aktualisieren',
+    liveEs: 'Live ES',
+    maxDistance: 'Max. Distanz',
+    avgDistance: 'Ø Distanz',
+    regions: 'Regionen',
+    recentSpots: 'Letzte Spots',
+    spots: 'Spots',
+    updated: 'Aktualisiert',
+    noEsActivity: 'Keine ES-Aktivität erkannt',
+    esDataSource: 'Daten: PSKReporter (live)',
     // Band statuses
     statusOpen: 'Offen',
     statusClosed: 'Zu',
