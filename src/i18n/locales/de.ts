@@ -230,7 +230,7 @@ export default {
     avgDistance: 'Ø Distanz',
     regions: 'Regionen',
     recentSpots: 'Letzte Spots',
-    spots: 'Spots',
+    esSpots: 'Spots',
     updated: 'Aktualisiert',
     noEsActivity: 'Keine ES-Aktivität erkannt',
     esDataSource: 'Daten: PSKReporter (live)',

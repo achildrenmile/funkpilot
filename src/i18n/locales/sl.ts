@@ -227,7 +227,7 @@ export default {
     avgDistance: 'Povp. razdalja',
     regions: 'Regije',
     recentSpots: 'Zadnji spoti',
-    spots: 'spotov',
+    esSpots: 'spotov',
     updated: 'Posodobljeno',
     noEsActivity: 'Ni zaznane ES aktivnosti',
     esDataSource: 'Podatki: PSKReporter (v živo)',

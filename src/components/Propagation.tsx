@@ -29,7 +29,7 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
   // ES Alert state
   const [esAlerts, setEsAlerts] = useState<EsAlert[]>([]);
   const [esLoading, setEsLoading] = useState(false);
-  const [esError, setEsError] = useState<string | null>(null);
+  const [_esError, setEsError] = useState<string | null>(null);
   const [lastEsUpdate, setLastEsUpdate] = useState<Date | null>(null);
 
   // Check API availability on mount

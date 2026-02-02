@@ -227,7 +227,7 @@ export default {
     avgDistance: 'Avg distance',
     regions: 'Regions',
     recentSpots: 'Recent spots',
-    spots: 'spots',
+    esSpots: 'spots',
     updated: 'Updated',
     noEsActivity: 'No ES activity detected',
     esDataSource: 'Data: PSKReporter (live)',
