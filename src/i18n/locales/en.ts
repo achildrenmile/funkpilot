@@ -217,6 +217,10 @@ export default {
     legendDisturbed: 'Disturbed',
     legendClosed: 'Closed',
     legendNote: 'K! = high K-index, LP = Long Path, ES = Sporadic-E, D-Abs = D-Layer Absorption, QRN = Atmospheric Noise',
+    legendNoteVhf: 'Tropo = Tropospheric propagation, MS = Meteor Scatter (VHF: mainly EU range)',
+    // VHF section
+    vhfBands: 'VHF Bands',
+    vhfEuropeNote: 'ES/Tropo/MS, EU focus',
     // Band statuses
     statusOpen: 'Open',
     statusClosed: 'Closed',
@@ -228,6 +232,7 @@ export default {
     statusTwilight: 'Twilight',
     statusEsLikely: 'ES likely',
     statusEsPossible: 'ES possible',
+    statusEsRare: 'ES rare',
     statusLocal: 'Local',
     statusF2Open: 'F2 open',
     statusLpPossible: 'LP poss.',
@@ -236,6 +241,9 @@ export default {
     statusDayQrn: 'Day/QRN',
     statusDayDAbs: 'Day/D-Abs',
     statusDifficult: 'Difficult',
+    statusTropo: 'Tropo',
+    statusTropoEu: 'Tropo EU',
+    statusMs: 'MS poss.',
   },
 
   // Callsign Finder

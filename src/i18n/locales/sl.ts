@@ -217,6 +217,10 @@ export default {
     legendDisturbed: 'Moteno',
     legendClosed: 'Zaprto',
     legendNote: 'K! = visok K-indeks, LP = dolga pot, ES = sporadični E, D-Abs = absorpcija D-plasti, QRN = atmosferski šum',
+    legendNoteVhf: 'Tropo = troposfersko širjenje, MS = meteorski odboj (VHF: predvsem EU doseg)',
+    // VHF section
+    vhfBands: 'VHF pasovi',
+    vhfEuropeNote: 'ES/Tropo/MS, EU fokus',
     // Band statuses
     statusOpen: 'Odprto',
     statusClosed: 'Zaprto',
@@ -228,6 +232,7 @@ export default {
     statusTwilight: 'Somrak',
     statusEsLikely: 'ES verjetno',
     statusEsPossible: 'ES možno',
+    statusEsRare: 'ES redko',
     statusLocal: 'Lokalno',
     statusF2Open: 'F2 odprto',
     statusLpPossible: 'LP možno',
@@ -236,6 +241,9 @@ export default {
     statusDayQrn: 'Dan/QRN',
     statusDayDAbs: 'Dan/D-Abs',
     statusDifficult: 'Težko',
+    statusTropo: 'Tropo',
+    statusTropoEu: 'Tropo EU',
+    statusMs: 'MS možno',
   },
 
   // Callsign Finder

@@ -373,16 +373,49 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
 
         // Band definitions with real propagation characteristics
         const allBands = [
-          // VHF - Magic Band
+          // VHF Bands (2m, 4m, 6m) - European focus
+          { band: '2m', freq: 144, label: '144 MHz', category: 'vhf',
+            getStatus: () => {
+              // 2m: Primarily Tropo, Meteor Scatter, rare Sporadic-E (mainly summer, EU range)
+              // ES on 2m is rare and mainly June/July, requires very strong ES clouds
+              const summerMonth = now.getMonth() >= 4 && now.getMonth() <= 7; // May-August
+              const esRare = solarData.sfi > 150 && solarData.kIndex <= 2 && summerMonth;
+              const tropoGood = solarData.kIndex <= 2; // Stable conditions favor tropo
+              const msActive = true; // Meteor scatter always possible with right equipment
+
+              if (esRare && isTwilight) return { status: t('propagation.statusEsRare'), color: 'green', open: true };
+              if (esRare) return { status: t('propagation.statusEsPossible'), color: 'yellow', open: false };
+              if (tropoGood && !isDay) return { status: t('propagation.statusTropoEu'), color: 'green', open: true };
+              if (tropoGood) return { status: t('propagation.statusTropo'), color: 'yellow', open: false };
+              if (msActive) return { status: t('propagation.statusMs'), color: 'slate', open: false };
+              return { status: t('propagation.statusLocal'), color: 'slate', open: false };
+            }
+          },
+          { band: '4m', freq: 70, label: '70 MHz', category: 'vhf',
+            getStatus: () => {
+              // 4m: Good ES band for EU, between 6m and 2m behavior
+              // ES more common than 2m, less than 6m. Summer season best.
+              const summerMonth = now.getMonth() >= 4 && now.getMonth() <= 7; // May-August
+              const esLikely = solarData.sfi > 100 && solarData.kIndex <= 3 && summerMonth;
+              const esPossible = solarData.sfi > 80 && summerMonth;
+              const tropoGood = solarData.kIndex <= 2;
+
+              if (esLikely) return { status: t('propagation.statusEsLikely'), color: 'green', open: true };
+              if (esPossible) return { status: t('propagation.statusEsPossible'), color: 'yellow', open: false };
+              if (tropoGood && isTwilight) return { status: t('propagation.statusTropoEu'), color: 'green', open: true };
+              if (tropoGood) return { status: t('propagation.statusTropo'), color: 'yellow', open: false };
+              return { status: t('propagation.statusLocal'), color: 'slate', open: false };
+            }
+          },
           { band: '6m', freq: 50, label: '50 MHz', category: 'vhf',
             getStatus: () => {
               const esLikely = solarData.sfi > 120 && solarData.kIndex <= 3;
               const esPossible = solarData.sfi > 90;
               const fOpen = solarData.sfi > 150;
-              if (fOpen) return { status: 'F2 offen', color: 'green', open: true };
-              if (esLikely) return { status: 'ES wahrsch.', color: 'green', open: true };
-              if (esPossible) return { status: 'ES möglich', color: 'yellow', open: false };
-              return { status: 'Lokal', color: 'slate', open: false };
+              if (fOpen) return { status: t('propagation.statusF2Open'), color: 'green', open: true };
+              if (esLikely) return { status: t('propagation.statusEsLikely'), color: 'green', open: true };
+              if (esPossible) return { status: t('propagation.statusEsPossible'), color: 'yellow', open: false };
+              return { status: t('propagation.statusLocal'), color: 'slate', open: false };
             }
           },
           // Upper HF - Day bands, SFI dependent
@@ -543,9 +576,9 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
               </div>
             </div>
 
-            {/* 6m Magic Band */}
-            <p className="text-sm text-slate-400 mb-2">{t('propagation.magicBand')}</p>
-            <div className="grid grid-cols-1 gap-2 mb-4">
+            {/* VHF Bands (2m, 4m, 6m) */}
+            <p className="text-sm text-slate-400 mb-2">{t('propagation.vhfBands')} ({t('propagation.vhfEuropeNote')})</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               {allBands.filter(b => b.category === 'vhf').map((bandInfo) => {
                 const result = bandInfo.getStatus();
                 return (
@@ -635,6 +668,9 @@ export default function Propagation({ settings, solarData, isLoading }: Propagat
               </div>
               <p className="text-xs text-slate-500 mt-2">
                 {t('propagation.legendNote')}
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                {t('propagation.legendNoteVhf')}
               </p>
             </div>
           </div>

@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.16.0',
+    date: '2026-02-02',
+    title: 'VHF Propagation (2m & 4m)',
+    changes: [
+      { type: 'feature', text: '2m (144 MHz) band with Tropo, ES, Meteor Scatter status' },
+      { type: 'feature', text: '4m (70 MHz) band with ES and Tropo indicators' },
+      { type: 'improvement', text: 'European focus: ES/Tropo/MS mainly for EU range' },
+      { type: 'improvement', text: 'Summer season detection for ES probability' },
+    ],
+  },
+  {
     version: '1.15.2',
     date: '2026-02-01',
     title: 'Cleaner URL Format',
