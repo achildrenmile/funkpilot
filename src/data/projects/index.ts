@@ -9,6 +9,12 @@ import { morseDecoder } from './morse-decoder';
 import { morseTrainer } from './morse-trainer';
 import { beaconKeyer } from './beacon-keyer';
 
+// MorseFleet compatible USB/Bluetooth adapters
+import { picoVbandDongle } from './pico-vband-dongle';
+import { arduinoUsbHidKeyer } from './arduino-usb-hid-keyer';
+import { esp32BluetoothKeyer } from './esp32-bluetooth-keyer';
+import { serialPaddleAdapter } from './serial-paddle-adapter';
+
 // Measurement projects
 import { frequencyCounter } from './frequency-counter';
 import { dummyLoad } from './dummy-load';
@@ -74,6 +80,12 @@ export const ALL_PROJECTS: HamProject[] = [
   morseTrainer,
   beaconKeyer,
 
+  // MorseFleet compatible USB/Bluetooth adapters
+  picoVbandDongle,
+  arduinoUsbHidKeyer,
+  esp32BluetoothKeyer,
+  serialPaddleAdapter,
+
   // Measurement
   swrMeter,
   frequencyCounter,
@@ -135,6 +147,11 @@ export {
   morseDecoder,
   morseTrainer,
   beaconKeyer,
+  // MorseFleet USB/Bluetooth adapters
+  picoVbandDongle,
+  arduinoUsbHidKeyer,
+  esp32BluetoothKeyer,
+  serialPaddleAdapter,
   // Measurement
   frequencyCounter,
   dummyLoad,

@@ -10,6 +10,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.18.0',
+    date: '2026-02-03',
+    title: 'DIY Morse USB/Bluetooth Adapter',
+    changes: [
+      { type: 'feature', text: '4 neue DIY-Projekte für MorseFleet-kompatible Paddle-Adapter' },
+      { type: 'feature', text: 'Pi Pico VBand Dongle: Günstiger USB-HID Adapter (~5€)' },
+      { type: 'feature', text: 'Arduino Pro Micro USB-HID: Mit komplettem Quellcode' },
+      { type: 'feature', text: 'ESP32 Bluetooth: Kabelloser Adapter für Tablets/Smartphones' },
+      { type: 'feature', text: 'Serial Adapter: Web Serial API für Chrome/Edge' },
+      { type: 'improvement', text: 'Vollständige Verdrahtungsdiagramme und Bauanleitungen' },
+    ],
+  },
+  {
     version: '1.17.0',
     date: '2026-02-02',
     title: 'Real-Time ES Alerts',
