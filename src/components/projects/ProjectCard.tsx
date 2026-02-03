@@ -1,7 +1,10 @@
-import { Cpu } from 'lucide-react';
+import { Cpu, Anchor } from 'lucide-react';
 import type { HamProject } from '../../types/projects';
 import { CATEGORY_INFO, HARDWARE_INFO, DIFFICULTY_LABELS, getLocalized } from '../../types/projects';
 import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
+
+// MorseFleet badge translations
+const MORSEFLEET_LABEL = { de: 'MorseFleet', en: 'MorseFleet', sl: 'MorseFleet' };
 
 interface ProjectCardProps {
   project: HamProject;
@@ -40,6 +43,14 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
           <Cpu className="w-3 h-3" />
           {hardware.name}
         </span>
+
+        {/* MorseFleet Badge */}
+        {project.morsefleet && (
+          <span className="bg-amber-600 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1" title="MorseFleet compatible">
+            <Anchor className="w-3 h-3" />
+            {getLocalized(MORSEFLEET_LABEL, lang)}
+          </span>
+        )}
 
         {/* Difficulty */}
         <span className="text-xs text-slate-500">

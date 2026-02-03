@@ -46,7 +46,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
         <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-80px)]">
           <div className="space-y-6 text-slate-300">
             <p>
-              FunkPilot ist dein KI-Assistent für den Amateurfunk. Hier findest du
+              FunkPilot ist dein KI-Assistent für alle Funk-Begeisterten — Amateurfunk, CB-Funk, PMR, SWL, SDR und mehr. Hier findest du
               eine Übersicht aller Funktionen.
             </p>
 

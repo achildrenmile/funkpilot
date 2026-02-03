@@ -10,6 +10,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.20.0',
+    date: '2026-02-03',
+    title: 'Für alle Funk-Enthusiasten',
+    changes: [
+      { type: 'feature', text: 'Inklusiver für alle Funk-Interessierten: Amateurfunk, CB-Funk, PMR, SWL, SDR' },
+      { type: 'feature', text: 'MorseFleet-Badge sichtbar auf Projektkarten' },
+      { type: 'feature', text: 'MorseFleet-Filter in der Projektübersicht' },
+      { type: 'improvement', text: 'Aktualisierte Beschreibungen in README, Help und Landing Page' },
+    ],
+  },
+  {
     version: '1.19.0',
     date: '2026-02-03',
     title: 'MorseFleet Kompatibilität',

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Wrench, Search } from 'lucide-react';
+import { Wrench, Search, Anchor } from 'lucide-react';
 import { ALL_PROJECTS, getProjectsByCategory, getProjectById } from '../../data/projects';
 import { CATEGORY_INFO, type ProjectCategory, getLocalized } from '../../types/projects';
 import { ProjectCard } from './ProjectCard';
@@ -7,7 +7,10 @@ import { ProjectDetail } from './ProjectDetail';
 import { useCurrentLanguage } from '../../hooks/useLocalizedProject';
 import type { HamProject } from '../../types/projects';
 
-type CategoryFilter = 'all' | ProjectCategory;
+type CategoryFilter = 'all' | 'morsefleet' | ProjectCategory;
+
+// Count MorseFleet projects
+const MORSEFLEET_COUNT = ALL_PROJECTS.filter(p => p.morsefleet).length;
 
 interface ProjectsTabProps {
   initialProjectId?: string;
@@ -37,6 +40,8 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
   // Filter projects
   let filteredProjects = selectedCategory === 'all'
     ? ALL_PROJECTS
+    : selectedCategory === 'morsefleet'
+    ? ALL_PROJECTS.filter(p => p.morsefleet)
     : getProjectsByCategory(selectedCategory);
 
   // Search filter (search in localized content)
@@ -64,7 +69,7 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
   // Translations
   const texts = {
     title: { de: 'Bastelprojekte', en: 'DIY Projects', sl: 'DIY projekti' },
-    subtitle: { de: 'Arduino & ESP32 Projekte für Funkamateure', en: 'Arduino & ESP32 projects for ham radio operators', sl: 'Arduino & ESP32 projekti za radioamaterje' },
+    subtitle: { de: 'Arduino & ESP32 Projekte für Funk-Enthusiasten', en: 'Arduino & ESP32 projects for radio enthusiasts', sl: 'Arduino & ESP32 projekti za radijske navdušence' },
     searchPlaceholder: { de: 'Projekt suchen...', en: 'Search projects...', sl: 'Išči projekte...' },
     all: { de: 'Alle', en: 'All', sl: 'Vse' },
     noResults: { de: 'Keine Projekte gefunden', en: 'No projects found', sl: 'Ni najdenih projektov' },
@@ -112,6 +117,21 @@ export default function ProjectsTab({ initialProjectId, onProjectChange }: Proje
             >
               {getLocalized(texts.all, lang)} ({ALL_PROJECTS.length})
             </button>
+            {/* MorseFleet Filter */}
+            {MORSEFLEET_COUNT > 0 && (
+              <button
+                onClick={() => setSelectedCategory('morsefleet')}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
+                  selectedCategory === 'morsefleet'
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                <Anchor className="w-3.5 h-3.5" />
+                <span>MorseFleet</span>
+                <span className="text-xs opacity-70">({MORSEFLEET_COUNT})</span>
+              </button>
+            )}
             {(Object.keys(CATEGORY_INFO) as ProjectCategory[]).map((cat) => {
               const count = getProjectsByCategory(cat).length;
               if (count === 0) return null;

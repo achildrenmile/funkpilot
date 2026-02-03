@@ -1,4 +1,4 @@
-# FunkPilot - AI Assistant for Amateur Radio
+# FunkPilot - AI Assistant for Radio Enthusiasts
 
 <p align="center">
   <img src="public/favicon.svg" alt="FunkPilot Logo" width="100" height="100">
@@ -8,7 +8,7 @@
   <strong>🇦🇹 Deutsch</strong> | <strong>🇬🇧 English</strong> | <strong>🇸🇮 Slovenščina</strong>
 </p>
 
-FunkPilot is a modern web assistant for amateur radio operators, combining AI capabilities with practical tools for ham radio operation.
+FunkPilot is a modern web assistant for radio enthusiasts — **amateur radio operators, CB radio users, PMR, SWL listeners, SDR hobbyists** and anyone interested in radio communication. Combining AI capabilities with practical tools for radio operation.
 
 ## Features
 
