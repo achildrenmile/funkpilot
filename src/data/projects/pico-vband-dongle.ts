@@ -9,6 +9,7 @@ export const picoVbandDongle: HamProject = {
   },
   category: 'cw-morse',
   difficulty: 1,
+  morsefleet: true,
   description: {
     de: 'Günstiger USB HID Adapter für Morse-Paddle. Wandelt Paddle-Eingaben in Tastatur-Signale um. Funktioniert mit VBand, Vail, MorseFleet und anderen CW-Übungswebseiten. 4 umschaltbare Modi!',
     en: 'Affordable USB HID adapter for Morse paddles. Converts paddle input to keyboard signals. Works with VBand, Vail, MorseFleet and other CW practice websites. 4 selectable modes!',

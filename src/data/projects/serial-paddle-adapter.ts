@@ -9,6 +9,7 @@ export const serialPaddleAdapter: HamProject = {
   },
   category: 'cw-morse',
   difficulty: 1,
+  morsefleet: true,
   description: {
     de: 'USB-Serial Adapter für Morse-Paddles. Nutzt Web Serial API für direkte Kommunikation mit Chrome/Edge. Drei Protokolle: Simple Binary, ASCII und Morserino. Ideal für MorseFleet Serial-Modus!',
     en: 'USB-Serial adapter for Morse paddles. Uses Web Serial API for direct communication with Chrome/Edge. Three protocols: Simple Binary, ASCII and Morserino. Ideal for MorseFleet Serial mode!',

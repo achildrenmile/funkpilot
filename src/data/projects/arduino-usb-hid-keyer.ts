@@ -9,6 +9,7 @@ export const arduinoUsbHidKeyer: HamProject = {
   },
   category: 'cw-morse',
   difficulty: 1,
+  morsefleet: true,
   description: {
     de: 'USB HID Adapter mit Arduino Pro Micro. Paddle-Eingaben werden als Strg-Tasten an den PC gesendet. Perfekt für MorseFleet, VBand und andere CW-Übungswebseiten. Einfacher DIY-Aufbau!',
     en: 'USB HID adapter using Arduino Pro Micro. Paddle inputs are sent as Ctrl keys to PC. Perfect for MorseFleet, VBand and other CW practice websites. Simple DIY build!',

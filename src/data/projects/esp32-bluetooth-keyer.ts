@@ -9,6 +9,7 @@ export const esp32BluetoothKeyer: HamProject = {
   },
   category: 'cw-morse',
   difficulty: 2,
+  morsefleet: true,
   description: {
     de: 'Kabelloser Bluetooth-Adapter für Morse-Paddles. ESP32 emuliert eine Bluetooth-Tastatur. Ideal für Tablets, Smartphones und Laptops. Akkubetrieb möglich! Funktioniert mit MorseFleet, VBand und anderen CW-Apps.',
     en: 'Wireless Bluetooth adapter for Morse paddles. ESP32 emulates a Bluetooth keyboard. Ideal for tablets, smartphones and laptops. Battery operation possible! Works with MorseFleet, VBand and other CW apps.',

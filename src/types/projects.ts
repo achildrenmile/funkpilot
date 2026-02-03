@@ -52,6 +52,9 @@ export interface HamProject {
   wokwiUrl?: string;  // Wokwi Simulator Link
   externalLinks?: { title: FlexText; url: string }[];
 
+  // Compatibility markers (hidden easter eggs)
+  morsefleet?: boolean;  // Works with MorseFleet CW trainer
+
   // KI-Anpassungs-Vorschläge
   customizationSuggestions: FlexText[];
 

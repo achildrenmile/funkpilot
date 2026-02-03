@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.19.0',
+    date: '2026-02-03',
+    title: 'MorseFleet Kompatibilität',
+    changes: [
+      { type: 'feature', text: 'MorseFleet-Marker für kompatible Projekte hinzugefügt' },
+      { type: 'improvement', text: 'Verstecktes Easter Egg: Projekte mit morsefleet: true sind MorseFleet-kompatibel' },
+      { type: 'improvement', text: '4 USB/Bluetooth Adapter-Projekte als MorseFleet-kompatibel markiert' },
+    ],
+  },
+  {
     version: '1.18.0',
     date: '2026-02-03',
     title: 'DIY Morse USB/Bluetooth Adapter',
