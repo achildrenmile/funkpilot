@@ -2,7 +2,7 @@ export default {
   // Common
   common: {
     appName: 'FunkPilot',
-    appTagline: 'KI-Assistent für Funkamateure',
+    appTagline: 'KI-Assistent für Funk-Enthusiasten',
     aiSystem: 'KI-System',
     aiSystemTitle: 'Dieses System verwendet Künstliche Intelligenz',
     loading: 'Lädt...',
@@ -333,7 +333,7 @@ export default {
   // Projects
   projects: {
     title: 'Bastelprojekte',
-    subtitle: 'Arduino & ESP32 Projekte für Funkamateure',
+    subtitle: 'Arduino & ESP32 Projekte für Funk-Enthusiasten',
     searchPlaceholder: 'Projekt suchen...',
     noProjects: 'Keine Projekte gefunden',
     tryOther: 'Versuche eine andere Suche oder Kategorie',
@@ -449,7 +449,7 @@ export default {
     saved: 'Gespeichert',
     // About
     aboutTitle: 'Über FunkPilot',
-    aboutText: 'FunkPilot ist ein Open-Source KI-Assistent für Funkamateure. Entwickelt mit Leidenschaft für die Amateurfunk-Community.',
+    aboutText: 'FunkPilot ist ein Open-Source KI-Assistent für Funk-Enthusiasten. Entwickelt mit Leidenschaft für alle Funk-Begeisterten.',
     version: 'Version',
   },
 

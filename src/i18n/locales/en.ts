@@ -2,7 +2,7 @@ export default {
   // Common
   common: {
     appName: 'FunkPilot',
-    appTagline: 'AI Assistant for Ham Radio Operators',
+    appTagline: 'AI Assistant for Radio Enthusiasts',
     aiSystem: 'AI System',
     aiSystemTitle: 'This system uses Artificial Intelligence',
     loading: 'Loading...',
@@ -333,7 +333,7 @@ export default {
   // Projects
   projects: {
     title: 'DIY Projects',
-    subtitle: 'Arduino & ESP32 projects for ham radio operators',
+    subtitle: 'Arduino & ESP32 projects for radio enthusiasts',
     searchPlaceholder: 'Search project...',
     noProjects: 'No projects found',
     tryOther: 'Try a different search or category',
@@ -449,7 +449,7 @@ export default {
     saved: 'Saved',
     // About
     aboutTitle: 'About FunkPilot',
-    aboutText: 'FunkPilot is an open-source AI assistant for ham radio operators. Developed with passion for the amateur radio community.',
+    aboutText: 'FunkPilot is an open-source AI assistant for radio enthusiasts. Developed with passion for all radio hobbyists.',
     version: 'Version',
   },
 

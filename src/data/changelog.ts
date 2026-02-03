@@ -10,6 +10,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.20.1',
+    date: '2026-02-03',
+    title: 'Tagline-Fix',
+    changes: [
+      { type: 'fix', text: 'Alle Taglines auf "Funk-Enthusiasten" aktualisiert' },
+    ],
+  },
+  {
     version: '1.20.0',
     date: '2026-02-03',
     title: 'Für alle Funk-Enthusiasten',

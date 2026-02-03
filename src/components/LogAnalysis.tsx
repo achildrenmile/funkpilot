@@ -126,7 +126,7 @@ ${analysis}
 
 ---
 
-*Generiert von FunkPilot - KI-Assistent für Funkamateure*
+*Generiert von FunkPilot - KI-Assistent für Funk-Enthusiasten*
 `;
 
     const blob = new Blob([report], { type: 'text/markdown' });

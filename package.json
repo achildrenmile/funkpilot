@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "KI-Assistent für Funkamateure - Voice CQ, Chat, Log-Analyse, Propagation",
+  "description": "KI-Assistent für Funk-Enthusiasten - Voice CQ, Chat, Log-Analyse, Propagation",
   "keywords": [
     "hamradio",
     "hamradio-application",

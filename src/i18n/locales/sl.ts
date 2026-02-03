@@ -2,7 +2,7 @@ export default {
   // Common
   common: {
     appName: 'FunkPilot',
-    appTagline: 'AI asistent za radioamaterje',
+    appTagline: 'KI-pomočnik za radijske navdušence',
     aiSystem: 'AI sistem',
     aiSystemTitle: 'Ta sistem uporablja umetno inteligenco',
     loading: 'Nalaganje...',
@@ -333,7 +333,7 @@ export default {
   // Projects
   projects: {
     title: 'DIY projekti',
-    subtitle: 'Arduino & ESP32 projekti za radioamaterje',
+    subtitle: 'Arduino & ESP32 projekti za radijske navdušence',
     searchPlaceholder: 'Išči projekt...',
     noProjects: 'Ni najdenih projektov',
     tryOther: 'Poskusite drugo iskanje ali kategorijo',
@@ -449,7 +449,7 @@ export default {
     saved: 'Shranjeno',
     // About
     aboutTitle: 'O FunkPilot',
-    aboutText: 'FunkPilot je odprtokodni AI asistent za radioamaterje. Razvit s strastjo za radioamatersko skupnost.',
+    aboutText: 'FunkPilot je odprtokodni KI-pomočnik za radijske navdušence. Razvit s strastjo za vse ljubitelje radia.',
     version: 'Različica',
   },
 
