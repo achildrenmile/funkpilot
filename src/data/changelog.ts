@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.20.2',
+    date: '2026-02-03',
+    title: 'Hilfe & Rechtliches mehrsprachig',
+    changes: [
+      { type: 'improvement', text: 'Hilfe-Modal jetzt in DE/EN/SL verfügbar' },
+      { type: 'improvement', text: 'Impressum jetzt in DE/EN/SL verfügbar' },
+      { type: 'improvement', text: 'Datenschutz & KI-Hinweis jetzt in DE/EN/SL verfügbar' },
+    ],
+  },
+  {
     version: '1.20.1',
     date: '2026-02-03',
     title: 'Tagline-Fix',

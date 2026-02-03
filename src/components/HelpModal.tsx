@@ -45,162 +45,138 @@ export function HelpModal({ onClose }: HelpModalProps) {
         {/* Content */}
         <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-80px)]">
           <div className="space-y-6 text-slate-300">
-            <p>
-              FunkPilot ist dein KI-Assistent für alle Funk-Begeisterten — Amateurfunk, CB-Funk, PMR, SWL, SDR und mehr. Hier findest du
-              eine Übersicht aller Funktionen.
-            </p>
+            <p>{t('help.intro')}</p>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <Mic className="w-5 h-5 text-sky-400" />
-                Voice CQ
+                {t('help.voiceCQTitle')}
               </h3>
-              <p className="mb-2">
-                Generiere natürlich klingende CQ-Rufe und Contest-Phrasen mit Text-to-Speech.
-              </p>
+              <p className="mb-2">{t('help.voiceCQDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li>Wähle eine Contest-Vorlage oder schreibe eigenen Text</li>
-                <li>Dein Rufzeichen wird automatisch in NATO-Phonetik umgewandelt</li>
-                <li>Klicke auf Play um die Ausgabe zu hören</li>
-                <li>Geschwindigkeit kann in Einstellungen angepasst werden</li>
+                <li>{t('help.voiceCQFeature1')}</li>
+                <li>{t('help.voiceCQFeature2')}</li>
+                <li>{t('help.voiceCQFeature3')}</li>
+                <li>{t('help.voiceCQFeature4')}</li>
               </ul>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-sky-400" />
-                QSO Chat
+                {t('help.qsoChatTitle')}
               </h3>
-              <p className="mb-2">
-                Stelle Fragen zu allen Amateurfunk-Themen an den KI-Assistenten.
-              </p>
+              <p className="mb-2">{t('help.qsoChatDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li>Technik: Antennen, Transceiver, SDR</li>
-                <li>Betriebsverfahren: CW, SSB, Digimodes</li>
-                <li>Vorschriften: Lizenzklassen, Bandpläne</li>
-                <li>Propagation: Ausbreitungsbedingungen</li>
+                <li>{t('help.qsoChatFeature1')}</li>
+                <li>{t('help.qsoChatFeature2')}</li>
+                <li>{t('help.qsoChatFeature3')}</li>
+                <li>{t('help.qsoChatFeature4')}</li>
               </ul>
               <div className="mt-3 p-2 bg-amber-900/30 border border-amber-700/50 rounded">
                 <h4 className="text-sm font-medium text-amber-200 flex items-center gap-1">
                   <Wrench className="w-4 h-4" />
-                  Ham Radio Tools (Groq MCP)
+                  {t('help.hamRadioTools')}
                 </h4>
                 <p className="text-xs text-slate-400 mt-1">
-                  Mit GROQ_API_KEY aktiviert: Bandplan-Abfragen, Wellenlängen-, EIRP-,
-                  Kabelverlust-, SWR- und Akkulaufzeit-Berechnungen direkt im Chat.
+                  {t('help.hamRadioToolsDesc')}
                 </p>
               </div>
               <div className="mt-3 p-2 bg-sky-900/30 border border-sky-700/50 rounded">
                 <h4 className="text-sm font-medium text-sky-200 flex items-center gap-1">
                   <Search className="w-4 h-4" />
-                  Web-Suche (Tavily)
+                  {t('help.webSearch')}
                 </h4>
                 <p className="text-xs text-slate-400 mt-1">
-                  Aktuelle Informationen zu Contests, Propagation und Amateurfunk-News.
-                  Frage z.B. "Welcher Contest ist aktuell?" oder "Was ist heute auf den Bändern los?"
+                  {t('help.webSearchDesc')}
                 </p>
               </div>
               <div className="mt-3 p-2 bg-purple-900/30 border border-purple-700/50 rounded">
                 <h4 className="text-sm font-medium text-purple-200">
-                  Transparente Verarbeitung
+                  {t('help.transparentProcessing')}
                 </h4>
                 <p className="text-xs text-slate-400 mt-1">
-                  Während der Verarbeitung siehst du live, was passiert:
+                  {t('help.transparentProcessingDesc')}
                 </p>
-                <ul className="text-xs text-slate-400 mt-1 space-y-0.5 ml-2">
-                  <li>🌐 Web-Suche nach aktuellen Infos</li>
-                  <li>📻 Rufzeichen-Lookup (OE-Liste, QRZ, HamQTH)</li>
-                  <li>🔍 Suffix-Verfügbarkeitsprüfung</li>
-                  <li>👤 Rufzeichen-Vorschläge generieren</li>
-                  <li>✨ KI generiert Antwort</li>
-                </ul>
               </div>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-sky-400" />
-                Log-Analyse
+                {t('help.logAnalysisTitle')}
               </h3>
-              <p className="mb-2">
-                Importiere dein Contest-Log (ADIF-Format) für detaillierte Statistiken.
-              </p>
+              <p className="mb-2">{t('help.logAnalysisDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li>ADIF-Datei per Drag & Drop importieren</li>
-                <li>QSO-Statistiken nach Band, Mode, Zeit</li>
-                <li>KI-Analyse mit Verbesserungsvorschlägen</li>
-                <li>Erkennung von Aktivitätslücken</li>
+                <li>{t('help.logAnalysisFeature1')}</li>
+                <li>{t('help.logAnalysisFeature2')}</li>
+                <li>{t('help.logAnalysisFeature3')}</li>
+                <li>{t('help.logAnalysisFeature4')}</li>
               </ul>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <Radio className="w-5 h-5 text-sky-400" />
-                Propagation
+                {t('help.propagationTitle')}
               </h3>
-              <p className="mb-2">
-                Echtzeit Solar-Daten und KI-Empfehlungen für DX-Verbindungen.
-              </p>
+              <p className="mb-2">{t('help.propagationDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li>Aktuelle Solardaten: SFI, K-Index, A-Index</li>
-                <li>Band-Öffnungen für alle Bänder (160m - 70cm)</li>
-                <li>Wähle ein Ziel für personalisierte Empfehlungen</li>
-                <li>Berücksichtigt deinen Standort (Locator)</li>
+                <li>{t('help.propagationFeature1')}</li>
+                <li>{t('help.propagationFeature2')}</li>
+                <li>{t('help.propagationFeature3')}</li>
+                <li>{t('help.propagationFeature4')}</li>
               </ul>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <Search className="w-5 h-5 text-sky-400" />
-                Rufzeichen-Finder
+                {t('help.callsignFinderTitle')}
               </h3>
-              <p className="mb-2">
-                Österreichische Rufzeichen suchen, Verfügbarkeit prüfen und Vorschläge generieren.
-              </p>
+              <p className="mb-2">{t('help.callsignFinderDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li><strong>Suche:</strong> Rufzeichen in offizieller OE-Liste und QRZ.com nachschlagen</li>
-                <li><strong>Schwarzfunker-Warnung:</strong> Erkennt Rufzeichen die nur in QRZ, aber nicht offiziell registriert sind</li>
-                <li><strong>Verfügbarkeit:</strong> Prüft Suffix in allen 9 Bundesländern (OE1-OE9)</li>
-                <li><strong>Vorschläge:</strong> Generiert passende Rufzeichen basierend auf deinem Namen</li>
-                <li><strong>Chat-Integration:</strong> Alle Features auch im Chat nutzbar ("Wer ist OE3NSC?", "Ist ABC frei?")</li>
+                <li>{t('help.callsignFinderFeature1')}</li>
+                <li>{t('help.callsignFinderFeature2')}</li>
+                <li>{t('help.callsignFinderFeature3')}</li>
+                <li>{t('help.callsignFinderFeature4')}</li>
+                <li>{t('help.callsignFinderFeature5')}</li>
               </ul>
             </section>
 
             <section className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2 flex items-center gap-2">
                 <Settings className="w-5 h-5 text-sky-400" />
-                Einstellungen
+                {t('help.settingsTitle')}
               </h3>
-              <p className="mb-2">
-                Konfiguriere FunkPilot für deine Station.
-              </p>
+              <p className="mb-2">{t('help.settingsDesc')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2 text-sm text-slate-400">
-                <li>Rufzeichen und Name für personalisierte Ausgabe</li>
-                <li>Locator (Maidenhead) für Propagation-Berechnung</li>
-                <li>TTS-Sprache und Geschwindigkeit</li>
-                <li>Theme: Dunkel oder Hell-Modus</li>
-                <li>Server-Status und API-Verbindung</li>
+                <li>{t('help.settingsFeature1')}</li>
+                <li>{t('help.settingsFeature2')}</li>
+                <li>{t('help.settingsFeature3')}</li>
+                <li>{t('help.settingsFeature4')}</li>
+                <li>{t('help.settingsFeature5')}</li>
               </ul>
             </section>
 
             <section className="border-t border-slate-700 pt-4">
               <h3 className="text-lg font-semibold text-slate-100 mb-2">
-                Tastenkürzel
+                {t('help.keyboardShortcuts')}
               </h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Hilfe anzeigen</span>
+                  <span className="text-slate-400">{t('help.showHelp')}</span>
                   <kbd className="bg-slate-700 px-2 py-0.5 rounded text-slate-300">?</kbd>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Modal schließen</span>
+                  <span className="text-slate-400">{t('help.closeModal')}</span>
                   <kbd className="bg-slate-700 px-2 py-0.5 rounded text-slate-300">Esc</kbd>
                 </div>
               </div>
             </section>
 
             <p className="text-sm text-slate-400 pt-2">
-              Bei Fragen oder Feedback: <a href="mailto:oe8yml@rednil.at" className="text-sky-400 hover:underline">oe8yml@rednil.at</a>
+              {t('help.feedbackContact')} <a href="mailto:oe8yml@rednil.at" className="text-sky-400 hover:underline">oe8yml@rednil.at</a>
             </p>
           </div>
         </div>
