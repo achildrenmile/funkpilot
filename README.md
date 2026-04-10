@@ -1,5 +1,10 @@
 # FunkPilot - AI Assistant for Radio Enthusiasts
 
+[![Featured on oeradio.at](https://img.shields.io/badge/Featured_on-oeradio.at-2563eb?style=flat-square)](https://oeradio.at/werkzeuge/) [![Live Demo](https://img.shields.io/badge/Live_Demo-funkpilot.oeradio.at-16a34a?style=flat-square)](https://funkpilot.oeradio.at) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+> 🎙️ **Part of the [oeradio.at](https://oeradio.at/werkzeuge/) open source ham radio tool collection.**
+> Browse all tools → [**oeradio.at/werkzeuge**](https://oeradio.at/werkzeuge/)
+
 <p align="center">
   <img src="public/favicon.svg" alt="FunkPilot Logo" width="100" height="100">
 </p>
